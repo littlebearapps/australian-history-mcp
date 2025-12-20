@@ -1,0 +1,51 @@
+{
+  "name": "@littlebearapps/australian-archives-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Australian historical archives - PROV Victoria and Trove NLA",
+  "main": "dist/index.js",
+  "bin": {
+    "australian-archives-mcp": "./dist/index.js"
+  },
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "trove",
+    "prov",
+    "australia",
+    "archives",
+    "historical",
+    "newspapers",
+    "genealogy"
+  ],
+  "author": "Little Bear Apps",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/littlebearapps/australian-archives-mcp"
+  },
+  "files": [
+    "dist/**/*",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
+    "eslint": "^8.56.0"
+  }
+}
