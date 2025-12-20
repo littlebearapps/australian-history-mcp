@@ -156,15 +156,101 @@ export interface TroveTitleDetail extends TroveNewspaperTitle {
 }
 
 // ============================================================================
+// data.gov.au (CKAN) Types
+// ============================================================================
+
+export interface DataGovAUSearchParams {
+  query?: string;
+  organization?: string;
+  groups?: string[];
+  tags?: string[];
+  format?: string;
+  limit?: number;
+  offset?: number;
+  sort?: string;
+}
+
+export interface DataGovAUResource {
+  id: string;
+  name: string;
+  description?: string;
+  format: string;
+  url: string;
+  size?: number;
+  lastModified?: string;
+  datastoreActive?: boolean;
+}
+
+export interface DataGovAUDataset {
+  id: string;
+  name: string;
+  title: string;
+  notes?: string;
+  organization?: {
+    name: string;
+    title: string;
+    description?: string;
+  };
+  resources: DataGovAUResource[];
+  tags: string[];
+  metadataCreated: string;
+  metadataModified: string;
+  licenseId?: string;
+  licenseTitle?: string;
+  author?: string;
+  maintainer?: string;
+  url?: string;
+}
+
+export interface DataGovAUSearchResult {
+  count: number;
+  datasets: DataGovAUDataset[];
+}
+
+export interface DataGovAUOrganization {
+  id: string;
+  name: string;
+  title: string;
+  description?: string;
+  packageCount: number;
+  imageUrl?: string;
+  created?: string;
+}
+
+export interface DataGovAUGroup {
+  id: string;
+  name: string;
+  title: string;
+  description?: string;
+  packageCount: number;
+  imageUrl?: string;
+}
+
+export interface DataGovAUDatastoreParams {
+  resourceId: string;
+  query?: string;
+  filters?: Record<string, string | string[]>;
+  limit?: number;
+  offset?: number;
+}
+
+export interface DataGovAUDatastoreResult {
+  resourceId: string;
+  fields: Array<{ id: string; type: string }>;
+  records: Record<string, unknown>[];
+  total: number;
+}
+
+// ============================================================================
 // Common Types
 // ============================================================================
 
 export interface HarvestResult {
-  source: 'trove' | 'prov';
+  source: 'trove' | 'prov' | 'datagovau';
   query: string;
   totalHarvested: number;
   totalAvailable: number;
-  records: (TroveArticle | TroveWork | PROVRecord)[];
+  records: (TroveArticle | TroveWork | PROVRecord | DataGovAUDataset)[];
   nextCursor?: string;
   hasMore: boolean;
 }

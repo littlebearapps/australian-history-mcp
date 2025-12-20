@@ -32,19 +32,20 @@ export class PROVClient {
 
     // Build Solr query
     if (params.query) {
+      // Text search requires text: field prefix
       queryParts.push(`text:${this.escapeQuery(params.query)}`);
     }
 
     if (params.series) {
       // Series are in format "VPRS 515" or just "515"
       const seriesNum = params.series.replace(/^VPRS\s*/i, '');
-      queryParts.push(`VPRS:${seriesNum}`);
+      queryParts.push(`series_id:${seriesNum}`);
     }
 
     if (params.agency) {
       // Agency numbers in format "VA 473" or just "473"
       const agencyNum = params.agency.replace(/^VA\s*/i, '');
-      queryParts.push(`VA:${agencyNum}`);
+      queryParts.push(`agencies.ids:VA${agencyNum}`);
     }
 
     if (params.recordForm) {
@@ -58,11 +59,13 @@ export class PROVClient {
       queryParts.push(`start_dt:[${start} TO ${end}]`);
     }
 
-    // Build filter queries
-    const fqParts: string[] = [];
+    // Filter for digitised records (include in main query, not fq)
     if (params.digitisedOnly) {
-      fqParts.push('iiif-manifest:*');
+      queryParts.push('iiif-manifest:[* TO *]');
     }
+
+    // Build filter queries (currently unused but kept for future use)
+    const fqParts: string[] = [];
 
     // Construct URL
     const q = queryParts.length > 0 ? queryParts.join(' AND ') : '*:*';
@@ -105,7 +108,7 @@ export class PROVClient {
     const seriesNum = seriesId.replace(/^VPRS\s*/i, '');
 
     const urlParams = new URLSearchParams({
-      q: `VPRS:${seriesNum} AND document_type:series`,
+      q: `series_id:${seriesNum} AND document_type:series`,
       wt: 'json',
       rows: '1',
     });

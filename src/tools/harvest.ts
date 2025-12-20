@@ -1,9 +1,10 @@
 /**
- * Harvest Tools - Bulk download records from PROV and Trove
+ * Harvest Tools - Bulk download records from PROV, Trove, and data.gov.au
  */
 
 import { provClient } from '../clients/prov_client.js';
 import { createTroveClient } from '../clients/trove_client.js';
+import { dataGovAUClient } from '../clients/datagovau_client.js';
 import type { MCPToolResponse, TroveCategory, TroveState } from '../types.js';
 
 // ============================================================================
@@ -38,8 +39,18 @@ Returns paginated results for large datasets.`,
       },
       recordForm: {
         type: 'string',
-        description: 'Type of record',
-        enum: ['photograph', 'map', 'file', 'volume', 'plan', 'drawing', 'register'],
+        description: 'Type of record (e.g., "Photograph or Image", "File", "Volume")',
+        enum: [
+          'Photograph or Image',
+          'Map, Plan, or Drawing',
+          'File',
+          'Volume',
+          'Document',
+          'Card',
+          'Object',
+          'Moving Image',
+          'Sound Recording',
+        ],
       },
       dateFrom: {
         type: 'string',
@@ -326,6 +337,135 @@ export async function executeTroveHarvest(input: {
               };
             }
           }),
+        }, null, 2),
+      }],
+    };
+  } catch (error) {
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          error: error instanceof Error ? error.message : 'Unknown error',
+        }),
+      }],
+      isError: true,
+    };
+  }
+}
+
+// ============================================================================
+// data.gov.au Harvest
+// ============================================================================
+
+export const dataGovAUHarvestSchema = {
+  name: 'datagovau_harvest',
+  description: `Bulk download dataset metadata from data.gov.au.
+
+Use this for batch harvesting of:
+- Dataset metadata from specific organisations
+- Datasets matching search criteria
+- Datasets with specific formats or tags
+
+Returns paginated results for large datasets.`,
+  inputSchema: {
+    type: 'object' as const,
+    properties: {
+      query: {
+        type: 'string',
+        description: 'Search keywords',
+      },
+      organization: {
+        type: 'string',
+        description: 'Filter by organisation slug',
+      },
+      format: {
+        type: 'string',
+        description: 'Filter by resource format (e.g., "CSV", "JSON")',
+      },
+      tags: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Filter by tags',
+      },
+      maxRecords: {
+        type: 'number',
+        description: 'Maximum datasets to harvest (1-1000)',
+        default: 100,
+      },
+      startFrom: {
+        type: 'number',
+        description: 'Offset for pagination',
+        default: 0,
+      },
+    },
+    required: [],
+  },
+};
+
+export async function executeDataGovAUHarvest(input: {
+  query?: string;
+  organization?: string;
+  format?: string;
+  tags?: string[];
+  maxRecords?: number;
+  startFrom?: number;
+}): Promise<MCPToolResponse> {
+  try {
+    const maxRecords = Math.min(input.maxRecords ?? 100, 1000);
+    const batchSize = 100;
+    let offset = input.startFrom ?? 0;
+    const allDatasets: any[] = [];
+    let totalAvailable = 0;
+
+    // Harvest in batches
+    while (allDatasets.length < maxRecords) {
+      const remaining = maxRecords - allDatasets.length;
+      const limit = Math.min(batchSize, remaining);
+
+      const result = await dataGovAUClient.search({
+        query: input.query,
+        organization: input.organization,
+        format: input.format,
+        tags: input.tags,
+        limit,
+        offset,
+        sort: 'metadata_modified desc',
+      });
+
+      totalAvailable = result.count;
+      allDatasets.push(...result.datasets);
+
+      // Stop if no more results
+      if (result.datasets.length < limit) {
+        break;
+      }
+
+      offset += limit;
+    }
+
+    const hasMore = allDatasets.length < totalAvailable;
+    const nextOffset = hasMore ? offset : undefined;
+
+    return {
+      content: [{
+        type: 'text',
+        text: JSON.stringify({
+          source: 'datagovau',
+          harvested: allDatasets.length,
+          totalAvailable,
+          hasMore,
+          nextOffset,
+          datasets: allDatasets.map((d: any) => ({
+            id: d.id,
+            name: d.name,
+            title: d.title,
+            organization: d.organization?.title,
+            resourceCount: d.resources?.length ?? 0,
+            formats: [...new Set((d.resources ?? []).map((r: any) => r.format))],
+            license: d.licenseTitle || d.licenseId,
+            modified: d.metadataModified,
+            url: `https://data.gov.au/dataset/${d.name}`,
+          })),
         }, null, 2),
       }],
     };

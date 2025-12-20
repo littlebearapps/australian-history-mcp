@@ -33,8 +33,18 @@ PROV holds records from Victorian state government agencies, local councils, and
       },
       recordForm: {
         type: 'string',
-        description: 'Type of record (e.g., "photograph", "map", "file", "volume")',
-        enum: ['photograph', 'map', 'file', 'volume', 'plan', 'drawing', 'register'],
+        description: 'Type of record (e.g., "Photograph or Image", "File", "Volume")',
+        enum: [
+          'Photograph or Image',
+          'Map, Plan, or Drawing',
+          'File',
+          'Volume',
+          'Document',
+          'Card',
+          'Object',
+          'Moving Image',
+          'Sound Recording',
+        ],
       },
       dateFrom: {
         type: 'string',

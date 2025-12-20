@@ -160,6 +160,125 @@ Bulk download Trove search results.
 
 ---
 
+## data.gov.au Tools (No API Key Required)
+
+### datagovau_search
+
+Search datasets on data.gov.au.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | No | - | Search keywords |
+| `organization` | string | No | - | Organisation slug (e.g., "abs", "bom") |
+| `format` | string | No | - | Resource format (e.g., "CSV", "JSON") |
+| `tags` | string[] | No | - | Filter by tags |
+| `sort` | string | No | `relevance` | `relevance`, `metadata_modified desc`, `title asc` |
+| `limit` | number | No | 20 | Maximum results (1-100) |
+| `offset` | number | No | 0 | Pagination offset |
+
+---
+
+### datagovau_get_dataset
+
+Get full dataset details including all resources.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `dataset` | string | **Yes** | - | Dataset ID or name slug |
+
+---
+
+### datagovau_get_resource
+
+Get individual resource details.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `resource` | string | **Yes** | - | Resource UUID |
+
+---
+
+### datagovau_datastore_search
+
+Query tabular data directly (if datastore enabled).
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `resource` | string | **Yes** | - | Resource UUID |
+| `query` | string | No | - | Full-text search |
+| `filters` | object | No | - | Field filters (e.g., `{"state": "VIC"}`) |
+| `fields` | string[] | No | - | Fields to return |
+| `sort` | string | No | - | Sort field |
+| `limit` | number | No | 100 | Maximum rows (1-1000) |
+| `offset` | number | No | 0 | Pagination offset |
+
+---
+
+### datagovau_list_organizations
+
+List publishing organisations.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `limit` | number | No | 50 | Maximum to return |
+
+---
+
+### datagovau_get_organization
+
+Get organisation details.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `organization` | string | **Yes** | - | Organisation ID or slug |
+| `includeDatasets` | boolean | No | false | Include dataset list |
+
+---
+
+### datagovau_list_groups
+
+List dataset groups/categories.
+
+No parameters required.
+
+---
+
+### datagovau_get_group
+
+Get group details.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `group` | string | **Yes** | - | Group ID or slug |
+| `includeDatasets` | boolean | No | false | Include dataset list |
+
+---
+
+### datagovau_list_tags
+
+List popular tags.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | No | - | Filter tags by prefix |
+
+---
+
+### datagovau_harvest
+
+Bulk download dataset metadata.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | No | - | Search keywords |
+| `organization` | string | No | - | Organisation slug |
+| `format` | string | No | - | Resource format filter |
+| `tags` | string[] | No | - | Filter by tags |
+| `maxRecords` | number | No | 100 | Maximum datasets (1-1000) |
+| `startFrom` | number | No | 0 | Pagination offset |
+
+---
+
 ## Error Responses
 
 All tools return errors in this format:

@@ -27,6 +27,11 @@ Public Record Office Victoria API details and tips.
 - **Photographs** - Official photographs, building records
 - **Maps and plans** - Government surveys, building plans
 
+**Sample counts (Melbourne query, Dec 2025):**
+- 5,200+ digitised photographs
+- 900+ digitised maps/plans
+- 10,000+ government/council files
+
 ---
 
 ## Key Identifiers
@@ -53,13 +58,15 @@ Victorian Agency - the government body that created records.
 
 | Form | Description |
 |------|-------------|
-| `photograph` | Photographic prints, negatives |
-| `map` | Maps, charts |
-| `plan` | Building plans, engineering drawings |
-| `drawing` | Architectural drawings, sketches |
-| `file` | Paper files, correspondence |
-| `volume` | Bound volumes, registers |
-| `register` | Official registers, indexes |
+| `Photograph or Image` | Photographic prints, negatives, images |
+| `Map, Plan, or Drawing` | Maps, plans, architectural drawings |
+| `File` | Paper files, correspondence |
+| `Volume` | Bound volumes, registers |
+| `Document` | Individual documents |
+| `Card` | Index cards, card records |
+| `Object` | Physical objects, artefacts |
+| `Moving Image` | Film, video recordings |
+| `Sound Recording` | Audio recordings |
 
 ---
 
