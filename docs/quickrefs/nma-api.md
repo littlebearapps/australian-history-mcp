@@ -1,0 +1,82 @@
+# National Museum of Australia (NMA) API Quick Reference
+
+## API Endpoint
+
+`https://data.nma.gov.au/`
+
+## Authentication
+
+None required. Optional API key for higher rate limits.
+
+## Tools
+
+### nma_search_objects
+Search museum collection objects.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | string | Search term (e.g., "boomerang", "gold rush") |
+| `type` | string | Object type filter |
+| `collection` | string | Collection name filter |
+| `limit` | number | Max results (default 20, max 100) |
+| `offset` | number | Pagination offset |
+
+### nma_get_object
+Get detailed object record.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | string | Yes | Object ID from search results |
+
+Returns: title, types, collection, identifier, materials, dimensions, description, significance statement, places, metadata.
+
+### nma_search_places
+Search places of significance.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | string | Search term |
+| `limit` | number | Max results (default 20) |
+
+### nma_harvest
+Bulk download collection records.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | string | Search filter |
+| `type` | string | Object type filter |
+| `maxRecords` | number | Max records (1-1000, default 100) |
+| `startOffset` | number | Pagination offset |
+
+## Response Format
+
+```json
+{
+  "id": "154550",
+  "title": "Painted boomerang...",
+  "types": ["Boomerangs"],
+  "collection": { "id": "3814", "title": "Scott Rainbow collection" },
+  "identifier": "2008.0046.0023",
+  "materials": ["Wood"],
+  "dimensions": { "length": 570, "width": 135, "height": 15, "units": "mm" },
+  "physicalDescription": "...",
+  "significanceStatement": "...",
+  "places": [{ "title": "Queensland, Australia", "role": "Associated place" }],
+  "metadata": {
+    "modified": "2025-02-23",
+    "licence": "https://creativecommons.org/licenses/by-nc/4.0/"
+  }
+}
+```
+
+## Key Quirks
+
+- Uses offset-based pagination
+- Objects have type-prefixed IDs
+- Licence is CC-BY-NC (non-commercial use)
+- Places returned as array with title and role
+
+## Resources
+
+- [NMA Data Portal](https://data.nma.gov.au/)
+- [NMA Collection Search](https://collectionsearch.nma.gov.au/)

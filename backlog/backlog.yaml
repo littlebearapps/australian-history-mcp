@@ -1,0 +1,7 @@
+project:
+  name: australian-archives-mcp
+  description: MCP server for Australian historical archives - PROV, Trove, data.gov.au, Museums Victoria and more
+
+settings:
+  task_prefix: API
+  default_priority: medium
