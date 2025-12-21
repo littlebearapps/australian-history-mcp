@@ -8,20 +8,21 @@
  * GLAM Workbench: https://glam-workbench.net/prov/
  */
 
+import { BaseClient } from '../../core/base-client.js';
 import type {
   PROVSearchParams,
   PROVSearchResult,
   PROVRecord,
   PROVSeries,
-} from '../types.js';
+  PROVImage,
+  PROVImagesResult,
+} from './types.js';
 
 const PROV_API_BASE = 'https://api.prov.vic.gov.au/search';
 
-export class PROVClient {
-  private readonly baseUrl: string;
-
+export class PROVClient extends BaseClient {
   constructor() {
-    this.baseUrl = PROV_API_BASE;
+    super(PROV_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
   }
 
   /**
@@ -32,18 +33,15 @@ export class PROVClient {
 
     // Build Solr query
     if (params.query) {
-      // Text search requires text: field prefix
       queryParts.push(`text:${this.escapeQuery(params.query)}`);
     }
 
     if (params.series) {
-      // Series are in format "VPRS 515" or just "515"
       const seriesNum = params.series.replace(/^VPRS\s*/i, '');
       queryParts.push(`series_id:${seriesNum}`);
     }
 
     if (params.agency) {
-      // Agency numbers in format "VA 473" or just "473"
       const agencyNum = params.agency.replace(/^VA\s*/i, '');
       queryParts.push(`agencies.ids:VA${agencyNum}`);
     }
@@ -52,53 +50,29 @@ export class PROVClient {
       queryParts.push(`record_form:"${params.recordForm}"`);
     }
 
-    // Date range
     if (params.startDate || params.endDate) {
       const start = params.startDate || '*';
       const end = params.endDate || '*';
       queryParts.push(`start_dt:[${start} TO ${end}]`);
     }
 
-    // Filter for digitised records (include in main query, not fq)
     if (params.digitisedOnly) {
       queryParts.push('iiif-manifest:[* TO *]');
     }
 
-    // Build filter queries (currently unused but kept for future use)
-    const fqParts: string[] = [];
-
-    // Construct URL
     const q = queryParts.length > 0 ? queryParts.join(' AND ') : '*:*';
     const rows = params.rows ?? 20;
     const start = params.start ?? 0;
 
-    const urlParams = new URLSearchParams({
+    const url = this.buildUrl('/query', {
       q,
       wt: 'json',
-      rows: rows.toString(),
-      start: start.toString(),
+      rows,
+      start,
     });
 
-    if (fqParts.length > 0) {
-      fqParts.forEach(fq => urlParams.append('fq', fq));
-    }
-
-    const url = `${this.baseUrl}/query?${urlParams.toString()}`;
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`PROV API error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      return this.parseSearchResponse(data, start, rows);
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`PROV search failed: ${error.message}`);
-      }
-      throw error;
-    }
+    const data = await this.fetchJSON<any>(url);
+    return this.parseSearchResponse(data, start, rows);
   }
 
   /**
@@ -107,105 +81,64 @@ export class PROVClient {
   async getSeries(seriesId: string): Promise<PROVSeries | null> {
     const seriesNum = seriesId.replace(/^VPRS\s*/i, '');
 
-    const urlParams = new URLSearchParams({
+    const url = this.buildUrl('/query', {
       q: `series_id:${seriesNum} AND document_type:series`,
       wt: 'json',
-      rows: '1',
+      rows: 1,
     });
 
-    const url = `${this.baseUrl}/query?${urlParams.toString()}`;
+    const data = await this.fetchJSON<{ response?: { docs?: any[] } }>(url);
+    const docs = data.response?.docs ?? [];
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`PROV API error: ${response.status}`);
-      }
-
-      const data = await response.json() as { response?: { docs?: any[] } };
-      const docs = data.response?.docs ?? [];
-
-      if (docs.length === 0) {
-        return null;
-      }
-
-      return this.parseSeriesDoc(docs[0]);
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`PROV getSeries failed: ${error.message}`);
-      }
-      throw error;
+    if (docs.length === 0) {
+      return null;
     }
+
+    return this.parseSeriesDoc(docs[0]);
   }
 
   /**
-   * Get IIIF manifest URL for a digitised item
+   * Get image URLs from a PROV IIIF manifest
    */
-  async getIIIFManifest(itemId: string): Promise<string | null> {
-    const urlParams = new URLSearchParams({
-      q: `id:${itemId}`,
-      wt: 'json',
-      rows: '1',
-      fl: 'iiif_manifest',
-    });
+  async getImages(manifestUrl: string, options?: {
+    pages?: number[];
+    pageRange?: string;
+  }): Promise<PROVImagesResult> {
+    const manifest = await this.fetchJSON<any>(manifestUrl);
 
-    const url = `${this.baseUrl}/query?${urlParams.toString()}`;
+    const title = this.extractManifestTitle(manifest);
+    const description = this.extractManifestDescription(manifest);
+    const canvases = manifest.sequences?.[0]?.canvases ?? manifest.items ?? [];
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`PROV API error: ${response.status}`);
+    const pageFilter = this.parsePageFilter(options?.pages, options?.pageRange);
+
+    const images: PROVImage[] = [];
+    for (let i = 0; i < canvases.length; i++) {
+      const pageNum = i + 1;
+
+      if (pageFilter && !pageFilter.has(pageNum)) {
+        continue;
       }
 
-      const data = await response.json() as { response?: { docs?: any[] } };
-      const docs = data.response?.docs ?? [];
+      const canvas = canvases[i];
+      const imageUrls = this.extractImageUrls(canvas);
 
-      if (docs.length === 0 || !docs[0].iiif_manifest) {
-        return null;
+      if (imageUrls) {
+        images.push({
+          page: pageNum,
+          label: canvas.label ?? `Page ${pageNum}`,
+          ...imageUrls,
+        });
       }
-
-      return docs[0].iiif_manifest;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`PROV getIIIFManifest failed: ${error.message}`);
-      }
-      throw error;
     }
-  }
 
-  /**
-   * Search for digitised photos
-   */
-  async searchPhotos(query: string, options?: {
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-  }): Promise<PROVSearchResult> {
-    return this.search({
-      query,
-      recordForm: 'photograph',
-      digitisedOnly: true,
-      startDate: options?.dateFrom,
-      endDate: options?.dateTo,
-      rows: options?.limit,
-    });
-  }
-
-  /**
-   * Search for maps
-   */
-  async searchMaps(query: string, options?: {
-    dateFrom?: string;
-    dateTo?: string;
-    limit?: number;
-  }): Promise<PROVSearchResult> {
-    return this.search({
-      query,
-      recordForm: 'map',
-      digitisedOnly: true,
-      startDate: options?.dateFrom,
-      endDate: options?.dateTo,
-      rows: options?.limit,
-    });
+    return {
+      manifestUrl,
+      title,
+      description,
+      totalPages: canvases.length,
+      images,
+    };
   }
 
   // =========================================================================
@@ -213,14 +146,10 @@ export class PROVClient {
   // =========================================================================
 
   private escapeQuery(query: string): string {
-    // For multi-word queries, wrap in quotes for phrase matching
-    // For single words, use as-is
     const trimmed = query.trim();
     if (trimmed.includes(' ')) {
-      // Escape internal quotes and wrap in quotes
       return `"${trimmed.replace(/"/g, '\\"')}"`;
     }
-    // Single word - escape Solr special characters
     return trimmed.replace(/([+\-!(){}[\]^"~*?:\\/])/g, '\\$1');
   }
 
@@ -241,7 +170,6 @@ export class PROVClient {
   }
 
   private parseRecordDoc(doc: any): PROVRecord {
-    // Extract first value from arrays if needed
     const getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
 
     return {
@@ -275,7 +203,6 @@ export class PROVClient {
   }
 
   private buildRecordUrl(doc: any): string {
-    // PROV record URLs - use the identifier if available
     const id = doc._id ?? doc.id;
     if (doc.series_id) {
       return `https://prov.vic.gov.au/archive/VPRS${doc.series_id}`;
@@ -291,6 +218,95 @@ export class PROVClient {
     if (start && end) return `${start} - ${end}`;
     if (start) return `${start} -`;
     return `- ${end}`;
+  }
+
+  private extractManifestTitle(manifest: any): string {
+    const label = manifest.label;
+    if (typeof label === 'string') return label;
+    if (Array.isArray(label)) return label[0]?.['@value'] ?? label[0] ?? 'Untitled';
+    if (typeof label === 'object') {
+      const values = Object.values(label)[0] as string[] | undefined;
+      return values?.[0] ?? 'Untitled';
+    }
+    return 'Untitled';
+  }
+
+  private extractManifestDescription(manifest: any): string | undefined {
+    const desc = manifest.description ?? manifest.summary;
+    if (typeof desc === 'string') return desc;
+    if (Array.isArray(desc)) return desc[0]?.['@value'] ?? desc[0];
+    if (typeof desc === 'object') {
+      const values = Object.values(desc)[0] as string[] | undefined;
+      return values?.[0];
+    }
+    return undefined;
+  }
+
+  private parsePageFilter(pages?: number[], pageRange?: string): Set<number> | null {
+    if (!pages && !pageRange) return null;
+
+    const filter = new Set<number>();
+
+    if (pages) {
+      pages.forEach(p => filter.add(p));
+    }
+
+    if (pageRange) {
+      const parts = pageRange.split(',').map(s => s.trim());
+      for (const part of parts) {
+        if (part.includes('-')) {
+          const [start, end] = part.split('-').map(s => parseInt(s.trim(), 10));
+          for (let i = start; i <= end; i++) {
+            filter.add(i);
+          }
+        } else {
+          filter.add(parseInt(part, 10));
+        }
+      }
+    }
+
+    return filter.size > 0 ? filter : null;
+  }
+
+  private extractImageUrls(canvas: any): { thumbnail: string; medium: string; full: string } | null {
+    let serviceUrl: string | undefined;
+
+    // Try IIIF v2 structure
+    const images = canvas.images ?? [];
+    if (images.length > 0) {
+      const resource = images[0].resource;
+      if (resource?.service) {
+        const service = Array.isArray(resource.service) ? resource.service[0] : resource.service;
+        serviceUrl = service?.['@id'] ?? service?.id;
+      }
+      if (!serviceUrl && resource?.['@id']) {
+        const resourceId = resource['@id'];
+        if (resourceId.includes('/full/')) {
+          serviceUrl = resourceId.split('/full/')[0];
+        }
+      }
+    }
+
+    // Try IIIF v3 structure
+    if (!serviceUrl && canvas.items) {
+      const annotationPage = canvas.items[0];
+      const annotation = annotationPage?.items?.[0];
+      const body = annotation?.body;
+      if (body?.service) {
+        const service = Array.isArray(body.service) ? body.service[0] : body.service;
+        serviceUrl = service?.['@id'] ?? service?.id;
+      }
+    }
+
+    if (!serviceUrl) {
+      return null;
+    }
+
+    return {
+      thumbnail: `${serviceUrl}/full/!200,200/0/default.jpg`,
+      medium: `${serviceUrl}/full/!800,800/0/default.jpg`,
+      full: `${serviceUrl}/full/full/0/default.jpg`,
+    };
   }
 }
 

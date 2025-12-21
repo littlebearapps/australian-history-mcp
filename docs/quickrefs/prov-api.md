@@ -95,19 +95,43 @@ prov_search with series="VPRS 515"
 
 ---
 
-## IIIF Manifests
+## IIIF Manifests & Image Extraction
 
-Digitised records include IIIF manifests for viewing images.
+Digitised records include IIIF manifests for viewing images. Use the `prov_get_images` tool to extract downloadable URLs.
 
-**Manifest URL format:**
+### Using prov_get_images
+
 ```
-https://prov.vic.gov.au/archive/iiif/[item-id]/manifest
+prov_get_images with manifestUrl="<manifest_url>" pages="1-5" size="full"
 ```
 
-**Usage:**
-- Open in IIIF viewer (e.g., Mirador, Universal Viewer)
-- Extract individual image URLs for download
-- Access metadata embedded in manifest
+**Parameters:**
+- `manifestUrl` (required): The IIIF manifest URL from search results
+- `pages` (optional): Page filter - "1-5", "1,3,7", or "1-3,7,10-12"
+- `size` (optional): "thumbnail" (200px), "medium" (800px), "full", or "all" (default)
+
+**Returns:**
+- Total page count
+- Array of image URLs for each page
+
+### Example: North Melbourne Football Ground (159 pages)
+```
+prov_get_images with
+  manifestUrl="https://images.prov.vic.gov.au/manifests/09/B1/9F/7A/-F9F5-11E9-AE98-5B68487109BE/images/manifest.json"
+  pages="1-5"
+  size="full"
+```
+
+### Direct Image URL Format
+PROV uses Loris IIIF Image Server. URLs follow this pattern:
+```
+https://images.prov.vic.gov.au/loris/{encoded-path}/full/{size}/0/default.jpg
+```
+
+Size options:
+- `!200,200` - Thumbnail (max 200px)
+- `!800,800` - Medium (max 800px)
+- `full` - Full resolution
 
 ---
 
