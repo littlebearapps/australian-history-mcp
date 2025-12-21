@@ -79,21 +79,27 @@ export class MuseumsVictoriaClient extends BaseClient {
     queryParams.page = (params.page ?? 1).toString();
 
     const url = this.buildUrl('/search', queryParams);
+    const page = params.page ?? 1;
+    const perPage = params.perPage ?? 20;
+
+    // API returns envelope format: { headers: {...}, response: [...], status: number }
     const data = await this.fetchJSON<{
-      totalResults: number;
-      totalPages: number;
-      currentPage: number;
-      perPage: number;
-      data: unknown[];
+      headers: {
+        totalResults: number;
+        totalPages: number;
+        link: string;
+      };
+      response: unknown[];
+      status: number;
     }>(url);
 
     return {
-      totalResults: data.totalResults,
-      totalPages: data.totalPages,
-      currentPage: data.currentPage,
-      perPage: data.perPage,
-      records: data.data.map((r) => this.parseRecord(r)),
-      nextPage: data.currentPage < data.totalPages ? data.currentPage + 1 : undefined,
+      totalResults: data.headers.totalResults,
+      totalPages: data.headers.totalPages,
+      currentPage: page,
+      perPage: perPage,
+      records: data.response.map((r) => this.parseRecord(r)),
+      nextPage: page < data.headers.totalPages ? page + 1 : undefined,
     };
   }
 
@@ -102,10 +108,18 @@ export class MuseumsVictoriaClient extends BaseClient {
   // =========================================================================
 
   /**
+   * Strip type prefix from ID (e.g., "species/8436" -> "8436")
+   */
+  private stripIdPrefix(id: string, prefix: string): string {
+    return id.startsWith(`${prefix}/`) ? id.slice(prefix.length + 1) : id;
+  }
+
+  /**
    * Get an article by ID
    */
   async getArticle(id: string): Promise<MuseumArticle | null> {
-    const url = this.buildUrl(`/articles/${id}`, {});
+    const cleanId = this.stripIdPrefix(id, 'articles');
+    const url = this.buildUrl(`/articles/${cleanId}`, {});
 
     try {
       const data = await this.fetchJSON<unknown>(url);
@@ -122,7 +136,8 @@ export class MuseumsVictoriaClient extends BaseClient {
    * Get an item (object) by ID
    */
   async getItem(id: string): Promise<MuseumItem | null> {
-    const url = this.buildUrl(`/items/${id}`, {});
+    const cleanId = this.stripIdPrefix(id, 'items');
+    const url = this.buildUrl(`/items/${cleanId}`, {});
 
     try {
       const data = await this.fetchJSON<unknown>(url);
@@ -139,7 +154,8 @@ export class MuseumsVictoriaClient extends BaseClient {
    * Get a species by ID
    */
   async getSpecies(id: string): Promise<MuseumSpecies | null> {
-    const url = this.buildUrl(`/species/${id}`, {});
+    const cleanId = this.stripIdPrefix(id, 'species');
+    const url = this.buildUrl(`/species/${cleanId}`, {});
 
     try {
       const data = await this.fetchJSON<unknown>(url);
@@ -156,7 +172,8 @@ export class MuseumsVictoriaClient extends BaseClient {
    * Get a specimen by ID
    */
   async getSpecimen(id: string): Promise<MuseumSpecimen | null> {
-    const url = this.buildUrl(`/specimens/${id}`, {});
+    const cleanId = this.stripIdPrefix(id, 'specimens');
+    const url = this.buildUrl(`/specimens/${cleanId}`, {});
 
     try {
       const data = await this.fetchJSON<unknown>(url);
