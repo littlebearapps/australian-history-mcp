@@ -5,6 +5,7 @@
  * Provides Claude Code with programmatic access to:
  * - PROV (Public Record Office Victoria) - Victorian state archives
  * - Trove (National Library of Australia) - Federal digitised collections
+ * - data.gov.au (CKAN) - Australian government open data portal
  *
  * @package @littlebearapps/australian-archives-mcp
  */
@@ -16,23 +17,21 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 
-// Import tool definitions and executors
-import { provSearchSchema, executePROVSearch } from './tools/prov_search.js';
-import { troveSearchSchema, executeTroveSearch } from './tools/trove_search.js';
-import {
-  troveNewspaperArticleSchema,
-  executeTroveNewspaperArticle,
-  troveListTitlesSchema,
-  executeTroveListTitles,
-  troveTitleDetailsSchema,
-  executeTroveTitleDetails,
-} from './tools/trove_newspaper.js';
-import {
-  provHarvestSchema,
-  executePROVHarvest,
-  troveHarvestSchema,
-  executeTroveHarvest,
-} from './tools/harvest.js';
+// Import registry and source modules
+import { registry } from './registry.js';
+import { provSource } from './sources/prov/index.js';
+import { troveSource } from './sources/trove/index.js';
+import { dataGovAUSource } from './sources/datagovau/index.js';
+import { museumsVictoriaSource } from './sources/museums-victoria/index.js';
+
+// ============================================================================
+// Register Source Modules
+// ============================================================================
+
+registry.register(provSource);
+registry.register(troveSource);
+registry.register(dataGovAUSource);
+registry.register(museumsVictoriaSource);
 
 // ============================================================================
 // Server Setup
@@ -41,7 +40,7 @@ import {
 const server = new Server(
   {
     name: 'australian-archives-mcp',
-    version: '0.1.0',
+    version: '0.2.0',
   },
   {
     capabilities: {
@@ -54,20 +53,8 @@ const server = new Server(
 // Tool Registration
 // ============================================================================
 
-const tools = [
-  // PROV tools
-  provSearchSchema,
-  provHarvestSchema,
-  // Trove tools
-  troveSearchSchema,
-  troveNewspaperArticleSchema,
-  troveListTitlesSchema,
-  troveTitleDetailsSchema,
-  troveHarvestSchema,
-];
-
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools,
+  tools: registry.listTools(),
 }));
 
 // ============================================================================
@@ -76,53 +63,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-
-  try {
-    switch (name) {
-      // PROV tools
-      case 'prov_search':
-        return await executePROVSearch(args as any);
-
-      case 'prov_harvest':
-        return await executePROVHarvest(args as any);
-
-      // Trove tools
-      case 'trove_search':
-        return await executeTroveSearch(args as any);
-
-      case 'trove_newspaper_article':
-        return await executeTroveNewspaperArticle(args as any);
-
-      case 'trove_list_titles':
-        return await executeTroveListTitles(args as any);
-
-      case 'trove_title_details':
-        return await executeTroveTitleDetails(args as any);
-
-      case 'trove_harvest':
-        return await executeTroveHarvest(args as any);
-
-      default:
-        return {
-          content: [{
-            type: 'text',
-            text: JSON.stringify({ error: `Unknown tool: ${name}` }),
-          }],
-          isError: true,
-        };
-    }
-  } catch (error) {
-    return {
-      content: [{
-        type: 'text',
-        text: JSON.stringify({
-          error: error instanceof Error ? error.message : 'Unknown error',
-          tool: name,
-        }),
-      }],
-      isError: true,
-    };
-  }
+  return registry.executeTool(name, args ?? {});
 });
 
 // ============================================================================
@@ -134,9 +75,20 @@ async function main() {
   await server.connect(transport);
 
   console.error('Australian Archives MCP Server running on stdio');
-  console.error('Tools available:');
-  console.error('  PROV: prov_search, prov_harvest');
-  console.error('  Trove: trove_search, trove_newspaper_article, trove_list_titles, trove_title_details, trove_harvest');
+
+  // Show source status
+  const sources = registry.getSourcesStatus();
+  console.error('');
+  console.error('Registered sources:');
+  for (const source of sources) {
+    const authStatus = source.authRequired
+      ? (source.authConfigured ? '✓' : '✗ (API key required)')
+      : '(no auth)';
+    console.error(`  ${source.name}: ${source.toolCount} tools ${authStatus}`);
+  }
+
+  console.error('');
+  console.error(`Total: ${registry.toolCount} tools from ${registry.sourceCount} sources`);
 
   if (!process.env.TROVE_API_KEY) {
     console.error('');

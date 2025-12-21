@@ -1,6 +1,6 @@
 # Tools Reference
 
-Complete parameter documentation for all Australian Archives MCP tools.
+Complete parameter documentation for all 24 Australian Archives MCP tools.
 
 ---
 
@@ -31,6 +31,22 @@ Search the Public Record Office Victoria collection.
 ```
 Search PROV for "railway" photographs with digitised images only
 ```
+
+---
+
+### prov_get_images
+
+Extract image URLs from a PROV digitised record's IIIF manifest.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `manifestUrl` | string | **Yes** | - | IIIF manifest URL from search results |
+| `pages` | string | No | - | Page filter (e.g., "1-5", "1,3,7", "1-3,7,10-12") |
+| `size` | string | No | `all` | `thumbnail`, `medium`, `full`, or `all` |
+
+**Response includes:**
+- `pages` - Array of page objects with URLs by size
+- Each page has `thumbnail` (200px), `medium` (800px), `full` URLs
 
 ---
 
@@ -157,6 +173,203 @@ Bulk download Trove search results.
 - `records` - Array of results
 
 **Note:** Uses `bulkHarvest=true` mode for stable pagination.
+
+---
+
+## data.gov.au Tools (No API Key Required)
+
+### datagovau_search
+
+Search datasets on data.gov.au.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | No | - | Search keywords |
+| `organization` | string | No | - | Organisation slug (e.g., "abs", "bom") |
+| `format` | string | No | - | Resource format (e.g., "CSV", "JSON") |
+| `tags` | string[] | No | - | Filter by tags |
+| `sort` | string | No | `relevance` | `relevance`, `metadata_modified desc`, `title asc` |
+| `limit` | number | No | 20 | Maximum results (1-100) |
+| `offset` | number | No | 0 | Pagination offset |
+
+---
+
+### datagovau_get_dataset
+
+Get full dataset details including all resources.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `dataset` | string | **Yes** | - | Dataset ID or name slug |
+
+---
+
+### datagovau_get_resource
+
+Get individual resource details.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `resource` | string | **Yes** | - | Resource UUID |
+
+---
+
+### datagovau_datastore_search
+
+Query tabular data directly (if datastore enabled).
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `resource` | string | **Yes** | - | Resource UUID |
+| `query` | string | No | - | Full-text search |
+| `filters` | object | No | - | Field filters (e.g., `{"state": "VIC"}`) |
+| `fields` | string[] | No | - | Fields to return |
+| `sort` | string | No | - | Sort field |
+| `limit` | number | No | 100 | Maximum rows (1-1000) |
+| `offset` | number | No | 0 | Pagination offset |
+
+---
+
+### datagovau_list_organizations
+
+List publishing organisations.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `limit` | number | No | 50 | Maximum to return |
+
+---
+
+### datagovau_get_organization
+
+Get organisation details.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `organization` | string | **Yes** | - | Organisation ID or slug |
+| `includeDatasets` | boolean | No | false | Include dataset list |
+
+---
+
+### datagovau_list_groups
+
+List dataset groups/categories.
+
+No parameters required.
+
+---
+
+### datagovau_get_group
+
+Get group details.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `group` | string | **Yes** | - | Group ID or slug |
+| `includeDatasets` | boolean | No | false | Include dataset list |
+
+---
+
+### datagovau_list_tags
+
+List popular tags.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | No | - | Filter tags by prefix |
+
+---
+
+### datagovau_harvest
+
+Bulk download dataset metadata.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | No | - | Search keywords |
+| `organization` | string | No | - | Organisation slug |
+| `format` | string | No | - | Resource format filter |
+| `tags` | string[] | No | - | Filter by tags |
+| `maxRecords` | number | No | 100 | Maximum datasets (1-1000) |
+| `startFrom` | number | No | 0 | Pagination offset |
+
+---
+
+## Museums Victoria Tools (No API Key Required)
+
+### museumsvic_search
+
+Search Museums Victoria's collection.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | One required | - | Search terms (e.g., "platypus", "gold rush") |
+| `recordType` | string | One required | - | `article`, `item`, `species`, `specimen` |
+| `category` | string | One required | - | `natural sciences`, `first peoples`, `history & technology` |
+| `hasImages` | boolean | No | - | Only records with images |
+| `onDisplay` | boolean | No | - | Only items currently on display |
+| `imageLicence` | string | No | - | `public domain`, `cc by`, `cc by-nc`, `cc by-sa`, `cc by-nc-sa` |
+| `locality` | string | No | - | Geographic location filter |
+| `taxon` | string | No | - | Taxonomic classification filter |
+| `limit` | number | No | 20 | Maximum results (1-100) |
+
+---
+
+### museumsvic_get_article
+
+Get educational article by ID.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | - | Article ID from search results |
+
+---
+
+### museumsvic_get_item
+
+Get museum object by ID.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | - | Item ID from search results |
+
+---
+
+### museumsvic_get_species
+
+Get species information by ID.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | - | Species ID from search results |
+
+---
+
+### museumsvic_get_specimen
+
+Get natural science specimen by ID.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `id` | string | **Yes** | - | Specimen ID from search results |
+
+---
+
+### museumsvic_harvest
+
+Bulk download museum records.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | One required | - | Search terms |
+| `recordType` | string | One required | - | `article`, `item`, `species`, `specimen` |
+| `category` | string | One required | - | Collection category |
+| `hasImages` | boolean | No | - | Only records with images |
+| `imageLicence` | string | No | - | Image licence filter |
+| `locality` | string | No | - | Geographic location |
+| `taxon` | string | No | - | Taxonomic classification |
+| `maxRecords` | number | No | 100 | Maximum records (1-1000) |
+| `startPage` | number | No | 1 | Starting page for pagination |
 
 ---
 

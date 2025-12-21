@@ -1,59 +1,9 @@
 /**
- * Australian Archives MCP Server - Type Definitions
+ * Trove (National Library of Australia) Type Definitions
  */
 
 // ============================================================================
-// PROV (Public Record Office Victoria) Types
-// ============================================================================
-
-export interface PROVSearchParams {
-  query?: string;
-  series?: string;      // VPRS number (e.g., "VPRS 515")
-  agency?: string;      // VA number (e.g., "VA 473")
-  recordForm?: string;  // photograph, map, file, etc.
-  startDate?: string;   // YYYY-MM-DD
-  endDate?: string;     // YYYY-MM-DD
-  digitisedOnly?: boolean;
-  rows?: number;        // max results (default 20)
-  start?: number;       // pagination offset
-}
-
-export interface PROVRecord {
-  id: string;
-  title: string;
-  description?: string;
-  series?: string;
-  seriesTitle?: string;
-  agency?: string;
-  agencyTitle?: string;
-  recordForm?: string;
-  startDate?: string;
-  endDate?: string;
-  iiifManifest?: string;
-  digitised: boolean;
-  url: string;
-}
-
-export interface PROVSearchResult {
-  totalResults: number;
-  start: number;
-  rows: number;
-  records: PROVRecord[];
-}
-
-export interface PROVSeries {
-  id: string;
-  title: string;
-  description?: string;
-  agency?: string;
-  agencyTitle?: string;
-  dateRange?: string;
-  accessStatus?: string;
-  itemCount?: number;
-}
-
-// ============================================================================
-// Trove (National Library of Australia) Types
+// Search Parameter Types
 // ============================================================================
 
 export type TroveCategory =
@@ -80,6 +30,30 @@ export type TroveState =
   | 'act'
   | 'national';
 
+export const TROVE_CATEGORIES: TroveCategory[] = [
+  'all',
+  'newspaper',
+  'gazette',
+  'magazine',
+  'image',
+  'research',
+  'book',
+  'diary',
+  'music',
+];
+
+export const TROVE_STATES: TroveState[] = [
+  'vic',
+  'nsw',
+  'qld',
+  'sa',
+  'wa',
+  'tas',
+  'nt',
+  'act',
+  'national',
+];
+
 export interface TroveSearchParams {
   query: string;
   category?: TroveCategory | TroveCategory[];
@@ -93,6 +67,10 @@ export interface TroveSearchParams {
   format?: string;      // Photograph, Map, Book, etc.
   facets?: string[];
 }
+
+// ============================================================================
+// Article and Work Types
+// ============================================================================
 
 export interface TroveArticle {
   id: string;
@@ -133,6 +111,10 @@ export interface TroveSearchResult {
   records: (TroveArticle | TroveWork)[];
 }
 
+// ============================================================================
+// Newspaper Title Types
+// ============================================================================
+
 export interface TroveNewspaperTitle {
   id: string;
   title: string;
@@ -156,31 +138,25 @@ export interface TroveTitleDetail extends TroveNewspaperTitle {
 }
 
 // ============================================================================
-// Common Types
+// Full Article Detail
 // ============================================================================
 
-export interface HarvestResult {
-  source: 'trove' | 'prov';
-  query: string;
-  totalHarvested: number;
-  totalAvailable: number;
-  records: (TroveArticle | TroveWork | PROVRecord)[];
-  nextCursor?: string;
-  hasMore: boolean;
-}
-
-export interface MCPToolResponse {
-  content: Array<{
-    type: 'text';
-    text: string;
-  }>;
-  isError?: boolean;
-  [key: string]: unknown;
-}
-
-export interface APIError {
-  code: string;
-  message: string;
-  details?: string;
-  retryable: boolean;
+export interface TroveArticleDetail {
+  id: string;
+  heading: string;
+  title: string;
+  titleId: string;
+  date: string;
+  page: string;
+  pageSequence?: number;
+  category: string;
+  troveUrl: string;
+  pdfUrl?: string;
+  fullText?: string;
+  wordCount?: number;
+  correctionCount?: number;
+  tagCount?: number;
+  commentCount?: number;
+  illustrated?: boolean;
+  lastCorrected?: string;
 }

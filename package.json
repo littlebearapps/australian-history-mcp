@@ -1,7 +1,7 @@
 {
   "name": "@littlebearapps/australian-archives-mcp",
-  "version": "0.1.0",
-  "description": "MCP server for Australian historical archives - PROV Victoria and Trove NLA",
+  "version": "0.2.0",
+  "description": "MCP server for Australian archives - PROV, Trove, data.gov.au, Museums Victoria",
   "main": "dist/index.js",
   "bin": {
     "australian-archives-mcp": "./dist/index.js"
@@ -20,11 +20,14 @@
     "mcp",
     "trove",
     "prov",
+    "data-gov-au",
+    "museums-victoria",
     "australia",
     "archives",
     "historical",
     "newspapers",
-    "genealogy"
+    "genealogy",
+    "open-data"
   ],
   "author": "Little Bear Apps",
   "license": "MIT",
