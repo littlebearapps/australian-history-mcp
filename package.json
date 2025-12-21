@@ -1,7 +1,7 @@
 {
   "name": "@littlebearapps/australian-archives-mcp",
-  "version": "0.2.0",
-  "description": "MCP server for Australian archives - PROV, Trove, data.gov.au, Museums Victoria",
+  "version": "0.4.0",
+  "description": "MCP server for Australian archives - PROV, Trove, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts",
   "main": "dist/index.js",
   "bin": {
     "australian-archives-mcp": "./dist/index.js"
@@ -22,12 +22,25 @@
     "prov",
     "data-gov-au",
     "museums-victoria",
+    "ala",
+    "atlas-living-australia",
+    "nma",
+    "national-museum",
+    "vhd",
+    "heritage",
+    "acmi",
+    "moving-image",
+    "film",
+    "pm-transcripts",
+    "prime-minister",
+    "speeches",
     "australia",
     "archives",
     "historical",
     "newspapers",
     "genealogy",
-    "open-data"
+    "open-data",
+    "biodiversity"
   ],
   "author": "Little Bear Apps",
   "license": "MIT",

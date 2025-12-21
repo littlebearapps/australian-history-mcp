@@ -6,6 +6,12 @@
  * - PROV (Public Record Office Victoria) - Victorian state archives
  * - Trove (National Library of Australia) - Federal digitised collections
  * - data.gov.au (CKAN) - Australian government open data portal
+ * - Museums Victoria - Victorian museum collections
+ * - ALA (Atlas of Living Australia) - Australian biodiversity data
+ * - NMA (National Museum of Australia) - National museum collections
+ * - VHD (Victorian Heritage Database) - Heritage places and shipwrecks
+ * - ACMI (Australian Centre for the Moving Image) - Films, TV, videogames
+ * - PM Transcripts - Prime Ministerial speeches and media releases
  *
  * @package @littlebearapps/australian-archives-mcp
  */
@@ -23,6 +29,11 @@ import { provSource } from './sources/prov/index.js';
 import { troveSource } from './sources/trove/index.js';
 import { dataGovAUSource } from './sources/datagovau/index.js';
 import { museumsVictoriaSource } from './sources/museums-victoria/index.js';
+import { alaSource } from './sources/ala/index.js';
+import { nmaSource } from './sources/nma/index.js';
+import { vhdSource } from './sources/vhd/index.js';
+import { acmiSource } from './sources/acmi/index.js';
+import { pmTranscriptsSource } from './sources/pm-transcripts/index.js';
 
 // ============================================================================
 // Register Source Modules
@@ -32,6 +43,11 @@ registry.register(provSource);
 registry.register(troveSource);
 registry.register(dataGovAUSource);
 registry.register(museumsVictoriaSource);
+registry.register(alaSource);
+registry.register(nmaSource);
+registry.register(vhdSource);
+registry.register(acmiSource);
+registry.register(pmTranscriptsSource);
 
 // ============================================================================
 // Server Setup
@@ -40,7 +56,7 @@ registry.register(museumsVictoriaSource);
 const server = new Server(
   {
     name: 'australian-archives-mcp',
-    version: '0.2.0',
+    version: '0.4.0',
   },
   {
     capabilities: {

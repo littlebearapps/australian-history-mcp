@@ -2,7 +2,7 @@
 
 **Language:** Australian English
 **Last Updated:** 2025-12-21
-**Version:** 0.2.0
+**Version:** 0.4.0
 
 ---
 
@@ -17,6 +17,11 @@
 - **Trove** (National Library of Australia) - Federal digitised collections (requires API key)
 - **data.gov.au** (CKAN) - Australian government open data portal (no API key)
 - **Museums Victoria** - Victorian museum collections (no API key)
+- **ALA** (Atlas of Living Australia) - Australian biodiversity data (no API key)
+- **NMA** (National Museum of Australia) - National museum collections (no API key)
+- **VHD** (Victorian Heritage Database) - Heritage places and shipwrecks (no API key)
+- **ACMI** (Australian Centre for the Moving Image) - Films, TV, videogames, digital art (no API key)
+- **PM Transcripts** - Prime Ministerial speeches and media releases (no API key)
 
 **PROV Content (Victorian State Archives):**
 - Historical photographs and maps
@@ -40,6 +45,38 @@
 - Natural science specimens (insects, fossils, minerals)
 - Species information (Victorian fauna and flora)
 - Educational articles and stories
+
+**ALA Content (Biodiversity Data):**
+- 165M+ species occurrence records
+- 153,000+ species profiles with taxonomy
+- Distribution maps and conservation status
+- Citizen science observations
+
+**NMA Content (Museum Collections):**
+- 85,000+ museum objects (artefacts, artwork, photographs)
+- People and organisations (parties)
+- Places of significance
+- Media and documentation
+
+**VHD Content (Heritage Database):**
+- 12,000+ heritage places (buildings, sites, gardens)
+- Victorian shipwrecks (700+ wrecks)
+- Architectural styles and periods
+- Heritage overlays and protection status
+
+**ACMI Content (Moving Image Collection):**
+- 42,000+ works (films, TV, videogames, digital art)
+- Feature films, documentaries, shorts
+- Television programs and series
+- Videogames and interactive media
+- Creator information (directors, actors, studios)
+
+**PM Transcripts Content:**
+- 26,000+ transcripts (1945-present)
+- Prime Ministerial speeches
+- Media releases and statements
+- Interviews and press conferences
+- PDF document links
 
 ---
 
@@ -103,6 +140,43 @@ npx tsc --noEmit
 | `museumsvic_get_specimen` | None | Get natural science specimen by ID |
 | `museumsvic_harvest` | None | Bulk download museum records |
 
+### ALA Tools (4)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `ala_search_occurrences` | None | Search species occurrence records |
+| `ala_search_species` | None | Search species by common/scientific name |
+| `ala_get_species` | None | Get species profile with taxonomy and images |
+| `ala_harvest` | None | Bulk download occurrence records |
+
+### NMA Tools (4)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `nma_search_objects` | None | Search museum collection objects |
+| `nma_get_object` | None | Get detailed object record |
+| `nma_search_places` | None | Search places of significance |
+| `nma_harvest` | None | Bulk download collection records |
+
+### VHD Tools (4)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `vhd_search_places` | None | Search heritage places |
+| `vhd_get_place` | None | Get detailed heritage place record |
+| `vhd_search_shipwrecks` | None | Search Victorian shipwrecks |
+| `vhd_harvest` | None | Bulk download heritage records |
+
+### ACMI Tools (3)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `acmi_search_works` | None | Search ACMI collection for films, TV, videogames |
+| `acmi_get_work` | None | Get detailed work information by ID |
+| `acmi_harvest` | None | Bulk download ACMI collection works |
+
+### PM Transcripts Tools (2)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `pm_transcripts_get_transcript` | None | Get Prime Ministerial transcript by ID |
+| `pm_transcripts_harvest` | None | Bulk download transcripts with filters |
+
 **See:** `docs/quickrefs/` for complete parameter documentation
 
 ---
@@ -117,6 +191,21 @@ data.gov.au tools work immediately with no configuration.
 
 ### Museums Victoria (No Key Required)
 Museums Victoria tools work immediately with no configuration.
+
+### ALA (No Key Required)
+ALA tools work immediately with no configuration.
+
+### NMA (No Key Required)
+NMA tools work immediately with no configuration.
+
+### VHD (No Key Required)
+VHD tools work immediately with no configuration.
+
+### ACMI (No Key Required)
+ACMI tools work immediately with no configuration.
+
+### PM Transcripts (No Key Required)
+PM Transcripts tools work immediately with no configuration.
 
 ### Trove (API Key Required)
 
@@ -140,7 +229,7 @@ Museums Victoria tools work immediately with no configuration.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (24 tools via registry) |
+| `src/index.ts` | MCP server entry point (41 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
@@ -151,6 +240,11 @@ Museums Victoria tools work immediately with no configuration.
 | `src/sources/trove/` | Trove source (5 tools) |
 | `src/sources/datagovau/` | data.gov.au source (10 tools) |
 | `src/sources/museums-victoria/` | Museums Victoria source (6 tools) |
+| `src/sources/ala/` | ALA source (4 tools) |
+| `src/sources/nma/` | NMA source (4 tools) |
+| `src/sources/vhd/` | VHD source (4 tools) |
+| `src/sources/acmi/` | ACMI source (3 tools) |
+| `src/sources/pm-transcripts/` | PM Transcripts source (2 tools) |
 | `docs/quickrefs/` | Quick reference documentation |
 | `dist/` | Compiled JavaScript output |
 
@@ -164,21 +258,19 @@ Museums Victoria tools work immediately with no configuration.
 └───────────────────────────────────┬─────────────────────────────────────────┘
                                     │ stdio
 ┌───────────────────────────────────▼─────────────────────────────────────────┐
-│              Australian Archives MCP Server (24 tools, 4 sources)            │
+│              Australian Archives MCP Server (41 tools, 9 sources)            │
 │  ┌──────────────────────────────────────────────────────────────────────┐   │
 │  │                        Tool Registry (Map-based)                      │   │
 │  └──────────────────────────────────────────────────────────────────────┘   │
-│  ┌────────────┐  ┌────────────┐  ┌─────────────┐  ┌──────────────────┐     │
-│  │   PROV     │  │   Trove    │  │ data.gov.au │  │ Museums Victoria │     │
-│  │  (3 tools) │  │  (5 tools) │  │  (10 tools) │  │    (6 tools)     │     │
-│  │  no auth   │  │  API key   │  │   no auth   │  │     no auth      │     │
-│  └─────┬──────┘  └─────┬──────┘  └──────┬──────┘  └────────┬─────────┘     │
-└────────┼───────────────┼────────────────┼──────────────────┼───────────────┘
-         │               │                │                  │
-┌────────▼───────┐ ┌─────▼─────────┐ ┌────▼──────────┐ ┌─────▼─────────────┐
-│ PROV Solr API  │ │ Trove API v3  │ │  CKAN API     │ │ Collections API   │
-│  (CC-BY-NC)    │ │(200 calls/min)│ │ data.gov.au   │ │ museumsvictoria   │
-└────────────────┘ └───────────────┘ └───────────────┘ └───────────────────┘
+│  ┌────┐ ┌─────┐ ┌───────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐       │
+│  │PROV│ │Trove│ │dataGov│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│       │
+│  │(3) │ │(5)  │ │(10)   │ │(6)   │ │(4)│ │(4)│ │(4)│ │(3) │ │(2) │       │
+│  └──┬─┘ └──┬──┘ └───┬───┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘       │
+└─────┼──────┼────────┼────────┼───────┼─────┼─────┼─────┼──────┼──────────┘
+      │      │        │        │       │     │     │     │      │
+      ▼      ▼        ▼        ▼       ▼     ▼     ▼     ▼      ▼
+   PROV   Trove   data.gov  MusVic  ALA   NMA   VHD   ACMI   PMC
+   Solr   API v3  CKAN API  API     API   API   API   API    XML
 ```
 
 ---
@@ -237,9 +329,56 @@ Use museumsvic_search with recordType "species" and taxon "Platypus"
 Use museumsvic_get_specimen with ID from search results
 ```
 
+### Search Species Occurrences (ALA)
+```
+Use ala_search_occurrences with scientificName "Phascolarctos cinereus" (koala)
+```
+
+### Get Species Profile (ALA)
+```
+Use ala_get_species with GUID from search results
+```
+
+### Search Museum Objects (NMA)
+```
+Use nma_search_objects with query "boomerang" or "gold rush"
+```
+
+### Get Object Details (NMA)
+```
+Use nma_get_object with ID from search results
+```
+
+### Search Heritage Places (VHD)
+```
+Use vhd_search_places with query "railway station" and municipality "Melbourne"
+```
+
+### Search Shipwrecks (VHD)
+```
+Use vhd_search_shipwrecks with query "barque" or location keywords
+```
+
+### Search Australian Films (ACMI)
+```
+Use acmi_search_works with query "Mad Max" and type "Film"
+```
+
+### Get PM Transcript (PM Transcripts)
+```
+Use pm_transcripts_get_transcript with id 12345
+```
+
+### Harvest Early Transcripts (PM Transcripts)
+```
+Use pm_transcripts_harvest with startFrom 1 and maxRecords 10
+Note: For specific PMs, use startFrom near their era (e.g., Hawke startFrom=5000)
+```
+
 ### Bulk Download Research Results
 ```
-Use prov_harvest, trove_harvest, datagovau_harvest, or museumsvic_harvest
+Use prov_harvest, trove_harvest, datagovau_harvest, museumsvic_harvest,
+ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, or pm_transcripts_harvest
 ```
 
 ---
@@ -252,7 +391,12 @@ Use prov_harvest, trove_harvest, datagovau_harvest, or museumsvic_harvest
 4. **`docs/quickrefs/trove-api.md`** - Trove API details and tips
 5. **`docs/quickrefs/datagovau-api.md`** - data.gov.au CKAN API details
 6. **`docs/quickrefs/museums-victoria-api.md`** - Museums Victoria API details
-7. **`README.md`** - Public documentation for npm
+7. **`docs/quickrefs/ala-api.md`** - Atlas of Living Australia API details
+8. **`docs/quickrefs/nma-api.md`** - National Museum of Australia API details
+9. **`docs/quickrefs/vhd-api.md`** - Victorian Heritage Database API details
+10. **`docs/quickrefs/acmi-api.md`** - ACMI API details
+11. **`docs/quickrefs/pm-transcripts-api.md`** - PM Transcripts API details and limitations
+12. **`README.md`** - Public documentation for npm
 
 ---
 
@@ -280,6 +424,11 @@ Use prov_harvest, trove_harvest, datagovau_harvest, or museumsvic_harvest
 - **Trove:** Terms vary by content contributor; check individual items
 - **data.gov.au:** Mostly CC-BY licensed; check individual datasets
 - **Museums Victoria:** CC-BY 4.0 (most records), Public Domain (some)
+- **ALA:** Various (data contributors specify); mostly CC-BY
+- **NMA:** CC-BY-NC (non-commercial use)
+- **VHD:** CC-BY 4.0 (Victorian government open data)
+- **ACMI:** CC0 (public domain dedication for API data)
+- **PM Transcripts:** Australian Government (Crown copyright)
 - **This MCP Server:** MIT license
 
 ---
@@ -322,7 +471,18 @@ echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | node dist/index.js
 - **Datastore availability:** Only some data.gov.au resources have datastore enabled for direct querying
 - **Museums Victoria pagination:** Uses Link header; harvest tool handles automatically
 - **Museums Victoria IDs:** Record IDs are type-prefixed (e.g., `articles/12345`, `items/67890`)
+- **ALA dual APIs:** Uses biocache-ws for occurrences and bie-ws for species profiles
+- **ALA GUIDs:** Species identified by LSID GUIDs (e.g., `urn:lsid:biodiversity.org.au:...`)
+- **NMA pagination:** Uses offset-based pagination; harvest tool handles automatically
+- **VHD response format:** HAL+JSON with `_embedded` and `_links` structure
+- **VHD images:** Returned as dictionary keyed by ID, not array
+- **VHD API params:** Uses `rpp` (records per page) not `limit`, `kw` (keyword) not `query`
+- **ACMI pagination:** Page-based (page 1, 2, 3...) not offset-based
+- **ACMI work types:** Film, Television, Videogame, Artwork, Object, etc.
+- **PM Transcripts format:** XML responses requiring parsing
+- **PM Transcripts IDs:** Sequential integers, gaps exist for missing transcripts
+- **PM Transcripts harvest:** Slow for PM filtering due to sequential scanning. Use `pm_transcripts_get_transcript` for individual lookups. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000
 
 ---
 
-**Token Count:** ~600 tokens
+**Token Count:** ~700 tokens
