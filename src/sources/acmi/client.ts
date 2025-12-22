@@ -12,13 +12,15 @@ import type {
   ACMISearchParams,
   ACMIPaginatedResult,
   ACMIWork,
+  ACMICreator,
+  ACMIConstellation,
 } from './types.js';
 
 const ACMI_API_BASE = 'https://api.acmi.net.au';
 
 export class ACMIClient extends BaseClient {
   constructor() {
-    super(ACMI_API_BASE, { userAgent: 'australian-archives-mcp/0.4.0' });
+    super(ACMI_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   // =========================================================================
@@ -77,6 +79,76 @@ export class ACMIClient extends BaseClient {
 
     try {
       return await this.fetchJSON<ACMIWork>(url);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // =========================================================================
+  // Creators
+  // =========================================================================
+
+  /**
+   * List creators with pagination
+   * Note: ACMI API requires no page param for page 1, use ?page=N for pages 2+
+   */
+  async listCreators(page?: number): Promise<ACMIPaginatedResult<ACMICreator>> {
+    const queryParams: Record<string, string> = {};
+
+    if (page && page > 1) {
+      queryParams.page = page.toString();
+    }
+
+    const url = this.buildUrl('/creators/', queryParams);
+    return this.fetchJSON<ACMIPaginatedResult<ACMICreator>>(url);
+  }
+
+  /**
+   * Get a single creator by ID
+   */
+  async getCreator(id: number): Promise<ACMICreator | null> {
+    const url = this.buildUrl(`/creators/${id}/`, {});
+
+    try {
+      return await this.fetchJSON<ACMICreator>(url);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // =========================================================================
+  // Constellations (Curated Collections)
+  // =========================================================================
+
+  /**
+   * List constellations with pagination
+   * Note: ACMI API requires no page param for page 1, use ?page=N for pages 2+
+   */
+  async listConstellations(page?: number): Promise<ACMIPaginatedResult<ACMIConstellation>> {
+    const queryParams: Record<string, string> = {};
+
+    if (page && page > 1) {
+      queryParams.page = page.toString();
+    }
+
+    const url = this.buildUrl('/constellations/', queryParams);
+    return this.fetchJSON<ACMIPaginatedResult<ACMIConstellation>>(url);
+  }
+
+  /**
+   * Get a single constellation by ID
+   */
+  async getConstellation(id: number): Promise<ACMIConstellation | null> {
+    const url = this.buildUrl(`/constellations/${id}/`, {});
+
+    try {
+      return await this.fetchJSON<ACMIConstellation>(url);
     } catch (error) {
       if (error instanceof Error && error.message.includes('404')) {
         return null;

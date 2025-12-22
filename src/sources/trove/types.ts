@@ -67,6 +67,7 @@ export interface TroveSearchParams {
   format?: string;      // Photograph, Map, Book, etc.
   facets?: string[];
   nuc?: string;         // NUC code to filter by contributor (e.g., "ANL" for NLA, "VSL" for SLV)
+  illustrated?: 'Y' | 'N';  // Filter by illustration (Y = illustrated, N = not illustrated)
 }
 
 // ============================================================================
@@ -160,4 +161,35 @@ export interface TroveArticleDetail {
   commentCount?: number;
   illustrated?: boolean;
   lastCorrected?: string;
+}
+
+// ============================================================================
+// Contributor Types
+// ============================================================================
+
+export interface TroveContributor {
+  nuc: string;
+  name: string;
+  shortname?: string;
+  url?: string;
+  address?: string;
+  email?: string;
+  phone?: string;
+  fax?: string;
+  catalogue?: string;
+  totalHoldings?: number;
+}
+
+// ============================================================================
+// Magazine Title Types
+// ============================================================================
+
+export interface TroveMagazineTitle {
+  id: string;
+  title: string;
+  publisher?: string;
+  startDate?: string;
+  endDate?: string;
+  issn?: string;
+  troveUrl: string;
 }

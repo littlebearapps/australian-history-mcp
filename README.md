@@ -114,27 +114,31 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
-## Tools (46 total)
+## Tools (69 total)
 
-### PROV Tools (3)
+### PROV Tools (5)
 
 | Tool | Description |
 |------|-------------|
-| `prov_search` | Search Victorian state archives: photos, maps, records, council minutes |
+| `prov_search` | Search Victorian state archives with category filter (Agency, Series, Item, etc.) |
 | `prov_get_images` | Extract image URLs from a PROV digitised record via IIIF manifest |
 | `prov_harvest` | Bulk download PROV records with pagination |
+| `prov_get_agency` | Get agency details by VA number |
+| `prov_get_series` | Get series details by VPRS number |
 
-### Trove Tools (5)
+### Trove Tools (7)
 
 | Tool | Description |
 |------|-------------|
-| `trove_search` | Search Trove for Australian newspapers, gazettes, images, books, magazines |
+| `trove_search` | Search Trove with illustrationType filter for newspapers, gazettes, images, books |
 | `trove_newspaper_article` | Get full article details including OCR text and PDF link |
 | `trove_list_titles` | List available newspaper or gazette titles by state |
 | `trove_title_details` | Get title details with available years and issue counts |
 | `trove_harvest` | Bulk download Trove records with cursor-based pagination |
+| `trove_get_contributor` | Get contributor details by NUC code |
+| `trove_list_magazine_titles` | List available magazine titles |
 
-### data.gov.au Tools (10)
+### data.gov.au Tools (11)
 
 | Tool | Description |
 |------|-------------|
@@ -148,19 +152,20 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `datagovau_get_group` | Get group details and optionally datasets in this group |
 | `datagovau_list_tags` | List popular tags used on datasets |
 | `datagovau_harvest` | Bulk download dataset metadata with pagination |
+| `datagovau_autocomplete` | Autocomplete dataset names and titles |
 
 ### Museums Victoria Tools (6)
 
 | Tool | Description |
 |------|-------------|
-| `museumsvic_search` | Search Museums Victoria for objects, specimens, species, and articles |
+| `museumsvic_search` | Search Museums Victoria with random sort option for discovery |
 | `museumsvic_get_article` | Get an educational article by ID |
 | `museumsvic_get_item` | Get a museum object (photograph, artefact, technology) by ID |
 | `museumsvic_get_species` | Get species info (taxonomy, biology, habitat, distribution) by ID |
 | `museumsvic_get_specimen` | Get a natural science specimen with taxonomy and collection info |
 | `museumsvic_harvest` | Bulk download Museums Victoria records with pagination |
 
-### ALA Tools (4)
+### ALA Tools (8)
 
 | Tool | Description |
 |------|-------------|
@@ -168,8 +173,12 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `ala_search_species` | Search species by common or scientific name |
 | `ala_get_species` | Get species profile with taxonomy, images, distribution |
 | `ala_harvest` | Bulk download occurrence records with pagination |
+| `ala_search_images` | Search images by keyword, taxon, or species |
+| `ala_match_name` | Resolve taxonomic names to classification |
+| `ala_list_species_lists` | List user-curated species lists |
+| `ala_get_species_list` | Get species list details by druid |
 
-### NMA Tools (4)
+### NMA Tools (9)
 
 | Tool | Description |
 |------|-------------|
@@ -177,8 +186,13 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `nma_get_object` | Get detailed object record with media |
 | `nma_search_places` | Search places of significance in the collection |
 | `nma_harvest` | Bulk download collection records with pagination |
+| `nma_get_place` | Get place details by ID |
+| `nma_search_parties` | Search people and organisations |
+| `nma_get_party` | Get party (person/org) details by ID |
+| `nma_search_media` | Search images, video, and sound |
+| `nma_get_media` | Get media details by ID |
 
-### VHD Tools (4)
+### VHD Tools (9)
 
 | Tool | Description |
 |------|-------------|
@@ -186,14 +200,23 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `vhd_get_place` | Get detailed heritage place info with images |
 | `vhd_search_shipwrecks` | Search Victorian shipwrecks along the coast |
 | `vhd_harvest` | Bulk download heritage records with pagination |
+| `vhd_get_shipwreck` | Get shipwreck details by ID |
+| `vhd_list_municipalities` | List all Victorian municipalities |
+| `vhd_list_architectural_styles` | List architectural style classifications |
+| `vhd_list_themes` | List heritage themes (history, economics, etc.) |
+| `vhd_list_periods` | List historical periods |
 
-### ACMI Tools (3)
+### ACMI Tools (7)
 
 | Tool | Description |
 |------|-------------|
-| `acmi_search_works` | Search ACMI collection for films, TV, videogames, digital art |
+| `acmi_search_works` | Search ACMI collection with field and size options |
 | `acmi_get_work` | Get detailed work information by ID |
 | `acmi_harvest` | Bulk download ACMI collection works with pagination |
+| `acmi_list_creators` | List creators (directors, actors, studios) |
+| `acmi_get_creator` | Get creator details and filmography |
+| `acmi_list_constellations` | List curated thematic collections |
+| `acmi_get_constellation` | Get constellation details with works |
 
 ### PM Transcripts Tools (2)
 

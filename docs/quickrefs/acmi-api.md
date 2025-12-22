@@ -39,6 +39,42 @@ Bulk download ACMI collection works.
 | `maxRecords` | number | Max records (1-1000, default 100) |
 | `startPage` | number | Starting page (1-based, default 1) |
 
+### acmi_list_creators
+List creators (directors, actors, studios) from the ACMI collection.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | number | Page number (1-based, default 1) |
+
+Returns: name, slug, wikidata_id, works_count.
+
+### acmi_get_creator
+Get detailed creator information.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | number | Yes | Creator ID from list results |
+
+Returns: name, biography, wikidata links, and work count.
+
+### acmi_list_constellations
+List curated thematic collections (constellations).
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `page` | number | Page number (1-based, default 1) |
+
+Returns: id, name, description for each constellation.
+
+### acmi_get_constellation
+Get detailed constellation information.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | number | Yes | Constellation ID from list results |
+
+Returns: name, description, authors, and key work.
+
 ## Work Types
 
 - `Film` - Feature films, documentaries, shorts
@@ -54,6 +90,7 @@ Bulk download ACMI collection works.
 - API returns HAL+JSON format with `_embedded` structure
 - Creator information included in work details
 - Some works have multiple associated media items
+- **Constellations use `name` field** (not `title`) for the collection name
 
 ## Example Queries
 

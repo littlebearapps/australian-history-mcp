@@ -14,6 +14,7 @@ import type {
   PROVSearchResult,
   PROVRecord,
   PROVSeries,
+  PROVAgency,
   PROVImage,
   PROVImagesResult,
 } from './types.js';
@@ -22,7 +23,7 @@ const PROV_API_BASE = 'https://api.prov.vic.gov.au/search';
 
 export class PROVClient extends BaseClient {
   constructor() {
-    super(PROV_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(PROV_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   /**
@@ -60,6 +61,12 @@ export class PROVClient extends BaseClient {
       queryParts.push('iiif-manifest:[* TO *]');
     }
 
+    if (params.category) {
+      // Use proper case for category: 'agency' -> 'Agency', 'series' -> 'Series', etc.
+      const capitalizedCategory = params.category.charAt(0).toUpperCase() + params.category.slice(1).toLowerCase();
+      queryParts.push(`category:${capitalizedCategory}`);
+    }
+
     const q = queryParts.length > 0 ? queryParts.join(' AND ') : '*:*';
     const rows = params.rows ?? 20;
     const start = params.start ?? 0;
@@ -82,7 +89,7 @@ export class PROVClient extends BaseClient {
     const seriesNum = seriesId.replace(/^VPRS\s*/i, '');
 
     const url = this.buildUrl('/query', {
-      q: `series_id:${seriesNum} AND document_type:series`,
+      q: `category:Series AND series_id:${seriesNum}`,
       wt: 'json',
       rows: 1,
     });
@@ -95,6 +102,28 @@ export class PROVClient extends BaseClient {
     }
 
     return this.parseSeriesDoc(docs[0]);
+  }
+
+  /**
+   * Get details of a specific agency (VA)
+   */
+  async getAgency(agencyId: string): Promise<PROVAgency | null> {
+    const agencyNum = agencyId.replace(/^VA\s*/i, '');
+
+    const url = this.buildUrl('/query', {
+      q: `category:Agency AND citation:"VA ${agencyNum}"`,
+      wt: 'json',
+      rows: 1,
+    });
+
+    const data = await this.fetchJSON<{ response?: { docs?: any[] } }>(url);
+    const docs = data.response?.docs ?? [];
+
+    if (docs.length === 0) {
+      return null;
+    }
+
+    return this.parseAgencyDoc(docs[0]);
   }
 
   /**
@@ -190,15 +219,33 @@ export class PROVClient extends BaseClient {
   }
 
   private parseSeriesDoc(doc: any): PROVSeries {
+    const getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
+
+    // Extract description from function_content or other fields
+    const description = getFirst(doc.function_content) ?? doc.description ?? doc.scope_content ?? undefined;
+
     return {
-      id: `VPRS ${doc.VPRS ?? doc.id}`,
+      id: doc['identifier.PROV_ACM.id'] ?? `VPRS ${doc.series_id ?? doc.id}`,
       title: doc.title ?? doc.name ?? 'Untitled',
-      description: doc.description ?? doc.scope_content ?? undefined,
-      agency: doc.VA ?? undefined,
-      agencyTitle: doc.agency_title ?? undefined,
+      description: description,
+      agency: getFirst(doc.resp_agency_id) ? `VA ${getFirst(doc.resp_agency_id)}` : undefined,
+      agencyTitle: getFirst(doc.resp_agency_title) ?? undefined,
       dateRange: this.formatDateRange(doc.start_dt, doc.end_dt),
-      accessStatus: doc.access_status ?? undefined,
+      accessStatus: getFirst(doc.rights_status) ?? undefined,
       itemCount: doc.item_count ?? undefined,
+    };
+  }
+
+  private parseAgencyDoc(doc: any): PROVAgency {
+    const getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
+
+    return {
+      id: doc['identifier.PROV_ACM.id'] ?? doc.citation ?? `VA ${doc.VA}`,
+      title: doc.title ?? doc.name ?? 'Untitled',
+      description: doc.description ?? doc.history ?? doc.scope_content ?? undefined,
+      dateRange: this.formatDateRange(doc.start_dt, doc.end_dt),
+      status: doc.status ?? undefined,
+      seriesCount: doc.series_count ?? undefined,
     };
   }
 

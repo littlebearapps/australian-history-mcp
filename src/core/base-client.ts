@@ -29,7 +29,7 @@ export abstract class BaseClient {
 
   constructor(baseUrl: string, options?: { userAgent?: string; timeout?: number }) {
     this.baseUrl = baseUrl.replace(/\/$/, ''); // Remove trailing slash
-    this.userAgent = options?.userAgent ?? 'australian-archives-mcp/0.2.0';
+    this.userAgent = options?.userAgent ?? 'australian-archives-mcp/0.5.0';
     this.defaultTimeout = options?.timeout ?? 30000;
   }
 

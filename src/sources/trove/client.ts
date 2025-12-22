@@ -18,6 +18,8 @@ import type {
   TroveTitleDetail,
   TroveArticleDetail,
   TroveState,
+  TroveContributor,
+  TroveMagazineTitle,
 } from './types.js';
 
 const TROVE_API_BASE = 'https://api.trove.nla.gov.au/v3';
@@ -26,7 +28,7 @@ export class TroveClient extends BaseClient {
   private readonly apiKey: string;
 
   constructor(apiKey?: string) {
-    super(TROVE_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(TROVE_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
     this.apiKey = apiKey ?? process.env.TROVE_API_KEY ?? '';
 
     if (!this.apiKey) {
@@ -84,6 +86,11 @@ export class TroveClient extends BaseClient {
     // Common codes: ANL (NLA), VSL (SLV), SLNSW (State Library NSW)
     if (params.nuc) {
       urlParams['l-partnerNuc'] = params.nuc;
+    }
+
+    // Illustrated filter (for newspapers)
+    if (params.illustrated) {
+      urlParams['l-illustrated'] = params.illustrated;
     }
 
     // Include full text for newspapers
@@ -239,6 +246,37 @@ export class TroveClient extends BaseClient {
    */
   hasApiKey(): boolean {
     return !!this.apiKey;
+  }
+
+  /**
+   * Get contributor (library/archive) details by NUC code
+   */
+  async getContributor(nuc: string): Promise<TroveContributor | null> {
+    const url = this.buildUrl(`/contributor/${nuc}`, {
+      encoding: 'json',
+    });
+
+    try {
+      const data = await this.fetchWithAuth(url);
+      return this.parseContributor(data);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * List magazine titles
+   */
+  async listMagazineTitles(): Promise<TroveMagazineTitle[]> {
+    const url = this.buildUrl('/magazine/titles', {
+      encoding: 'json',
+    });
+
+    const data = await this.fetchWithAuth(url);
+    return this.parseMagazineTitles(data);
   }
 
   // =========================================================================
@@ -426,6 +464,37 @@ export class TroveClient extends BaseClient {
       }
     }
     return undefined;
+  }
+
+  private parseContributor(data: unknown): TroveContributor {
+    const d = data as Record<string, unknown>;
+    const contrib = (d.contributor ?? d) as Record<string, unknown>;
+    return {
+      nuc: String(contrib.nuc ?? contrib.id ?? ''),
+      name: String(contrib.name ?? 'Unknown'),
+      shortname: contrib.shortname ? String(contrib.shortname) : undefined,
+      url: contrib.url ? String(contrib.url) : undefined,
+      address: contrib.address ? String(contrib.address) : undefined,
+      email: contrib.email ? String(contrib.email) : undefined,
+      phone: contrib.phone ? String(contrib.phone) : undefined,
+      fax: contrib.fax ? String(contrib.fax) : undefined,
+      catalogue: contrib.catalogue ? String(contrib.catalogue) : undefined,
+      totalHoldings: typeof contrib.totalHoldings === 'number' ? contrib.totalHoldings : undefined,
+    };
+  }
+
+  private parseMagazineTitles(data: unknown): TroveMagazineTitle[] {
+    const d = data as Record<string, unknown>;
+    const titles = (d.magazine ?? []) as Array<Record<string, unknown>>;
+    return titles.map((t) => ({
+      id: String(t.id ?? ''),
+      title: String(t.title ?? 'Untitled'),
+      publisher: t.publisher ? String(t.publisher) : undefined,
+      startDate: t.startDate ? String(t.startDate) : undefined,
+      endDate: t.endDate ? String(t.endDate) : undefined,
+      issn: t.issn ? String(t.issn) : undefined,
+      troveUrl: t.troveUrl ? String(t.troveUrl) : `https://trove.nla.gov.au/magazine/title/${t.id}`,
+    }));
   }
 }
 

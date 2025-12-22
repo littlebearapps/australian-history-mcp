@@ -101,7 +101,7 @@ function parseSitemapXml(xml: string): PMTranscriptRef[] {
 
 export class PMTranscriptsClient extends BaseClient {
   constructor() {
-    super(PM_TRANSCRIPTS_BASE, { userAgent: 'australian-archives-mcp/0.4.0' });
+    super(PM_TRANSCRIPTS_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   /**
@@ -114,7 +114,7 @@ export class PMTranscriptsClient extends BaseClient {
       const response = await fetch(url, {
         headers: {
           Accept: 'application/xml, text/xml',
-          'User-Agent': 'australian-archives-mcp/0.4.0',
+          'User-Agent': 'australian-archives-mcp/0.5.0',
         },
       });
 
@@ -145,7 +145,7 @@ export class PMTranscriptsClient extends BaseClient {
     const response = await fetch(url, {
       headers: {
         Accept: 'application/xml, text/xml',
-        'User-Agent': 'australian-archives-mcp/0.4.0',
+        'User-Agent': 'australian-archives-mcp/0.5.0',
       },
     });
 

@@ -109,23 +109,27 @@ npx tsc --noEmit
 
 ## MCP Tools Available
 
-### PROV Tools (3)
+### PROV Tools (5)
 | Tool | API Key | Purpose |
 |------|---------|---------|
-| `prov_search` | None | Search Victorian state archives |
+| `prov_search` | None | Search Victorian state archives (with category filter) |
 | `prov_get_images` | None | Extract image URLs from digitised records |
 | `prov_harvest` | None | Bulk download PROV records |
+| `prov_get_agency` | None | Get agency details by VA number |
+| `prov_get_series` | None | Get series details by VPRS number |
 
-### Trove Tools (5)
+### Trove Tools (7)
 | Tool | API Key | Purpose |
 |------|---------|---------|
-| `trove_search` | Required | Search newspapers, images, books |
+| `trove_search` | Required | Search newspapers, images, books (with illustrationType) |
 | `trove_newspaper_article` | Required | Get full newspaper article text |
 | `trove_list_titles` | Required | List newspaper/gazette titles |
 | `trove_title_details` | Required | Get title info with issue dates |
 | `trove_harvest` | Required | Bulk download Trove records |
+| `trove_get_contributor` | Required | Get contributor details by NUC code |
+| `trove_list_magazine_titles` | Required | List available magazine titles |
 
-### data.gov.au Tools (10)
+### data.gov.au Tools (11)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `datagovau_search` | None | Search datasets by keyword, organisation, format |
@@ -138,47 +142,66 @@ npx tsc --noEmit
 | `datagovau_get_group` | None | Get group details |
 | `datagovau_list_tags` | None | List popular tags |
 | `datagovau_harvest` | None | Bulk download dataset metadata |
+| `datagovau_autocomplete` | None | Autocomplete dataset names and titles |
 
 ### Museums Victoria Tools (6)
 | Tool | API Key | Purpose |
 |------|---------|---------|
-| `museumsvic_search` | None | Search museum collections |
+| `museumsvic_search` | None | Search museum collections (with random sort option) |
 | `museumsvic_get_article` | None | Get educational article by ID |
 | `museumsvic_get_item` | None | Get museum object by ID |
 | `museumsvic_get_species` | None | Get species information by ID |
 | `museumsvic_get_specimen` | None | Get natural science specimen by ID |
 | `museumsvic_harvest` | None | Bulk download museum records |
 
-### ALA Tools (4)
+### ALA Tools (8)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `ala_search_occurrences` | None | Search species occurrence records |
 | `ala_search_species` | None | Search species by common/scientific name |
 | `ala_get_species` | None | Get species profile with taxonomy and images |
 | `ala_harvest` | None | Bulk download occurrence records |
+| `ala_search_images` | None | Search images by keyword, taxon, or species |
+| `ala_match_name` | None | Resolve taxonomic names to classification |
+| `ala_list_species_lists` | None | List user-curated species lists |
+| `ala_get_species_list` | None | Get species list details by druid |
 
-### NMA Tools (4)
+### NMA Tools (9)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `nma_search_objects` | None | Search museum collection objects |
 | `nma_get_object` | None | Get detailed object record |
 | `nma_search_places` | None | Search places of significance |
 | `nma_harvest` | None | Bulk download collection records |
+| `nma_get_place` | None | Get place details by ID |
+| `nma_search_parties` | None | Search people and organisations |
+| `nma_get_party` | None | Get party (person/org) details by ID |
+| `nma_search_media` | None | Search images, video, and sound |
+| `nma_get_media` | None | Get media details by ID |
 
-### VHD Tools (4)
+### VHD Tools (9)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `vhd_search_places` | None | Search heritage places |
 | `vhd_get_place` | None | Get detailed heritage place record |
 | `vhd_search_shipwrecks` | None | Search Victorian shipwrecks |
 | `vhd_harvest` | None | Bulk download heritage records |
+| `vhd_get_shipwreck` | None | Get shipwreck details by ID |
+| `vhd_list_municipalities` | None | List all Victorian municipalities |
+| `vhd_list_architectural_styles` | None | List architectural style classifications |
+| `vhd_list_themes` | None | List heritage themes (history, economics, etc.) |
+| `vhd_list_periods` | None | List historical periods |
 
-### ACMI Tools (3)
+### ACMI Tools (7)
 | Tool | API Key | Purpose |
 |------|---------|---------|
-| `acmi_search_works` | None | Search ACMI collection for films, TV, videogames |
+| `acmi_search_works` | None | Search ACMI collection (with field and size options) |
 | `acmi_get_work` | None | Get detailed work information by ID |
 | `acmi_harvest` | None | Bulk download ACMI collection works |
+| `acmi_list_creators` | None | List creators (directors, actors, studios) |
+| `acmi_get_creator` | None | Get creator details and filmography |
+| `acmi_list_constellations` | None | List curated thematic collections |
+| `acmi_get_constellation` | None | Get constellation details with works |
 
 ### PM Transcripts Tools (2)
 | Tool | API Key | Purpose |
@@ -257,21 +280,21 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (46 tools via registry) |
+| `src/index.ts` | MCP server entry point (69 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
 | `src/core/base-client.ts` | Shared fetch helpers with retry |
 | `src/core/base-source.ts` | Source interface definition |
 | `src/core/harvest-runner.ts` | Shared pagination logic |
-| `src/sources/prov/` | PROV source (3 tools) |
-| `src/sources/trove/` | Trove source (5 tools) |
-| `src/sources/datagovau/` | data.gov.au source (10 tools) |
+| `src/sources/prov/` | PROV source (5 tools) |
+| `src/sources/trove/` | Trove source (7 tools) |
+| `src/sources/datagovau/` | data.gov.au source (11 tools) |
 | `src/sources/museums-victoria/` | Museums Victoria source (6 tools) |
-| `src/sources/ala/` | ALA source (4 tools) |
-| `src/sources/nma/` | NMA source (4 tools) |
-| `src/sources/vhd/` | VHD source (4 tools) |
-| `src/sources/acmi/` | ACMI source (3 tools) |
+| `src/sources/ala/` | ALA source (8 tools) |
+| `src/sources/nma/` | NMA source (9 tools) |
+| `src/sources/vhd/` | VHD source (9 tools) |
+| `src/sources/acmi/` | ACMI source (7 tools) |
 | `src/sources/pm-transcripts/` | PM Transcripts source (2 tools) |
 | `src/sources/iiif/` | IIIF source (2 tools) |
 | `src/sources/ga-hap/` | GA HAP source (3 tools) |
@@ -289,13 +312,13 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 └───────────────────────────────────┬─────────────────────────────────────────────┘
                                     │ stdio
 ┌───────────────────────────────────▼─────────────────────────────────────────────┐
-│               Australian Archives MCP Server (46 tools, 11 sources)              │
+│               Australian Archives MCP Server (69 tools, 11 sources)              │
 │  ┌──────────────────────────────────────────────────────────────────────────┐   │
 │  │                         Tool Registry (Map-based)                         │   │
 │  └──────────────────────────────────────────────────────────────────────────┘   │
 │  ┌────┐ ┌─────┐ ┌───────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐│
 │  │PROV│ │Trove│ │dataGov│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA ││
-│  │(3) │ │(5)  │ │(10)   │ │(6)   │ │(4)│ │(4)│ │(4)│ │(3) │ │(2) │ │(2) │ │(3) ││
+│  │(5) │ │(7)  │ │(11)   │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) ││
 │  └──┬─┘ └──┬──┘ └───┬───┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘│
 └─────┼──────┼────────┼────────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼────┘
       │      │        │        │       │     │     │     │      │      │      │
@@ -547,8 +570,10 @@ echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | node dist/index.js
 - **VHD response format:** HAL+JSON with `_embedded` and `_links` structure
 - **VHD images:** Returned as dictionary keyed by ID, not array
 - **VHD API params:** Uses `rpp` (records per page) not `limit`, `kw` (keyword) not `query`
+- **VHD lookup embedded keys:** API returns different keys than endpoint paths (e.g., `local_government_authority` not `municipalities`, `architectural_style` not `architectural-styles`, `period` not `periods`)
 - **ACMI pagination:** Page-based (page 1, 2, 3...) not offset-based
 - **ACMI work types:** Film, Television, Videogame, Artwork, Object, etc.
+- **ACMI constellations:** API uses `name` field not `title` for constellation names
 - **PM Transcripts format:** XML responses requiring parsing
 - **PM Transcripts IDs:** Sequential integers, gaps exist for missing transcripts
 - **PM Transcripts harvest:** Slow for PM filtering due to sequential scanning. Use `pm_transcripts_get_transcript` for individual lookups. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000

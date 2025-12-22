@@ -11,6 +11,8 @@ import { defineSource } from '../../core/base-source.js';
 import { provSearchTool } from './tools/search.js';
 import { provGetImagesTool } from './tools/images.js';
 import { provHarvestTool } from './tools/harvest.js';
+import { provGetSeriesTool } from './tools/get-series.js';
+import { provGetAgencyTool } from './tools/get-agency.js';
 
 export const provSource = defineSource({
   name: 'prov',
@@ -21,6 +23,8 @@ export const provSource = defineSource({
     provSearchTool,
     provGetImagesTool,
     provHarvestTool,
+    provGetSeriesTool,
+    provGetAgencyTool,
   ],
 });
 

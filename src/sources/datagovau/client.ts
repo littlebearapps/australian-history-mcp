@@ -25,7 +25,7 @@ const DATAGOVAU_API_BASE = 'https://data.gov.au/data/api/3/action';
 
 export class DataGovAUClient extends BaseClient {
   constructor() {
-    super(DATAGOVAU_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(DATAGOVAU_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   // =========================================================================
@@ -352,6 +352,26 @@ export class DataGovAUClient extends BaseClient {
     const data = await this.fetchJSON<{
       success: boolean;
       result: string[];
+    }>(url);
+
+    return data.result ?? [];
+  }
+
+  /**
+   * Autocomplete dataset names and titles
+   */
+  async autocomplete(query: string, limit?: number): Promise<{ name: string; title: string }[]> {
+    const queryParams: Record<string, string> = {
+      q: query,
+    };
+    if (limit) {
+      queryParams.limit = limit.toString();
+    }
+
+    const url = this.buildUrl('/package_autocomplete', queryParams);
+    const data = await this.fetchJSON<{
+      success: boolean;
+      result: Array<{ name: string; title: string }>;
     }>(url);
 
     return data.result ?? [];

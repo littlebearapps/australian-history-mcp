@@ -22,6 +22,7 @@ import {
   dataGovAUListTagsTool,
 } from './tools/browse.js';
 import { dataGovAUHarvestTool } from './tools/harvest.js';
+import { dataGovAUAutocompleteTool } from './tools/autocomplete.js';
 
 export const dataGovAUSource = defineSource({
   name: 'datagovau',
@@ -39,6 +40,7 @@ export const dataGovAUSource = defineSource({
     dataGovAUGetGroupTool,
     dataGovAUListTagsTool,
     dataGovAUHarvestTool,
+    dataGovAUAutocompleteTool,
   ],
 });
 

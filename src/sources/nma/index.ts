@@ -11,6 +11,11 @@ import { defineSource } from '../../core/base-source.js';
 import { nmaSearchObjectsTool } from './tools/search-objects.js';
 import { nmaGetObjectTool } from './tools/get-object.js';
 import { nmaSearchPlacesTool } from './tools/search-places.js';
+import { nmaGetPlaceTool } from './tools/get-place.js';
+import { nmaSearchPartiesTool } from './tools/search-parties.js';
+import { nmaGetPartyTool } from './tools/get-party.js';
+import { nmaSearchMediaTool } from './tools/search-media.js';
+import { nmaGetMediaTool } from './tools/get-media.js';
 import { nmaHarvestTool } from './tools/harvest.js';
 
 export const nmaSource = defineSource({
@@ -22,6 +27,11 @@ export const nmaSource = defineSource({
     nmaSearchObjectsTool,
     nmaGetObjectTool,
     nmaSearchPlacesTool,
+    nmaGetPlaceTool,
+    nmaSearchPartiesTool,
+    nmaGetPartyTool,
+    nmaSearchMediaTool,
+    nmaGetMediaTool,
     nmaHarvestTool,
   ],
 });

@@ -50,6 +50,11 @@ export const troveSearchTool: SourceTool = {
           type: 'string',
           description: 'NUC code to filter by contributor/partner. Common codes: VSL (State Library Victoria), SLNSW (State Library NSW), ANL (National Library), QSL (State Library Queensland)',
         },
+        illustrationType: {
+          type: 'string',
+          description: 'Filter by illustration type (for newspapers/magazines). Options: Illustrated, Not Illustrated',
+          enum: ['Illustrated', 'Not Illustrated'],
+        },
         limit: {
           type: 'number',
           description: 'Maximum results (1-100)',
@@ -70,6 +75,7 @@ export const troveSearchTool: SourceTool = {
       format?: string;
       includeFullText?: boolean;
       nuc?: string;
+      illustrationType?: string;
       limit?: number;
     };
 
@@ -78,6 +84,14 @@ export const troveSearchTool: SourceTool = {
     }
 
     try {
+      // Convert illustrationType to API format
+      let illustrated: 'Y' | 'N' | undefined;
+      if (input.illustrationType === 'Illustrated') {
+        illustrated = 'Y';
+      } else if (input.illustrationType === 'Not Illustrated') {
+        illustrated = 'N';
+      }
+
       const params: TroveSearchParams = {
         query: input.query,
         category: input.category as TroveSearchParams['category'],
@@ -87,6 +101,7 @@ export const troveSearchTool: SourceTool = {
         format: input.format,
         includeFullText: input.includeFullText ?? false,
         nuc: input.nuc,
+        illustrated,
         limit: Math.min(input.limit ?? 20, 100),
       };
 

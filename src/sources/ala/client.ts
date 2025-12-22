@@ -17,15 +17,26 @@ import type {
   ALASpeciesSearchResult,
   ALASpeciesProfile,
   ALAAutoCompleteResult,
+  ALAImageSearchParams,
+  ALAImageSearchResult,
+  ALAImage,
+  ALANameMatchResult,
+  ALASpeciesListSearchResult,
+  ALASpeciesList,
+  ALASpeciesListDetail,
+  ALASpeciesListItem,
 } from './types.js';
 
 // ALA uses multiple API endpoints
 const BIOCACHE_API_BASE = 'https://biocache-ws.ala.org.au/ws';
 const BIE_API_BASE = 'https://bie-ws.ala.org.au/ws';
+const IMAGES_API_BASE = 'https://images.ala.org.au/ws';
+const NAMEMATCHING_API_BASE = 'https://namematching-ws.ala.org.au/api';
+const LISTS_API_BASE = 'https://lists.ala.org.au/ws';
 
 export class ALAClient extends BaseClient {
   constructor() {
-    super(BIOCACHE_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(BIOCACHE_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   // =========================================================================
@@ -59,7 +70,7 @@ export class ALAClient extends BaseClient {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'australian-archives-mcp/0.2.0',
+          'User-Agent': 'australian-archives-mcp/0.5.0',
         },
       });
 
@@ -270,6 +281,151 @@ export class ALAClient extends BaseClient {
   }
 
   // =========================================================================
+  // Image Search
+  // =========================================================================
+
+  /**
+   * Build URL for Images API
+   */
+  private buildImagesUrl(path: string, params?: Record<string, unknown>): string {
+    const url = new URL(`${IMAGES_API_BASE}${path}`);
+    if (params) {
+      for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null && value !== '') {
+          url.searchParams.set(key, String(value));
+        }
+      }
+    }
+    return url.toString();
+  }
+
+  /**
+   * Search for images
+   */
+  async searchImages(params: ALAImageSearchParams): Promise<ALAImageSearchResult> {
+    const url = this.buildImagesUrl('/search', {
+      q: params.q,
+      pageSize: (params.pageSize ?? 20).toString(),
+      offset: (params.offset ?? 0).toString(),
+    });
+
+    const data = await this.fetchBieJSON<{
+      totalRecords: number;
+      pageSize: number;
+      startIndex: number;
+      images: unknown[];
+    }>(url);
+
+    return {
+      totalRecords: data.totalRecords ?? 0,
+      pageSize: data.pageSize ?? 20,
+      startIndex: data.startIndex ?? 0,
+      images: (data.images ?? []).map((img) => this.parseImage(img)),
+    };
+  }
+
+  // =========================================================================
+  // Name Matching
+  // =========================================================================
+
+  /**
+   * Match a scientific name to the ALA taxonomy
+   */
+  async matchName(scientificName: string): Promise<ALANameMatchResult> {
+    const url = new URL(`${NAMEMATCHING_API_BASE}/searchByClassification`);
+    url.searchParams.set('scientificName', scientificName);
+
+    const data = await this.fetchBieJSON<unknown>(url.toString());
+    return this.parseNameMatch(data);
+  }
+
+  // =========================================================================
+  // Species Lists
+  // =========================================================================
+
+  /**
+   * Build URL for Lists API
+   */
+  private buildListsUrl(path: string, params?: Record<string, unknown>): string {
+    const url = new URL(`${LISTS_API_BASE}${path}`);
+    if (params) {
+      for (const [key, value] of Object.entries(params)) {
+        if (value !== undefined && value !== null && value !== '') {
+          url.searchParams.set(key, String(value));
+        }
+      }
+    }
+    return url.toString();
+  }
+
+  /**
+   * List species lists
+   */
+  async listSpeciesLists(params?: { max?: number; offset?: number; listType?: string }): Promise<ALASpeciesListSearchResult> {
+    const url = this.buildListsUrl('/speciesList', {
+      max: (params?.max ?? 20).toString(),
+      offset: (params?.offset ?? 0).toString(),
+      listType: params?.listType,
+    });
+
+    const data = await this.fetchBieJSON<{
+      lists: unknown[];
+      listCount: number;
+      max: number;
+      offset: number;
+    }>(url);
+
+    return {
+      lists: (data.lists ?? []).map((l) => this.parseSpeciesList(l)),
+      listCount: data.listCount ?? 0,
+      max: data.max ?? 20,
+      offset: data.offset ?? 0,
+    };
+  }
+
+  /**
+   * Get a species list by ID (includes list items from separate endpoint)
+   */
+  async getSpeciesList(dataResourceUid: string): Promise<ALASpeciesListDetail | null> {
+    const listUrl = this.buildListsUrl(`/speciesList/${dataResourceUid}`, {});
+    const itemsUrl = this.buildListsUrl(`/speciesListItems/${dataResourceUid}`, {
+      max: '100',  // Get up to 100 items
+    });
+
+    try {
+      // Fetch both list metadata and items in parallel
+      const [listData, itemsData] = await Promise.all([
+        this.fetchBieJSON<unknown>(listUrl),
+        this.fetchBieJSON<unknown[]>(itemsUrl).catch(() => [] as unknown[]),
+      ]);
+
+      const detail = this.parseSpeciesListDetail(listData);
+
+      // Add items from the separate endpoint
+      if (Array.isArray(itemsData)) {
+        detail.items = itemsData.map((item: unknown) => {
+          const d = item as Record<string, unknown>;
+          return {
+            id: typeof d.id === 'number' ? d.id : 0,
+            lsid: d.lsid ? String(d.lsid) : undefined,
+            name: String(d.name ?? d.scientificName ?? ''),
+            commonName: d.commonName ? String(d.commonName) : undefined,
+            scientificName: d.scientificName ? String(d.scientificName) : undefined,
+            kvpValues: Array.isArray(d.kvpValues) ? d.kvpValues as Record<string, string>[] : undefined,
+          };
+        });
+      }
+
+      return detail;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
+  }
+
+  // =========================================================================
   // Private Parsers
   // =========================================================================
 
@@ -409,6 +565,105 @@ export class ALAClient extends BaseClient {
       kingdom: d.kingdom ? String(d.kingdom) : undefined,
       rankId: typeof d.rankId === 'number' ? d.rankId : undefined,
       rankString: d.rankString ? String(d.rankString) : undefined,
+    };
+  }
+
+  private parseImage(data: unknown): ALAImage {
+    const d = data as Record<string, unknown>;
+
+    // ALA Images API returns imageIdentifier, not imageUrl
+    // We need to construct URLs from the identifier
+    const imageId = String(d.imageId ?? d.imageIdentifier ?? '');
+    const imageBaseUrl = imageId ? `https://images.ala.org.au/image/${imageId}` : '';
+
+    return {
+      imageId: imageId,
+      // Construct URLs from imageIdentifier since they're not in the response
+      imageUrl: imageBaseUrl ? `${imageBaseUrl}/original` : (d.imageUrl ? String(d.imageUrl) : ''),
+      thumbnailUrl: imageBaseUrl ? `${imageBaseUrl}/thumbnail` : (d.thumbnailUrl ? String(d.thumbnailUrl) : undefined),
+      largeImageUrl: imageBaseUrl ? `${imageBaseUrl}/large` : (d.largeImageUrl ? String(d.largeImageUrl) : undefined),
+      title: d.title ? String(d.title) : undefined,
+      creator: d.creator ? String(d.creator) : undefined,
+      license: d.license ? String(d.license) : undefined,
+      dataResourceName: d.dataResourceName ? String(d.dataResourceName) : undefined,
+      occurrenceId: d.occurrenceId ? String(d.occurrenceId) : undefined,
+      scientificName: d.scientificName ? String(d.scientificName) : undefined,
+      vernacularName: d.vernacularName ? String(d.vernacularName) : undefined,
+      recognisedLicence: d.recognisedLicence ? String(d.recognisedLicence) : undefined,
+    };
+  }
+
+  private parseNameMatch(data: unknown): ALANameMatchResult {
+    const d = data as Record<string, unknown>;
+
+    return {
+      success: d.success === true,
+      scientificName: d.scientificName ? String(d.scientificName) : undefined,
+      scientificNameAuthorship: d.scientificNameAuthorship ? String(d.scientificNameAuthorship) : undefined,
+      taxonConceptID: d.taxonConceptID ? String(d.taxonConceptID) : undefined,
+      rank: d.rank ? String(d.rank) : undefined,
+      rankId: typeof d.rankId === 'number' ? d.rankId : undefined,
+      lft: typeof d.lft === 'number' ? d.lft : undefined,
+      rgt: typeof d.rgt === 'number' ? d.rgt : undefined,
+      matchType: d.matchType ? String(d.matchType) : undefined,
+      nameType: d.nameType ? String(d.nameType) : undefined,
+      synonymType: d.synonymType ? String(d.synonymType) : undefined,
+      kingdom: d.kingdom ? String(d.kingdom) : undefined,
+      kingdomID: d.kingdomID ? String(d.kingdomID) : undefined,
+      phylum: d.phylum ? String(d.phylum) : undefined,
+      phylumID: d.phylumID ? String(d.phylumID) : undefined,
+      classs: d.classs ? String(d.classs) : undefined,
+      classID: d.classID ? String(d.classID) : undefined,
+      order: d.order ? String(d.order) : undefined,
+      orderID: d.orderID ? String(d.orderID) : undefined,
+      family: d.family ? String(d.family) : undefined,
+      familyID: d.familyID ? String(d.familyID) : undefined,
+      genus: d.genus ? String(d.genus) : undefined,
+      genusID: d.genusID ? String(d.genusID) : undefined,
+      species: d.species ? String(d.species) : undefined,
+      speciesID: d.speciesID ? String(d.speciesID) : undefined,
+      vernacularName: d.vernacularName ? String(d.vernacularName) : undefined,
+      issues: Array.isArray(d.issues) ? d.issues.map(String) : undefined,
+    };
+  }
+
+  private parseSpeciesList(data: unknown): ALASpeciesList {
+    const d = data as Record<string, unknown>;
+
+    return {
+      dataResourceUid: String(d.dataResourceUid ?? ''),
+      listName: String(d.listName ?? ''),
+      listType: d.listType ? String(d.listType) : undefined,
+      dateCreated: d.dateCreated ? String(d.dateCreated) : undefined,
+      lastUpdated: d.lastUpdated ? String(d.lastUpdated) : undefined,
+      itemCount: typeof d.itemCount === 'number' ? d.itemCount : 0,
+      isAuthoritative: typeof d.isAuthoritative === 'boolean' ? d.isAuthoritative : undefined,
+      isPrivate: typeof d.isPrivate === 'boolean' ? d.isPrivate : undefined,
+      region: d.region ? String(d.region) : undefined,
+      description: d.description ? String(d.description) : undefined,
+    };
+  }
+
+  private parseSpeciesListDetail(data: unknown): ALASpeciesListDetail {
+    const d = data as Record<string, unknown>;
+
+    return {
+      dataResourceUid: String(d.dataResourceUid ?? ''),
+      listName: String(d.listName ?? ''),
+      listType: d.listType ? String(d.listType) : undefined,
+      description: d.description ? String(d.description) : undefined,
+      dateCreated: d.dateCreated ? String(d.dateCreated) : undefined,
+      lastUpdated: d.lastUpdated ? String(d.lastUpdated) : undefined,
+      itemCount: typeof d.itemCount === 'number' ? d.itemCount : 0,
+      items: Array.isArray(d.items)
+        ? d.items.map((item: Record<string, unknown>) => ({
+            id: typeof item.id === 'number' ? item.id : 0,
+            lsid: item.lsid ? String(item.lsid) : undefined,
+            name: String(item.name ?? ''),
+            commonName: item.commonName ? String(item.commonName) : undefined,
+            kvpValues: Array.isArray(item.kvpValues) ? item.kvpValues as Record<string, string>[] : undefined,
+          }))
+        : [],
     };
   }
 }

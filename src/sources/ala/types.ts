@@ -183,3 +183,116 @@ export interface ALAAutoCompleteResult {
   rankId?: number;
   rankString?: string;
 }
+
+// ============================================================================
+// Image Types
+// ============================================================================
+
+export interface ALAImageSearchParams {
+  /** Search query */
+  q: string;
+  /** Maximum results (default 20) */
+  pageSize?: number;
+  /** Start offset */
+  offset?: number;
+}
+
+export interface ALAImage {
+  imageId: string;
+  imageUrl: string;
+  thumbnailUrl?: string;
+  largeImageUrl?: string;
+  title?: string;
+  creator?: string;
+  license?: string;
+  dataResourceName?: string;
+  occurrenceId?: string;
+  scientificName?: string;
+  vernacularName?: string;
+  recognisedLicence?: string;
+}
+
+export interface ALAImageSearchResult {
+  totalRecords: number;
+  pageSize: number;
+  startIndex: number;
+  images: ALAImage[];
+}
+
+// ============================================================================
+// Name Matching Types
+// ============================================================================
+
+export interface ALANameMatchResult {
+  success: boolean;
+  scientificName?: string;
+  scientificNameAuthorship?: string;
+  taxonConceptID?: string;
+  rank?: string;
+  rankId?: number;
+  lft?: number;
+  rgt?: number;
+  matchType?: string;
+  nameType?: string;
+  synonymType?: string;
+  kingdom?: string;
+  kingdomID?: string;
+  phylum?: string;
+  phylumID?: string;
+  classs?: string;
+  classID?: string;
+  order?: string;
+  orderID?: string;
+  family?: string;
+  familyID?: string;
+  genus?: string;
+  genusID?: string;
+  species?: string;
+  speciesID?: string;
+  vernacularName?: string;
+  issues?: string[];
+}
+
+// ============================================================================
+// Species List Types
+// ============================================================================
+
+export interface ALASpeciesList {
+  dataResourceUid: string;
+  listName: string;
+  listType?: string;
+  dateCreated?: string;
+  lastUpdated?: string;
+  itemCount: number;
+  isAuthoritative?: boolean;
+  isPrivate?: boolean;
+  region?: string;
+  description?: string;
+}
+
+export interface ALASpeciesListSearchResult {
+  lists: ALASpeciesList[];
+  listCount: number;
+  max: number;
+  offset: number;
+}
+
+export interface ALASpeciesListItem {
+  id: number;
+  lsid?: string;
+  name: string;
+  commonName?: string;
+  scientificName?: string;
+  kvpValues?: Record<string, string>[];
+}
+
+export interface ALASpeciesListDetail {
+  dataResourceUid: string;
+  listName: string;
+  listType?: string;
+  description?: string;
+  dateCreated?: string;
+  lastUpdated?: string;
+  itemCount: number;
+  items: ALASpeciesListItem[];
+}

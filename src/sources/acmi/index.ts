@@ -10,6 +10,10 @@
 import { defineSource } from '../../core/base-source.js';
 import { acmiSearchWorksTool } from './tools/search-works.js';
 import { acmiGetWorkTool } from './tools/get-work.js';
+import { acmiListCreatorsTool } from './tools/list-creators.js';
+import { acmiGetCreatorTool } from './tools/get-creator.js';
+import { acmiListConstellationsTool } from './tools/list-constellations.js';
+import { acmiGetConstellationTool } from './tools/get-constellation.js';
 import { acmiHarvestTool } from './tools/harvest.js';
 
 export const acmiSource = defineSource({
@@ -20,6 +24,10 @@ export const acmiSource = defineSource({
   tools: [
     acmiSearchWorksTool,
     acmiGetWorkTool,
+    acmiListCreatorsTool,
+    acmiGetCreatorTool,
+    acmiListConstellationsTool,
+    acmiGetConstellationTool,
     acmiHarvestTool,
   ],
 });
