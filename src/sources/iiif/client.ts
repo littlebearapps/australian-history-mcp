@@ -23,7 +23,7 @@ import type {
 
 export class IIIFClient extends BaseClient {
   constructor() {
-    super('', { userAgent: 'australian-archives-mcp/0.4.0' });
+    super('', { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   /**

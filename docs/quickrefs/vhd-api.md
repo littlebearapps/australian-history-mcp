@@ -48,6 +48,35 @@ Bulk download heritage records.
 | `maxRecords` | number | Max records (1-1000, default 100) |
 | `startPage` | number | Page to start from (1-based) |
 
+### vhd_get_shipwreck
+Get detailed shipwreck record.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `id` | number | Yes | Shipwreck ID from search results |
+
+Returns: vessel name, type, rig, propulsion, builder, tonnage, loss location, loss date, cargo, and heritage status.
+
+### vhd_list_municipalities
+List all Victorian municipalities (Local Government Areas).
+
+No parameters required. Returns list with ID and name for each municipality.
+
+### vhd_list_architectural_styles
+List all architectural style classifications.
+
+No parameters required. Returns list with ID and style name.
+
+### vhd_list_themes
+List heritage themes for categorising places.
+
+No parameters required. Returns themes like "Gold", "Pastoral", "Maritime", "Education", etc.
+
+### vhd_list_periods
+List all time periods.
+
+No parameters required. Returns periods as year ranges (e.g., "1880 - 1909").
+
 ## API Parameter Mapping
 
 The VHD API uses different parameter names than typical REST APIs:
@@ -92,6 +121,11 @@ VHD uses HAL+JSON with `_embedded` and `_links`:
 - Uses `kw` (keyword) not `query`
 - Page-based pagination (1-indexed)
 - Default page size is 25 records
+- **Lookup endpoint embedded keys differ from endpoint paths:**
+  - `/municipalities` → `_embedded.local_government_authority`
+  - `/architectural-styles` → `_embedded.architectural_style`
+  - `/themes` → `_embedded.themes`
+  - `/periods` → `_embedded.period`
 
 ## Additional Endpoints
 

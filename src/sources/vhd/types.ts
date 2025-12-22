@@ -146,3 +146,56 @@ export interface VHDShipwreckDetail extends VHDShipwreck {
   passengers?: string;
   lives_lost?: string;
 }
+
+// ============================================================================
+// Lookup Types
+// ============================================================================
+
+export interface VHDLookupItem {
+  id: number;
+  name: string;
+  /** Description for themes */
+  description?: string;
+  /** Count of places/records (if returned) */
+  count?: number;
+}
+
+export interface VHDLookupResponse {
+  _embedded?: {
+    // API returns different key names than endpoint paths
+    local_government_authority?: VHDMunicipalityRaw[];
+    architectural_style?: VHDArchitecturalStyleRaw[];
+    themes?: VHDThemeRaw[];
+    period?: VHDPeriodRaw[];
+  };
+}
+
+// Raw API response types (before normalisation to VHDLookupItem)
+export interface VHDMunicipalityRaw {
+  id: string;
+  lga_code: string;
+  lga_name: string;
+  lga_name_brief: string;
+  url?: string;
+}
+
+export interface VHDArchitecturalStyleRaw {
+  id: string;
+  architectural_style_name: string;
+  architectural_style_id?: string;
+  place_id?: string;
+  comment?: string;
+  sort_order?: string;
+}
+
+export interface VHDThemeRaw {
+  id: string;
+  name: string;
+}
+
+export interface VHDPeriodRaw {
+  id: string;
+  start_year: string;
+  end_year: string;
+  image_image_id?: string;
+}

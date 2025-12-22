@@ -49,6 +49,11 @@ export const museumsvicSearchTool: SourceTool = {
           type: 'string',
           description: 'Filter by taxonomic classification',
         },
+        random: {
+          type: 'boolean',
+          description: 'Return results in random order (useful for discovering collection)',
+          default: false,
+        },
         limit: {
           type: 'number',
           description: 'Maximum results to return (1-100)',
@@ -69,6 +74,7 @@ export const museumsvicSearchTool: SourceTool = {
       imageLicence?: string;
       locality?: string;
       taxon?: string;
+      random?: boolean;
       limit?: number;
     };
 
@@ -87,6 +93,7 @@ export const museumsvicSearchTool: SourceTool = {
         imageLicence: input.imageLicence as MuseumSearchParams['imageLicence'],
         locality: input.locality,
         taxon: input.taxon,
+        random: input.random,
         perPage: Math.min(input.limit ?? 20, 100),
       };
 

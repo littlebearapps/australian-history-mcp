@@ -23,7 +23,7 @@ export class NMAClient extends BaseClient {
   private apiKey?: string;
 
   constructor() {
-    super(NMA_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(NMA_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
     this.apiKey = process.env.NMA_API_KEY;
   }
 
@@ -180,6 +180,23 @@ export class NMAClient extends BaseClient {
 
     const url = this.buildUrl('/media', queryParams);
     return this.fetchWithAuth<NMASearchResult<NMAMedia>>(url);
+  }
+
+  /**
+   * Get a single media item by ID
+   */
+  async getMedia(id: string): Promise<NMAMedia | null> {
+    const url = this.buildUrl(`/media/${id}`, {});
+
+    try {
+      const result = await this.fetchWithAuth<NMASearchResult<NMAMedia>>(url);
+      return result.data[0] ?? null;
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('404')) {
+        return null;
+      }
+      throw error;
+    }
   }
 
   // =========================================================================

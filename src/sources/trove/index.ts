@@ -15,6 +15,8 @@ import {
   troveTitleDetailsTool,
 } from './tools/newspaper.js';
 import { troveHarvestTool } from './tools/harvest.js';
+import { troveGetContributorTool } from './tools/get-contributor.js';
+import { troveListMagazineTitlesTool } from './tools/list-magazine-titles.js';
 
 export const troveSource = defineSource({
   name: 'trove',
@@ -29,6 +31,8 @@ export const troveSource = defineSource({
     troveListTitlesTool,
     troveTitleDetailsTool,
     troveHarvestTool,
+    troveGetContributorTool,
+    troveListMagazineTitlesTool,
   ],
 });
 

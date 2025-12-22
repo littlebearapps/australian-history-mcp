@@ -12,6 +12,7 @@ export interface PROVSearchParams {
   query?: string;
   series?: string;      // VPRS number (e.g., "VPRS 515")
   agency?: string;      // VA number (e.g., "VA 473")
+  category?: PROVDocumentCategory; // document type filter
   recordForm?: string;  // photograph, map, file, etc.
   startDate?: string;   // YYYY-MM-DD
   endDate?: string;     // YYYY-MM-DD
@@ -95,3 +96,31 @@ export const PROV_RECORD_FORMS = [
 ] as const;
 
 export type PROVRecordForm = typeof PROV_RECORD_FORMS[number];
+
+// ============================================================================
+// Document Category Enum
+// ============================================================================
+
+export const PROV_DOCUMENT_CATEGORIES = [
+  'agency',
+  'function',
+  'series',
+  'consignment',
+  'item',
+  'image',
+] as const;
+
+export type PROVDocumentCategory = typeof PROV_DOCUMENT_CATEGORIES[number];
+
+// ============================================================================
+// Agency Types
+// ============================================================================
+
+export interface PROVAgency {
+  id: string;
+  title: string;
+  description?: string;
+  dateRange?: string;
+  status?: string;
+  seriesCount?: number;
+}

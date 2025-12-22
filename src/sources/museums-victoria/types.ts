@@ -30,6 +30,7 @@ export interface MuseumSearchParams {
   locality?: string;
   taxon?: string;
   collectingArea?: string;
+  random?: boolean;
   perPage?: number;
   page?: number;
 }

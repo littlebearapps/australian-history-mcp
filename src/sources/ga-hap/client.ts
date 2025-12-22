@@ -33,7 +33,7 @@ const EARTH_RADIUS = 6378137;
 
 export class GAHAPClient extends BaseClient {
   constructor() {
-    super(API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   // =========================================================================

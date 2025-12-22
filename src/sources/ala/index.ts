@@ -11,6 +11,10 @@ import { defineSource } from '../../core/base-source.js';
 import { alaSearchOccurrencesTool } from './tools/search-occurrences.js';
 import { alaSearchSpeciesTool } from './tools/search-species.js';
 import { alaGetSpeciesTool } from './tools/get-species.js';
+import { alaSearchImagesTool } from './tools/search-images.js';
+import { alaMatchNameTool } from './tools/match-name.js';
+import { alaListSpeciesListsTool } from './tools/list-species-lists.js';
+import { alaGetSpeciesListTool } from './tools/get-species-list.js';
 import { alaHarvestTool } from './tools/harvest.js';
 
 export const alaSource = defineSource({
@@ -22,6 +26,10 @@ export const alaSource = defineSource({
     alaSearchOccurrencesTool,
     alaSearchSpeciesTool,
     alaGetSpeciesTool,
+    alaSearchImagesTool,
+    alaMatchNameTool,
+    alaListSpeciesListsTool,
+    alaGetSpeciesListTool,
     alaHarvestTool,
   ],
 });

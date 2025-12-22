@@ -16,13 +16,18 @@ import type {
   VHDPlaceDetail,
   VHDShipwreck,
   VHDShipwreckDetail,
+  VHDLookupItem,
+  VHDLookupResponse,
+  VHDMunicipalityRaw,
+  VHDArchitecturalStyleRaw,
+  VHDPeriodRaw,
 } from './types.js';
 
 const VHD_API_BASE = 'https://api.heritagecouncil.vic.gov.au/v1';
 
 export class VHDClient extends BaseClient {
   constructor() {
-    super(VHD_API_BASE, { userAgent: 'australian-archives-mcp/0.2.0' });
+    super(VHD_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
   }
 
   // =========================================================================
@@ -130,6 +135,62 @@ export class VHDClient extends BaseClient {
       }
       throw error;
     }
+  }
+
+  // =========================================================================
+  // Lookup Endpoints
+  // =========================================================================
+
+  /**
+   * List all municipalities (local government areas)
+   */
+  async listMunicipalities(): Promise<VHDLookupItem[]> {
+    const url = this.buildUrl('/municipalities', {});
+    const response = await this.fetchJSON<VHDLookupResponse>(url);
+    const raw = response._embedded?.local_government_authority ?? [];
+    return raw.map((m: VHDMunicipalityRaw) => ({
+      id: parseInt(m.id, 10) || 0,
+      name: m.lga_name,
+    }));
+  }
+
+  /**
+   * List all architectural styles
+   */
+  async listArchitecturalStyles(): Promise<VHDLookupItem[]> {
+    const url = this.buildUrl('/architectural-styles', {});
+    const response = await this.fetchJSON<VHDLookupResponse>(url);
+    const raw = response._embedded?.architectural_style ?? [];
+    return raw.map((s: VHDArchitecturalStyleRaw) => ({
+      id: parseInt(s.id, 10) || 0,
+      name: s.architectural_style_name,
+    }));
+  }
+
+  /**
+   * List all heritage themes
+   */
+  async listThemes(): Promise<VHDLookupItem[]> {
+    const url = this.buildUrl('/themes', {});
+    const response = await this.fetchJSON<VHDLookupResponse>(url);
+    const raw = response._embedded?.themes ?? [];
+    return raw.map((t) => ({
+      id: parseInt(t.id, 10) || 0,
+      name: t.name,
+    }));
+  }
+
+  /**
+   * List all time periods
+   */
+  async listPeriods(): Promise<VHDLookupItem[]> {
+    const url = this.buildUrl('/periods', {});
+    const response = await this.fetchJSON<VHDLookupResponse>(url);
+    const raw = response._embedded?.period ?? [];
+    return raw.map((p: VHDPeriodRaw) => ({
+      id: parseInt(p.id, 10) || 0,
+      name: `${p.start_year} - ${p.end_year}`,
+    }));
   }
 }
 

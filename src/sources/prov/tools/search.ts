@@ -5,7 +5,7 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { provClient } from '../client.js';
-import { PROV_RECORD_FORMS, type PROVSearchParams } from '../types.js';
+import { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES, type PROVSearchParams } from '../types.js';
 
 export const provSearchTool: SourceTool = {
   schema: {
@@ -30,6 +30,11 @@ export const provSearchTool: SourceTool = {
           type: 'string',
           description: 'Record type filter',
           enum: PROV_RECORD_FORMS,
+        },
+        category: {
+          type: 'string',
+          description: 'Document category filter (agency, function, series, consignment, item, image)',
+          enum: PROV_DOCUMENT_CATEGORIES,
         },
         dateFrom: {
           type: 'string',
@@ -60,6 +65,7 @@ export const provSearchTool: SourceTool = {
       series?: string;
       agency?: string;
       recordForm?: string;
+      category?: string;
       dateFrom?: string;
       dateTo?: string;
       digitisedOnly?: boolean;
@@ -77,6 +83,7 @@ export const provSearchTool: SourceTool = {
         series: input.series,
         agency: input.agency,
         recordForm: input.recordForm,
+        category: input.category as PROVSearchParams['category'],
         startDate: input.dateFrom,
         endDate: input.dateTo,
         digitisedOnly: input.digitisedOnly ?? false,

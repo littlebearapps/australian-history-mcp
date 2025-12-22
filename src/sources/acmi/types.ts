@@ -148,8 +148,14 @@ export interface ACMICreator {
 
 export interface ACMIConstellation {
   id: number;
-  title: string;
-  slug: string;
+  name: string;
+  slug?: string;
   description: string;
-  works_count: number;
+  works_count?: number;
+  key_work?: ACMIWork;
+  authors?: Array<{
+    id: number;
+    full_name: string;
+    job_title?: string;
+  }>;
 }
