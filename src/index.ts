@@ -12,6 +12,8 @@
  * - VHD (Victorian Heritage Database) - Heritage places and shipwrecks
  * - ACMI (Australian Centre for the Moving Image) - Films, TV, videogames
  * - PM Transcripts - Prime Ministerial speeches and media releases
+ * - IIIF - Generic IIIF manifest and image tools (any institution)
+ * - GA HAP (Geoscience Australia) - Historical aerial photography (1928-1996)
  *
  * @package @littlebearapps/australian-archives-mcp
  */
@@ -34,6 +36,8 @@ import { nmaSource } from './sources/nma/index.js';
 import { vhdSource } from './sources/vhd/index.js';
 import { acmiSource } from './sources/acmi/index.js';
 import { pmTranscriptsSource } from './sources/pm-transcripts/index.js';
+import { iiifSource } from './sources/iiif/index.js';
+import { gaHapSource } from './sources/ga-hap/index.js';
 
 // ============================================================================
 // Register Source Modules
@@ -48,6 +52,8 @@ registry.register(nmaSource);
 registry.register(vhdSource);
 registry.register(acmiSource);
 registry.register(pmTranscriptsSource);
+registry.register(iiifSource);
+registry.register(gaHapSource);
 
 // ============================================================================
 // Server Setup
@@ -56,7 +62,7 @@ registry.register(pmTranscriptsSource);
 const server = new Server(
   {
     name: 'australian-archives-mcp',
-    version: '0.4.0',
+    version: '0.5.0',
   },
   {
     capabilities: {

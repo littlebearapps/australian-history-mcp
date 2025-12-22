@@ -66,6 +66,7 @@ export interface TroveSearchParams {
   includeFullText?: boolean;
   format?: string;      // Photograph, Map, Book, etc.
   facets?: string[];
+  nuc?: string;         // NUC code to filter by contributor (e.g., "ANL" for NLA, "VSL" for SLV)
 }
 
 // ============================================================================

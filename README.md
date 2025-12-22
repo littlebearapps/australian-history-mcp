@@ -19,6 +19,8 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 | **VHD** (Victorian Heritage Database) | None | 12,000+ heritage places, 700+ shipwrecks, architectural data |
 | **ACMI** (Australian Centre for the Moving Image) | None | 42,000+ films, TV, videogames, digital art |
 | **PM Transcripts** | None | 26,000+ Prime Ministerial speeches, media releases, interviews |
+| **IIIF** | None | Generic IIIF manifest/image tools for any institution |
+| **GA HAP** (Geoscience Australia) | None | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 ## Installation
 
@@ -105,14 +107,14 @@ Add to `.mcp.json` in your project:
 
 ## Trove API Key
 
-Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts) work without authentication.
+Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work without authentication.
 
 1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
 2. Select "Level 1" (personal/research use)
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
-## Tools (41 total)
+## Tools (46 total)
 
 ### PROV Tools (3)
 
@@ -199,6 +201,23 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 |------|-------------|
 | `pm_transcripts_get_transcript` | Get Prime Ministerial transcript by ID |
 | `pm_transcripts_harvest` | Bulk download transcripts (see limitations below) |
+
+### IIIF Tools (2)
+
+| Tool | Description |
+|------|-------------|
+| `iiif_get_manifest` | Fetch and parse IIIF manifest from any institution |
+| `iiif_get_image_url` | Construct IIIF Image API URLs for various sizes/formats |
+
+### GA HAP Tools (3)
+
+| Tool | Description |
+|------|-------------|
+| `ga_hap_search` | Search historical aerial photos by state, year, location, bbox |
+| `ga_hap_get_photo` | Get photo details by OBJECTID or film/run/frame |
+| `ga_hap_harvest` | Bulk download photo records with pagination |
+
+> **⚠️ GA HAP Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
 
 > **⚠️ PM Transcripts Harvest Limitation**: The PM Transcripts API has no search endpoint, so harvesting scans IDs sequentially. Filtering by PM name can be slow. For targeted PM research, use `startFrom` near the PM's era:
 > - Curtin/Chifley (1940s): ~1-2000
@@ -297,14 +316,39 @@ Use pm_transcripts_harvest with:
   maxRecords: 100
 ```
 
+### Search Victorian Aerial Photos (GA HAP)
+
+```
+Use ga_hap_search with:
+  state: "VIC"
+  yearFrom: 1950
+  yearTo: 1960
+  scannedOnly: true
+```
+
+### Get Aerial Photo Details (GA HAP)
+
+```
+Use ga_hap_get_photo with:
+  objectId: 12345
+```
+
+### Harvest Aerial Photos by Location (GA HAP)
+
+```
+Use ga_hap_harvest with:
+  bbox: "144.9,-37.9,145.1,-37.7"
+  maxRecords: 100
+```
+
 ### Bulk Download Records
 
 All sources have harvest tools for batch downloading:
 
 ```
 Use prov_harvest, trove_harvest, datagovau_harvest, museumsvic_harvest,
-ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, or pm_transcripts_harvest
-with maxRecords parameter (up to 1000)
+ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, pm_transcripts_harvest,
+or ga_hap_harvest with maxRecords parameter (up to 1000)
 ```
 
 ## Content Types
@@ -368,6 +412,13 @@ with maxRecords parameter (up to 1000)
 - Interviews and press conferences
 - PDF document links for original transcripts
 
+### Geoscience Australia HAP
+- 1.2 million+ aerial photographs (1928-1996)
+- All Australian states and territories
+- Preview images and full resolution TIFFs
+- Flight, run, and frame metadata
+- Photo centre coordinates
+
 ## Rate Limits
 
 - **PROV**: No documented rate limit
@@ -379,6 +430,7 @@ with maxRecords parameter (up to 1000)
 - **VHD**: No documented rate limit
 - **ACMI**: No documented rate limit
 - **PM Transcripts**: No documented rate limit (be respectful, 100ms delays recommended)
+- **GA HAP**: No documented rate limit (standard ArcGIS Feature Service)
 
 ## Licensing Notes
 
@@ -391,6 +443,8 @@ with maxRecords parameter (up to 1000)
 - **VHD**: CC-BY 4.0 (Victorian government open data)
 - **ACMI**: CC0 (public domain dedication for API data)
 - **PM Transcripts**: Australian Government (Crown copyright)
+- **IIIF**: Varies by institution (check manifest attribution field)
+- **GA HAP**: CC-BY 4.0 (Geoscience Australia, attribution required)
 - **This MCP Server**: MIT License
 
 ## Resources
@@ -405,6 +459,8 @@ with maxRecords parameter (up to 1000)
 - [Victorian Heritage Database](https://vhd.heritagecouncil.vic.gov.au/)
 - [ACMI Collection API](https://www.acmi.net.au/api/)
 - [PM Transcripts](https://pmtranscripts.pmc.gov.au/)
+- [IIIF Documentation](https://iiif.io/api/)
+- [Geoscience Australia HAP](https://www.ga.gov.au/scientific-topics/national-location-information/historical-aerial-photography)
 - [GLAM Workbench - PROV](https://glam-workbench.net/prov/)
 - [GLAM Workbench - Trove](https://glam-workbench.net/trove/)
 

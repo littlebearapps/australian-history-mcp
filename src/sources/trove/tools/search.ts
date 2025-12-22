@@ -46,6 +46,10 @@ export const troveSearchTool: SourceTool = {
           description: 'Include full article text (newspapers only)',
           default: false,
         },
+        nuc: {
+          type: 'string',
+          description: 'NUC code to filter by contributor/partner. Common codes: VSL (State Library Victoria), SLNSW (State Library NSW), ANL (National Library), QSL (State Library Queensland)',
+        },
         limit: {
           type: 'number',
           description: 'Maximum results (1-100)',
@@ -65,6 +69,7 @@ export const troveSearchTool: SourceTool = {
       dateTo?: string;
       format?: string;
       includeFullText?: boolean;
+      nuc?: string;
       limit?: number;
     };
 
@@ -81,6 +86,7 @@ export const troveSearchTool: SourceTool = {
         dateTo: input.dateTo,
         format: input.format,
         includeFullText: input.includeFullText ?? false,
+        nuc: input.nuc,
         limit: Math.min(input.limit ?? 20, 100),
       };
 
