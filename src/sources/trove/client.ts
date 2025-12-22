@@ -80,6 +80,12 @@ export class TroveClient extends BaseClient {
       urlParams['l-format'] = params.format;
     }
 
+    // NUC code filter (contributor/partner)
+    // Common codes: ANL (NLA), VSL (SLV), SLNSW (State Library NSW)
+    if (params.nuc) {
+      urlParams['l-partnerNuc'] = params.nuc;
+    }
+
     // Include full text for newspapers
     if (params.includeFullText) {
       urlParams.include = 'articletext';

@@ -1,8 +1,8 @@
 # CLAUDE.md - Australian Archives MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-21
-**Version:** 0.4.0
+**Last Updated:** 2025-12-22
+**Version:** 0.5.0
 
 ---
 
@@ -22,6 +22,8 @@
 - **VHD** (Victorian Heritage Database) - Heritage places and shipwrecks (no API key)
 - **ACMI** (Australian Centre for the Moving Image) - Films, TV, videogames, digital art (no API key)
 - **PM Transcripts** - Prime Ministerial speeches and media releases (no API key)
+- **IIIF** - Generic IIIF manifest and image tools for any institution (no API key)
+- **GA HAP** (Geoscience Australia) - Historical aerial photography 1928-1996 (no API key)
 
 **PROV Content (Victorian State Archives):**
 - Historical photographs and maps
@@ -77,6 +79,13 @@
 - Media releases and statements
 - Interviews and press conferences
 - PDF document links
+
+**GA HAP Content (Historical Aerial Photography):**
+- 1.2 million+ aerial photographs (1928-1996)
+- All Australian states and territories
+- Preview images and full resolution TIFFs
+- Film, run, and frame metadata
+- Coordinate locations (photo centres)
 
 ---
 
@@ -177,6 +186,19 @@ npx tsc --noEmit
 | `pm_transcripts_get_transcript` | None | Get Prime Ministerial transcript by ID |
 | `pm_transcripts_harvest` | None | Bulk download transcripts with filters |
 
+### IIIF Tools (2)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `iiif_get_manifest` | None | Fetch and parse IIIF manifest from any institution |
+| `iiif_get_image_url` | None | Construct IIIF Image API URLs for various sizes/formats |
+
+### GA HAP Tools (3)
+| Tool | API Key | Purpose |
+|------|---------|---------|
+| `ga_hap_search` | None | Search historical aerial photos by state/year/location |
+| `ga_hap_get_photo` | None | Get photo details by OBJECTID or film/run/frame |
+| `ga_hap_harvest` | None | Bulk download photo records with pagination |
+
 **See:** `docs/quickrefs/` for complete parameter documentation
 
 ---
@@ -207,6 +229,12 @@ ACMI tools work immediately with no configuration.
 ### PM Transcripts (No Key Required)
 PM Transcripts tools work immediately with no configuration.
 
+### IIIF (No Key Required)
+IIIF tools work immediately with no configuration. Works with any IIIF-compliant institution.
+
+### GA HAP (No Key Required)
+GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
+
 ### Trove (API Key Required)
 
 1. **Apply for key:** https://trove.nla.gov.au/about/create-something/using-api
@@ -229,7 +257,7 @@ PM Transcripts tools work immediately with no configuration.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (41 tools via registry) |
+| `src/index.ts` | MCP server entry point (46 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
@@ -245,7 +273,10 @@ PM Transcripts tools work immediately with no configuration.
 | `src/sources/vhd/` | VHD source (4 tools) |
 | `src/sources/acmi/` | ACMI source (3 tools) |
 | `src/sources/pm-transcripts/` | PM Transcripts source (2 tools) |
+| `src/sources/iiif/` | IIIF source (2 tools) |
+| `src/sources/ga-hap/` | GA HAP source (3 tools) |
 | `docs/quickrefs/` | Quick reference documentation |
+| `docs/search-queries/` | Research query templates (VFL clubs, etc.) |
 | `dist/` | Compiled JavaScript output |
 
 ---
@@ -253,24 +284,24 @@ PM Transcripts tools work immediately with no configuration.
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                            Claude Code Session                               │
-└───────────────────────────────────┬─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                             Claude Code Session                                  │
+└───────────────────────────────────┬─────────────────────────────────────────────┘
                                     │ stdio
-┌───────────────────────────────────▼─────────────────────────────────────────┐
-│              Australian Archives MCP Server (41 tools, 9 sources)            │
-│  ┌──────────────────────────────────────────────────────────────────────┐   │
-│  │                        Tool Registry (Map-based)                      │   │
-│  └──────────────────────────────────────────────────────────────────────┘   │
-│  ┌────┐ ┌─────┐ ┌───────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐       │
-│  │PROV│ │Trove│ │dataGov│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│       │
-│  │(3) │ │(5)  │ │(10)   │ │(6)   │ │(4)│ │(4)│ │(4)│ │(3) │ │(2) │       │
-│  └──┬─┘ └──┬──┘ └───┬───┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘       │
-└─────┼──────┼────────┼────────┼───────┼─────┼─────┼─────┼──────┼──────────┘
-      │      │        │        │       │     │     │     │      │
-      ▼      ▼        ▼        ▼       ▼     ▼     ▼     ▼      ▼
-   PROV   Trove   data.gov  MusVic  ALA   NMA   VHD   ACMI   PMC
-   Solr   API v3  CKAN API  API     API   API   API   API    XML
+┌───────────────────────────────────▼─────────────────────────────────────────────┐
+│               Australian Archives MCP Server (46 tools, 11 sources)              │
+│  ┌──────────────────────────────────────────────────────────────────────────┐   │
+│  │                         Tool Registry (Map-based)                         │   │
+│  └──────────────────────────────────────────────────────────────────────────┘   │
+│  ┌────┐ ┌─────┐ ┌───────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐│
+│  │PROV│ │Trove│ │dataGov│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA ││
+│  │(3) │ │(5)  │ │(10)   │ │(6)   │ │(4)│ │(4)│ │(4)│ │(3) │ │(2) │ │(2) │ │(3) ││
+│  └──┬─┘ └──┬──┘ └───┬───┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘│
+└─────┼──────┼────────┼────────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼────┘
+      │      │        │        │       │     │     │     │      │      │      │
+      ▼      ▼        ▼        ▼       ▼     ▼     ▼     ▼      ▼      ▼      ▼
+   PROV   Trove   data.gov  MusVic  ALA   NMA   VHD   ACMI   PMC   Any    GA
+   Solr   API v3  CKAN API  API     API   API   API   API    XML  IIIF  ArcGIS
 ```
 
 ---
@@ -375,10 +406,44 @@ Use pm_transcripts_harvest with startFrom 1 and maxRecords 10
 Note: For specific PMs, use startFrom near their era (e.g., Hawke startFrom=5000)
 ```
 
+### Search State Library Victoria Content (Trove + NUC)
+```
+Use trove_search with query "Melbourne 1890s", category "image", nuc "VSL"
+Common NUC codes: VSL (SLV), SLNSW (State Library NSW), ANL (NLA), QSL (State Library QLD)
+```
+
+### Access SLV IIIF Manifest
+```
+Use iiif_get_manifest with manifestUrl "https://rosetta.slv.vic.gov.au/delivery/iiif/presentation/2.1/IE145082/manifest"
+```
+
+### Construct IIIF Image URL (Any Institution)
+```
+Use iiif_get_image_url with imageServiceUrl from manifest, size "!1024,1024", format "jpg"
+Size options: "max" (full), "!w,h" (best fit), "pct:50" (percentage), "w," or ",h" (single dimension)
+```
+
+### Search Victorian Aerial Photos (GA HAP)
+```
+Use ga_hap_search with state "VIC", yearFrom 1950, yearTo 1960, scannedOnly true
+```
+
+### Get Aerial Photo Details (GA HAP)
+```
+Use ga_hap_get_photo with objectId from search results, or filmNumber + run + frame
+```
+
+### Harvest Aerial Photos by Location (GA HAP)
+```
+Use ga_hap_harvest with bbox "144.9,-37.9,145.1,-37.7" (Melbourne area) and maxRecords 100
+State codes: NSW, VIC, QLD, SA, WA, TAS, NT, ACT
+```
+
 ### Bulk Download Research Results
 ```
 Use prov_harvest, trove_harvest, datagovau_harvest, museumsvic_harvest,
-ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, or pm_transcripts_harvest
+ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, pm_transcripts_harvest,
+or ga_hap_harvest
 ```
 
 ---
@@ -396,7 +461,10 @@ ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, or pm_transcripts_harvest
 9. **`docs/quickrefs/vhd-api.md`** - Victorian Heritage Database API details
 10. **`docs/quickrefs/acmi-api.md`** - ACMI API details
 11. **`docs/quickrefs/pm-transcripts-api.md`** - PM Transcripts API details and limitations
-12. **`README.md`** - Public documentation for npm
+12. **`docs/quickrefs/iiif-api.md`** - IIIF standard reference and tools
+13. **`docs/quickrefs/slv-guide.md`** - State Library Victoria access patterns
+14. **`docs/quickrefs/ga-hap-api.md`** - Geoscience Australia HAP API details
+15. **`README.md`** - Public documentation for npm
 
 ---
 
@@ -429,6 +497,8 @@ ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, or pm_transcripts_harvest
 - **VHD:** CC-BY 4.0 (Victorian government open data)
 - **ACMI:** CC0 (public domain dedication for API data)
 - **PM Transcripts:** Australian Government (Crown copyright)
+- **IIIF:** Varies by institution (check manifest attribution field)
+- **GA HAP:** CC-BY 4.0 (Geoscience Australia, attribution required)
 - **This MCP Server:** MIT license
 
 ---
@@ -482,7 +552,15 @@ echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | node dist/index.js
 - **PM Transcripts format:** XML responses requiring parsing
 - **PM Transcripts IDs:** Sequential integers, gaps exist for missing transcripts
 - **PM Transcripts harvest:** Slow for PM filtering due to sequential scanning. Use `pm_transcripts_get_transcript` for individual lookups. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000
+- **IIIF Presentation API versions:** Supports v2.x and v3.x manifests; v3 uses different structure (`items` instead of `sequences`)
+- **IIIF Image API port:** SLV uses port 2083 for images, standard 443 for manifests
+- **Trove NUC filtering:** Use `nuc` parameter to filter by contributor (e.g., "VSL" for State Library Victoria)
+- **GA HAP coordinates:** API uses Web Mercator (EPSG:3857); our tools convert to WGS84 latitude/longitude
+- **GA HAP URL fields:** PREVIEW_URL and TIF_URL contain HTML anchor tags; client extracts href automatically
+- **GA HAP pagination:** Max 2000 records per query; use harvest tool for larger downloads
+- **GA HAP state codes:** NSW=1, VIC=2, QLD=3, SA=4, WA=5, TAS=6, NT=7, ACT=8
+- **GA HAP RUN/FRAME fields:** These are strings not integers (e.g., "COAST TIE 2", "C-KEY"); prefer objectId for lookups
 
 ---
 
-**Token Count:** ~700 tokens
+**Token Count:** ~800 tokens

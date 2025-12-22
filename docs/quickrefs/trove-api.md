@@ -62,6 +62,45 @@ kc_set trove-api-key "YOUR_KEY"
 
 ---
 
+## NUC Codes (Contributor Filtering)
+
+Filter search results by contributing institution using the `nuc` parameter.
+
+### Common NUC Codes
+
+| Code | Institution |
+|------|-------------|
+| `VSL` | State Library Victoria |
+| `SLNSW` | State Library NSW |
+| `QSL` | State Library Queensland |
+| `SLSA` | State Library South Australia |
+| `SLWA` | State Library Western Australia |
+| `SLT` | State Library Tasmania |
+| `ANL` | National Library of Australia |
+| `ANL:DL` | NLA Digital Library |
+| `AIATSIS` | Australian Institute of Aboriginal and Torres Strait Islander Studies |
+| `AWM` | Australian War Memorial |
+
+### Usage Example
+
+```
+Use trove_search with:
+  query: "Melbourne photograph"
+  category: "image"
+  nuc: "VSL"
+```
+
+This returns only State Library Victoria images matching "Melbourne photograph".
+
+### Finding NUC Codes
+
+To find a contributor's NUC code:
+1. Search Trove for content you know is from that institution
+2. Look at the contributor field in results
+3. Use that code in the `nuc` parameter
+
+---
+
 ## Newspaper Coverage
 
 **Digitised period:** Primarily 1803-1954 (out of copyright)
