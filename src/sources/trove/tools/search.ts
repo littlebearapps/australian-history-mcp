@@ -10,7 +10,7 @@ import { TROVE_CATEGORIES, TROVE_STATES, type TroveSearchParams } from '../types
 export const troveSearchTool: SourceTool = {
   schema: {
     name: 'trove_search',
-    description: 'Search Trove for Australian newspapers, gazettes, images, books, and magazines.',
+    description: 'Search Trove for Australian newspapers, gazettes, images, books, and magazines. Supports sorting, advanced filters, search indexes, and holdings retrieval.',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -60,6 +60,63 @@ export const troveSearchTool: SourceTool = {
           description: 'Maximum results (1-100)',
           default: 20,
         },
+        // NEW: Sorting
+        sortby: {
+          type: 'string',
+          enum: ['relevance', 'datedesc', 'dateasc'],
+          default: 'relevance',
+          description: 'Sort order: relevance (default), datedesc (newest first), dateasc (oldest first)',
+        },
+        // NEW: Advanced filters
+        decade: {
+          type: 'string',
+          description: 'Filter by decade (e.g., "199" for 1990s, "188" for 1880s)',
+        },
+        language: {
+          type: 'string',
+          description: 'Language filter (e.g., "english", "french")',
+        },
+        availability: {
+          type: 'string',
+          enum: ['online', 'free', 'restricted', 'subscription'],
+          description: 'Online availability: online (any), free, restricted, subscription',
+        },
+        australian: {
+          type: 'boolean',
+          description: 'Filter to Australian content only',
+        },
+        firstAustralians: {
+          type: 'boolean',
+          description: 'Filter to First Nations content',
+        },
+        // NEW: Search indexes
+        creator: {
+          type: 'string',
+          description: 'Search by author/creator name',
+        },
+        subject: {
+          type: 'string',
+          description: 'Search by subject term',
+        },
+        isbn: {
+          type: 'string',
+          description: 'Search by ISBN',
+        },
+        issn: {
+          type: 'string',
+          description: 'Search by ISSN',
+        },
+        // NEW: Include options
+        includeHoldings: {
+          type: 'boolean',
+          default: false,
+          description: 'Include library holdings (NUC codes, call numbers) in results',
+        },
+        includeLinks: {
+          type: 'boolean',
+          default: false,
+          description: 'Include external links in results',
+        },
       },
       required: ['query'],
     },
@@ -77,6 +134,19 @@ export const troveSearchTool: SourceTool = {
       nuc?: string;
       illustrationType?: string;
       limit?: number;
+      // NEW parameters
+      sortby?: 'relevance' | 'datedesc' | 'dateasc';
+      decade?: string;
+      language?: string;
+      availability?: string;
+      australian?: boolean;
+      firstAustralians?: boolean;
+      creator?: string;
+      subject?: string;
+      isbn?: string;
+      issn?: string;
+      includeHoldings?: boolean;
+      includeLinks?: boolean;
     };
 
     if (!troveClient.hasApiKey()) {
@@ -92,6 +162,13 @@ export const troveSearchTool: SourceTool = {
         illustrated = 'N';
       }
 
+      // Convert availability to API format
+      let availability: 'y' | 'y/f' | 'y/r' | 'y/s' | undefined;
+      if (input.availability === 'online') availability = 'y';
+      else if (input.availability === 'free') availability = 'y/f';
+      else if (input.availability === 'restricted') availability = 'y/r';
+      else if (input.availability === 'subscription') availability = 'y/s';
+
       const params: TroveSearchParams = {
         query: input.query,
         category: input.category as TroveSearchParams['category'],
@@ -103,6 +180,22 @@ export const troveSearchTool: SourceTool = {
         nuc: input.nuc,
         illustrated,
         limit: Math.min(input.limit ?? 20, 100),
+        // NEW: Sorting
+        sortby: input.sortby,
+        // NEW: Advanced filters
+        decade: input.decade,
+        language: input.language,
+        availability,
+        australian: input.australian,
+        firstAustralians: input.firstAustralians,
+        // NEW: Search indexes
+        creator: input.creator,
+        subject: input.subject,
+        isbn: input.isbn,
+        issn: input.issn,
+        // NEW: Include options
+        includeHoldings: input.includeHoldings,
+        includeLinks: input.includeLinks,
       };
 
       const result = await troveClient.search(params);
