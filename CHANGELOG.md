@@ -1,0 +1,100 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.5.0] - 2024-12-23
+
+### Added
+- 6 new Trove tools: `trove_get_work`, `trove_get_person`, `trove_get_list`, `trove_search_people`, `trove_list_magazine_titles`, `trove_get_magazine_title`
+- 20 additional tools across existing sources
+
+### Fixed
+- VHD API response parsing for embedded keys
+- ACMI API constellation name field handling
+- Trove state abbreviation mapping to full names for search API
+- `[object Object]` parsing bugs in Trove responses
+
+## [0.4.0] - 2024-12-22
+
+### Added
+- **GA HAP source** (Geoscience Australia Historical Aerial Photography)
+  - `ga_hap_search` - Search historical aerial photos by state/year/location
+  - `ga_hap_get_photo` - Get photo details by OBJECTID or film/run/frame
+  - `ga_hap_harvest` - Bulk download photo records
+- **IIIF tools** for generic manifest and image handling
+  - `iiif_get_manifest` - Fetch and parse IIIF manifest from any institution
+  - `iiif_get_image_url` - Construct IIIF Image API URLs
+- Trove NUC filtering for contributor-specific searches
+- Trove `trove_list_contributors` tool
+
+## [0.3.0] - 2024-12-21
+
+### Added
+- **Atlas of Living Australia (ALA) source** - 8 biodiversity tools
+  - `ala_search_occurrences`, `ala_search_species`, `ala_get_species`
+  - `ala_harvest`, `ala_search_images`, `ala_match_name`
+  - `ala_list_species_lists`, `ala_get_species_list`
+- **National Museum of Australia (NMA) source** - 9 collection tools
+  - `nma_search_objects`, `nma_get_object`, `nma_search_places`
+  - `nma_get_place`, `nma_search_parties`, `nma_get_party`
+  - `nma_search_media`, `nma_get_media`, `nma_harvest`
+- **Victorian Heritage Database (VHD) source** - 9 heritage tools
+  - `vhd_search_places`, `vhd_get_place`, `vhd_search_shipwrecks`
+  - `vhd_get_shipwreck`, `vhd_harvest`
+  - `vhd_list_municipalities`, `vhd_list_architectural_styles`
+  - `vhd_list_themes`, `vhd_list_periods`
+- **ACMI source** (Australian Centre for the Moving Image) - 7 tools
+  - `acmi_search_works`, `acmi_get_work`, `acmi_harvest`
+  - `acmi_list_creators`, `acmi_get_creator`
+  - `acmi_list_constellations`, `acmi_get_constellation`
+- **PM Transcripts source** - 2 Prime Ministerial speech tools
+  - `pm_transcripts_get_transcript`, `pm_transcripts_harvest`
+
+## [0.2.0] - 2024-12-20
+
+### Added
+- **data.gov.au source** - 11 CKAN API tools
+  - `datagovau_search`, `datagovau_get_dataset`, `datagovau_get_resource`
+  - `datagovau_datastore_search`, `datagovau_list_organizations`
+  - `datagovau_get_organization`, `datagovau_list_groups`
+  - `datagovau_get_group`, `datagovau_list_tags`
+  - `datagovau_harvest`, `datagovau_autocomplete`
+- **Museums Victoria source** - 6 collection tools
+  - `museumsvic_search`, `museumsvic_get_article`
+  - `museumsvic_get_item`, `museumsvic_get_species`
+  - `museumsvic_get_specimen`, `museumsvic_harvest`
+- Comprehensive README for public npm package
+
+### Fixed
+- Museums Victoria API response parsing
+
+## [0.1.0] - 2024-12-19
+
+### Added
+- Initial release
+- **PROV source** (Public Record Office Victoria) - 5 tools
+  - `prov_search` - Search Victorian state archives
+  - `prov_get_images` - Extract image URLs from digitised records
+  - `prov_harvest` - Bulk download PROV records
+  - `prov_get_agency` - Get agency details by VA number
+  - `prov_get_series` - Get series details by VPRS number
+- **Trove source** (National Library of Australia) - 7 initial tools
+  - `trove_search` - Search newspapers, images, books
+  - `trove_harvest` - Bulk download Trove records
+  - `trove_newspaper_article` - Get full newspaper article text
+  - `trove_list_titles` - List newspaper/gazette titles
+  - `trove_title_details` - Get title info with issue dates
+  - `trove_get_contributor` - Get contributor details
+- MCP server architecture with registry pattern
+- Source module architecture for extensibility
+- Shared base client with retry logic
+- Harvest runner for pagination
+
+[0.5.0]: https://github.com/littlebearapps/australian-archives-mcp/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/littlebearapps/australian-archives-mcp/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/littlebearapps/australian-archives-mcp/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/littlebearapps/australian-archives-mcp/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/littlebearapps/australian-archives-mcp/releases/tag/v0.1.0

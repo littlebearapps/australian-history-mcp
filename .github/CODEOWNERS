@@ -1,0 +1,11 @@
+# CODEOWNERS
+#
+# These owners will be requested for review when someone opens a pull request.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything
+* @nathanschram
+
+# GitHub configuration
+/.github/ @nathanschram
+/.github/workflows/ @nathanschram

@@ -1,0 +1,58 @@
+title: "[Idea] "
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have an idea for a new feature or improvement? We'd love to hear it!
+
+  - type: dropdown
+    id: idea-type
+    attributes:
+      label: Type of Idea
+      options:
+        - New data source
+        - New tool for existing source
+        - Enhancement to existing tool
+        - Documentation improvement
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your idea in detail
+      placeholder: What would you like to see added or improved?
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: How would you use this feature?
+      placeholder: |
+        I would use this to...
+        This would help researchers who need to...
+    validations:
+      required: true
+
+  - type: input
+    id: api-link
+    attributes:
+      label: API Documentation Link
+      description: If proposing a new data source, provide a link to the API documentation
+      placeholder: "https://example.gov.au/api/docs"
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example Queries
+      description: If applicable, show example queries or expected output
+      placeholder: |
+        ```
+        Use new_tool with query="example" and limit=10
+        Expected output: list of records with fields...
+        ```

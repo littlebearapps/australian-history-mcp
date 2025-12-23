@@ -1,0 +1,55 @@
+title: "[Show & Tell] "
+labels: ["show-and-tell"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Built something cool with the Australian Archives MCP? Share it with the community!
+
+  - type: textarea
+    id: project
+    attributes:
+      label: Project Description
+      description: Tell us about what you built
+      placeholder: |
+        I built a tool that...
+        This project helps researchers...
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: sources-used
+    attributes:
+      label: Data Sources Used
+      description: Which sources did you use?
+      options:
+        - label: PROV (Victorian State Archives)
+        - label: Trove (National Library)
+        - label: data.gov.au (Open Data)
+        - label: Museums Victoria
+        - label: ALA (Atlas of Living Australia)
+        - label: NMA (National Museum)
+        - label: VHD (Victorian Heritage)
+        - label: ACMI (Moving Image)
+        - label: PM Transcripts
+        - label: IIIF
+        - label: GA HAP (Aerial Photography)
+
+  - type: textarea
+    id: tools-used
+    attributes:
+      label: Tools Used
+      description: Which MCP tools were most useful?
+      placeholder: |
+        - trove_search for finding newspaper articles
+        - prov_harvest for bulk downloading records
+
+  - type: textarea
+    id: links
+    attributes:
+      label: Links & Screenshots
+      description: Share links to your project, screenshots, or examples
+      placeholder: |
+        - GitHub: https://github.com/...
+        - Demo: https://...
+        - Screenshots: (drag and drop images here)

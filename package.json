@@ -48,6 +48,10 @@
     "type": "git",
     "url": "https://github.com/littlebearapps/australian-archives-mcp"
   },
+  "homepage": "https://github.com/littlebearapps/australian-archives-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/littlebearapps/australian-archives-mcp/issues"
+  },
   "files": [
     "dist/**/*",
     "README.md"

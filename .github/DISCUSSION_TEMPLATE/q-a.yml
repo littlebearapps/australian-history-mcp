@@ -1,0 +1,57 @@
+title: "[Q&A] "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your question! Please provide as much detail as possible so we can help you effectively.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like help with?
+      placeholder: Describe your question clearly...
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+      description: Share any approaches you've already attempted
+      placeholder: |
+        - I tried using trove_search with...
+        - I checked the documentation for...
+
+  - type: dropdown
+    id: source
+    attributes:
+      label: Data Source (if applicable)
+      description: Which data source is this related to?
+      options:
+        - Not source-specific
+        - PROV (Victorian State Archives)
+        - Trove (National Library)
+        - data.gov.au (Open Data)
+        - Museums Victoria
+        - ALA (Atlas of Living Australia)
+        - NMA (National Museum)
+        - VHD (Victorian Heritage)
+        - ACMI (Moving Image)
+        - PM Transcripts
+        - IIIF
+        - GA HAP (Aerial Photography)
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js Version
+      placeholder: "e.g., 20.10.0"
+
+  - type: input
+    id: mcp-client
+    attributes:
+      label: MCP Client
+      description: Which MCP client are you using?
+      placeholder: "e.g., Claude Code, custom integration"
