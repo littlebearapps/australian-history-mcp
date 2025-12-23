@@ -5,8 +5,6 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
-import type { TroveMagazineYear } from '../types.js';
-
 export const troveGetMagazineTitleTool: SourceTool = {
   schema: {
     name: 'trove_get_magazine_title',

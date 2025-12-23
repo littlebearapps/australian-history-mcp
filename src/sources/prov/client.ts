@@ -237,7 +237,7 @@ export class PROVClient extends BaseClient {
   }
 
   private parseAgencyDoc(doc: any): PROVAgency {
-    const getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
+    const _getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
 
     return {
       id: doc['identifier.PROV_ACM.id'] ?? doc.citation ?? `VA ${doc.VA}`,

@@ -57,7 +57,7 @@ export abstract class BaseClient {
       });
 
       if (!response.ok) {
-        const body = await response.text().catch(() => 'No response body');
+        const _body = await response.text().catch(() => 'No response body');
         throw new APIRequestError(
           `HTTP ${response.status}: ${response.statusText}`,
           `HTTP_${response.status}`,
