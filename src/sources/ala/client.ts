@@ -24,7 +24,6 @@ import type {
   ALASpeciesListSearchResult,
   ALASpeciesList,
   ALASpeciesListDetail,
-  ALASpeciesListItem,
 } from './types.js';
 
 // ALA uses multiple API endpoints

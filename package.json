@@ -48,6 +48,10 @@
     "type": "git",
     "url": "https://github.com/littlebearapps/australian-archives-mcp"
   },
+  "homepage": "https://github.com/littlebearapps/australian-archives-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/littlebearapps/australian-archives-mcp/issues"
+  },
   "files": [
     "dist/**/*",
     "README.md"
@@ -59,9 +63,11 @@
     "@modelcontextprotocol/sdk": "^1.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/node": "^20.0.0",
+    "eslint": "^9.39.2",
     "typescript": "^5.3.0",
-    "vitest": "^1.0.0",
-    "eslint": "^8.56.0"
+    "typescript-eslint": "^8.50.1",
+    "vitest": "^1.0.0"
   }
 }

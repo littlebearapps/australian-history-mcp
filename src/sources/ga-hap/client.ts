@@ -17,8 +17,6 @@ import type {
   GAHAPPhoto,
   GAHAPAttributes,
   GAHAPSearchResult,
-  STATE_CODES,
-  STATE_NAMES,
 } from './types.js';
 import { STATE_CODES as CODES, STATE_NAMES as NAMES } from './types.js';
 
