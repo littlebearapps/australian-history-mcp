@@ -118,16 +118,22 @@ npx tsc --noEmit
 | `prov_get_agency` | None | Get agency details by VA number |
 | `prov_get_series` | None | Get series details by VPRS number |
 
-### Trove Tools (7)
+### Trove Tools (13)
 | Tool | API Key | Purpose |
 |------|---------|---------|
-| `trove_search` | Required | Search newspapers, images, books (with illustrationType) |
+| `trove_search` | Required | Search newspapers, images, books (with sortby, filters, holdings) |
+| `trove_harvest` | Required | Bulk download Trove records (with sortby) |
 | `trove_newspaper_article` | Required | Get full newspaper article text |
 | `trove_list_titles` | Required | List newspaper/gazette titles |
 | `trove_title_details` | Required | Get title info with issue dates |
-| `trove_harvest` | Required | Bulk download Trove records |
 | `trove_get_contributor` | Required | Get contributor details by NUC code |
+| `trove_list_contributors` | Required | List/search all 1500+ contributing libraries |
 | `trove_list_magazine_titles` | Required | List available magazine titles |
+| `trove_get_magazine_title` | Required | Get magazine title details with years/issues |
+| `trove_get_work` | Required | Get book/image/map/music details by ID (with holdings, links, versions) |
+| `trove_get_person` | Required | Get person/organisation biographical data |
+| `trove_get_list` | Required | Get user-curated research list by ID |
+| `trove_search_people` | Required | Search people and organisations |
 
 ### data.gov.au Tools (11)
 | Tool | API Key | Purpose |
@@ -280,7 +286,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (69 tools via registry) |
+| `src/index.ts` | MCP server entry point (75 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
@@ -288,7 +294,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 | `src/core/base-source.ts` | Source interface definition |
 | `src/core/harvest-runner.ts` | Shared pagination logic |
 | `src/sources/prov/` | PROV source (5 tools) |
-| `src/sources/trove/` | Trove source (7 tools) |
+| `src/sources/trove/` | Trove source (13 tools) |
 | `src/sources/datagovau/` | data.gov.au source (11 tools) |
 | `src/sources/museums-victoria/` | Museums Victoria source (6 tools) |
 | `src/sources/ala/` | ALA source (8 tools) |
@@ -312,13 +318,13 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 └───────────────────────────────────┬─────────────────────────────────────────────┘
                                     │ stdio
 ┌───────────────────────────────────▼─────────────────────────────────────────────┐
-│               Australian Archives MCP Server (69 tools, 11 sources)              │
+│               Australian Archives MCP Server (75 tools, 11 sources)              │
 │  ┌──────────────────────────────────────────────────────────────────────────┐   │
 │  │                         Tool Registry (Map-based)                         │   │
 │  └──────────────────────────────────────────────────────────────────────────┘   │
 │  ┌────┐ ┌─────┐ ┌───────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐│
 │  │PROV│ │Trove│ │dataGov│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA ││
-│  │(5) │ │(7)  │ │(11)   │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) ││
+│  │(5) │ │(13) │ │(11)   │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) ││
 │  └──┬─┘ └──┬──┘ └───┬───┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘│
 └─────┼──────┼────────┼────────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼────┘
       │      │        │        │       │     │     │     │      │      │      │
@@ -350,6 +356,35 @@ Use prov_get_images with manifestUrl from search results, pages "1-10", size "fu
 ```
 Use trove_search with query "Melbourne flood", category "newspaper",
 dateFrom "1930", dateTo "1939", state "vic"
+```
+
+### Sort Trove Results by Date (Trove)
+```
+Use trove_search with query "gold discovery", sortby "dateasc" (oldest first)
+or sortby "datedesc" (newest first)
+```
+
+### Search by Author/Creator (Trove)
+```
+Use trove_search with query "bushrangers" and creator "Lawson" to find
+works by Henry Lawson about bushrangers
+```
+
+### Get Work Details with Holdings (Trove)
+```
+Use trove_get_work with workId and include ["holdings", "links"] to see
+which libraries have copies and online access links
+```
+
+### Search People and Organisations (Trove)
+```
+Use trove_search_people with query "Henry Lawson" to find biographical records
+```
+
+### Browse Contributing Libraries (Trove)
+```
+Use trove_list_contributors to list all 1500+ libraries,
+or with query "university" to filter
 ```
 
 ### Find Heritage Datasets (data.gov.au)

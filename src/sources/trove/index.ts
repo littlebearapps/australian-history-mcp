@@ -17,6 +17,13 @@ import {
 import { troveHarvestTool } from './tools/harvest.js';
 import { troveGetContributorTool } from './tools/get-contributor.js';
 import { troveListMagazineTitlesTool } from './tools/list-magazine-titles.js';
+// New Phase 1-3 tools
+import { troveGetWorkTool } from './tools/get-work.js';
+import { troveListContributorsTool } from './tools/list-contributors.js';
+import { troveGetMagazineTitleTool } from './tools/get-magazine-title.js';
+import { troveGetPersonTool } from './tools/get-person.js';
+import { troveGetListTool } from './tools/get-list.js';
+import { troveSearchPeopleTool } from './tools/search-people.js';
 
 export const troveSource = defineSource({
   name: 'trove',
@@ -26,13 +33,24 @@ export const troveSource = defineSource({
   authEnvVar: 'TROVE_API_KEY',
   checkAuth: () => !!process.env.TROVE_API_KEY,
   tools: [
+    // Core search and harvest
     troveSearchTool,
+    troveHarvestTool,
+    // Newspaper tools
     troveNewspaperArticleTool,
     troveListTitlesTool,
     troveTitleDetailsTool,
-    troveHarvestTool,
+    // Contributor tools
     troveGetContributorTool,
+    troveListContributorsTool,
+    // Magazine tools
     troveListMagazineTitlesTool,
+    troveGetMagazineTitleTool,
+    // Work/Person/List tools (new)
+    troveGetWorkTool,
+    troveGetPersonTool,
+    troveGetListTool,
+    troveSearchPeopleTool,
   ],
 });
 

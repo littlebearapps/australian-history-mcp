@@ -124,6 +124,13 @@ dateTo: "1899"
 ```
 Returns content from the 1890s.
 
+### Sorting Results
+```
+sortby: "relevance"  # Default
+sortby: "datedesc"   # Newest first
+sortby: "dateasc"    # Oldest first
+```
+
 ### Full Text Search
 For newspapers, use `includeFullText: true` to get OCR text in results.
 
@@ -134,6 +141,78 @@ Searching `newspaper` category is faster than `all`.
 Use quotes in query for exact phrases:
 ```
 query: '"Melbourne flood"'
+```
+
+### Search by Creator/Author
+```
+creator: "Lawson"    # Find works by Henry Lawson
+subject: "bushrangers"  # Find works about bushrangers
+```
+
+### Filter by Decade
+```
+decade: "188"   # 1880s
+decade: "192"   # 1920s
+```
+
+### Online Availability
+```
+availability: "online"      # Any online
+availability: "free"        # Free access
+availability: "restricted"  # Requires payment/membership
+availability: "subscription"  # Subscription required
+```
+
+### Include Library Holdings
+```
+includeHoldings: true  # Returns NUC codes, library names, call numbers
+includeLinks: true     # Returns external access links
+```
+
+---
+
+## New Tools (v0.6.0)
+
+### trove_get_work
+Get book/image/map/music details by ID with holdings, links, and versions.
+```
+workId: "12345678"
+include: ["holdings", "links", "workversions"]
+```
+
+### trove_list_contributors
+List/search all 1500+ contributing libraries.
+```
+query: "university"    # Optional filter
+reclevel: "full"       # Full contact details
+```
+
+### trove_get_magazine_title
+Get magazine title details with available years and issues.
+```
+titleId: "12345"
+includeYears: true
+```
+
+### trove_get_person
+Get person/organisation biographical data.
+```
+personId: "12345678"
+reclevel: "full"
+```
+
+### trove_get_list
+Get user-curated research lists.
+```
+listId: "12345678"
+includeItems: true
+```
+
+### trove_search_people
+Search people and organisations.
+```
+query: "Henry Lawson"
+type: "Person"        # Person, Organisation, or Family
 ```
 
 ---

@@ -51,6 +51,12 @@ export const troveHarvestTool: SourceTool = {
           type: 'string',
           description: 'NUC code to filter by contributor/partner. Common codes: VSL (State Library Victoria), SLNSW (State Library NSW), ANL (National Library), QSL (State Library Queensland)',
         },
+        sortby: {
+          type: 'string',
+          enum: ['relevance', 'datedesc', 'dateasc'],
+          default: 'relevance',
+          description: 'Sort order: relevance (default), datedesc (newest first), dateasc (oldest first)',
+        },
         maxRecords: {
           type: 'number',
           description: 'Maximum records to harvest (1-1000)',
@@ -75,6 +81,7 @@ export const troveHarvestTool: SourceTool = {
       format?: string;
       includeFullText?: boolean;
       nuc?: string;
+      sortby?: 'relevance' | 'datedesc' | 'dateasc';
       maxRecords?: number;
       cursor?: string;
     };
@@ -92,6 +99,7 @@ export const troveHarvestTool: SourceTool = {
         input.category && `category=${input.category}`,
         input.state && `state=${input.state}`,
         input.nuc && `nuc=${input.nuc}`,
+        input.sortby && input.sortby !== 'relevance' && `sortby=${input.sortby}`,
       ].filter(Boolean).join(', ');
 
       const result = await runHarvest<TroveArticle | TroveWork>('trove', queryDesc, {
@@ -109,6 +117,7 @@ export const troveHarvestTool: SourceTool = {
             format: input.format,
             includeFullText: input.includeFullText ?? false,
             nuc: input.nuc,
+            sortby: input.sortby,
             bulkHarvest: true,
             limit,
             start: cursor as string | undefined,

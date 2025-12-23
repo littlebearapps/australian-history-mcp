@@ -54,6 +54,21 @@ export const TROVE_STATES: TroveState[] = [
   'national',
 ];
 
+export type TroveSortBy = 'relevance' | 'datedesc' | 'dateasc';
+
+export type TroveAvailability = 'y' | 'y/f' | 'y/r' | 'y/s';
+
+export type TroveRecLevel = 'brief' | 'full';
+
+export type TroveIncludeOption =
+  | 'holdings'
+  | 'links'
+  | 'workversions'
+  | 'subscribinglibs'
+  | 'articletext'
+  | 'listitems'
+  | 'years';
+
 export interface TroveSearchParams {
   query: string;
   category?: TroveCategory | TroveCategory[];
@@ -68,6 +83,39 @@ export interface TroveSearchParams {
   facets?: string[];
   nuc?: string;         // NUC code to filter by contributor (e.g., "ANL" for NLA, "VSL" for SLV)
   illustrated?: 'Y' | 'N';  // Filter by illustration (Y = illustrated, N = not illustrated)
+
+  // Sorting
+  sortby?: TroveSortBy;
+
+  // Advanced filters (facets)
+  decade?: string;          // e.g., "199" for 1990s
+  language?: string;
+  availability?: TroveAvailability;  // online, free, restricted, subscription
+  australian?: boolean;
+  wordCount?: string;       // for newspapers
+  artType?: string;         // images: 'Images and artefacts' | 'Maps'
+  geocoverage?: string;
+  contribcollection?: string;
+  firstAustralians?: boolean;
+  austlanguage?: string;    // Austlang code
+
+  // Search indexes (added to query string)
+  creator?: string;
+  subject?: string;
+  isbn?: string;
+  issn?: string;
+  identifier?: string;
+  anbdid?: string;
+  lastupdated?: string;     // ISO date range [YYYY-MM-DDTHH:MM:SSZ TO *]
+  rights?: string;
+  placeOfPublication?: string;
+  geographicCoverage?: string;
+  fullTextInd?: boolean;
+  imageInd?: boolean;
+
+  // Include options
+  includeHoldings?: boolean;
+  includeLinks?: boolean;
 }
 
 // ============================================================================
@@ -192,4 +240,157 @@ export interface TroveMagazineTitle {
   endDate?: string;
   issn?: string;
   troveUrl: string;
+}
+
+// ============================================================================
+// Holdings, Links, and Version Types
+// ============================================================================
+
+export type TroveLinkType =
+  | 'fulltext'
+  | 'restricted'
+  | 'subscription'
+  | 'unknown'
+  | 'notonline'
+  | 'thumbnail'
+  | 'viewcopy';
+
+export interface TroveHolding {
+  nuc: string;
+  name?: string;
+  url?: string;
+  callNumber?: string;
+  localIdentifier?: string;
+}
+
+export interface TroveLink {
+  url: string;
+  linktype: TroveLinkType;
+  linktext?: string;
+}
+
+export interface TroveVersion {
+  id: string;
+  type: string[];
+  issued?: string;
+  holdingsCount: number;
+  holdings?: TroveHolding[];
+  links?: TroveLink[];
+}
+
+// ============================================================================
+// Full Work Detail (with holdings, links, versions)
+// ============================================================================
+
+export interface TroveWorkDetail {
+  id: string;
+  title: string;
+  contributor?: string;
+  issued?: string;
+  type: string[];
+  subjects?: string[];
+  abstract?: string;
+  tableOfContents?: string;
+  language?: string;
+  wikipedia?: string;
+  holdingsCount: number;
+  versionCount: number;
+  troveUrl: string;
+  thumbnailUrl?: string;
+  identifier?: string;
+  // With include=holdings
+  holdings?: TroveHolding[];
+  // With include=links
+  links?: TroveLink[];
+  // With include=workversions
+  versions?: TroveVersion[];
+}
+
+// ============================================================================
+// Person and Organisation Types
+// ============================================================================
+
+export type TrovePersonType = 'Person' | 'Organisation' | 'Family';
+
+export interface TrovePerson {
+  id: string;
+  type: TrovePersonType;
+  primaryName: string;
+  primaryDisplayName?: string;
+  alternateName?: string[];
+  alternateDisplayName?: string[];
+  title?: string;
+  occupation?: string[];
+  biography?: string;
+  contributor?: string;
+  thumbnailUrl?: string;
+  troveUrl: string;
+}
+
+export interface TrovePersonSearchResult {
+  query: string;
+  totalResults: number;
+  nextStart?: string;
+  records: TrovePerson[];
+}
+
+// ============================================================================
+// List Types (User-Curated Research Lists)
+// ============================================================================
+
+export interface TroveListItem {
+  note?: string;
+  work?: TroveWork;
+  article?: TroveArticle;
+  people?: {
+    id: string;
+    troveUrl: string;
+  };
+  externalWebsite?: {
+    title: string;
+    url: string;
+  };
+}
+
+export interface TroveList {
+  id: string;
+  title: string;
+  creator: string;
+  description?: string;
+  listItemCount: number;
+  thumbnailUrl?: string;
+  dateCreated?: string;
+  dateLastUpdated?: string;
+  troveUrl: string;
+  // With include=listitems
+  items?: TroveListItem[];
+}
+
+// ============================================================================
+// Magazine Title Detail (with years/issues)
+// ============================================================================
+
+export interface TroveMagazineIssue {
+  id: string;
+  date: string;
+  url: string;
+}
+
+export interface TroveMagazineYear {
+  year: string;
+  issueCount: number;
+  issues?: TroveMagazineIssue[];
+}
+
+export interface TroveMagazineTitleDetail {
+  id: string;
+  title: string;
+  publisher?: string;
+  place?: string;
+  issn?: string;
+  startDate?: string;
+  endDate?: string;
+  troveUrl: string;
+  // With include=years
+  years?: TroveMagazineYear[];
 }
