@@ -9,29 +9,30 @@
  */
 
 import { BaseClient } from '../../core/base-client.js';
-import type {
-  TroveSearchParams,
-  TroveSearchResult,
-  TroveArticle,
-  TroveWork,
-  TroveNewspaperTitle,
-  TroveTitleDetail,
-  TroveArticleDetail,
-  TroveState,
-  TroveContributor,
-  TroveMagazineTitle,
-  TroveWorkDetail,
-  TroveHolding,
-  TroveLink,
-  TroveVersion,
-  TrovePerson,
-  TrovePersonSearchResult,
-  TroveList,
-  TroveListItem,
-  TroveMagazineTitleDetail,
-  TroveMagazineYear,
-  TroveRecLevel,
-  TroveIncludeOption,
+import {
+  STATE_TO_FULL_NAME,
+  type TroveSearchParams,
+  type TroveSearchResult,
+  type TroveArticle,
+  type TroveWork,
+  type TroveNewspaperTitle,
+  type TroveTitleDetail,
+  type TroveArticleDetail,
+  type TroveState,
+  type TroveContributor,
+  type TroveMagazineTitle,
+  type TroveWorkDetail,
+  type TroveHolding,
+  type TroveLink,
+  type TroveVersion,
+  type TrovePerson,
+  type TrovePersonSearchResult,
+  type TroveList,
+  type TroveListItem,
+  type TroveMagazineTitleDetail,
+  type TroveMagazineYear,
+  type TroveRecLevel,
+  type TroveIncludeOption,
 } from './types.js';
 
 const TROVE_API_BASE = 'https://api.trove.nla.gov.au/v3';
@@ -130,9 +131,9 @@ export class TroveClient extends BaseClient {
 
     urlParams.q = query;
 
-    // State filter (for newspapers)
+    // State filter (for newspapers) - API requires full state names
     if (params.state) {
-      urlParams['l-state'] = params.state;
+      urlParams['l-state'] = STATE_TO_FULL_NAME[params.state] || params.state;
     }
 
     // Format filter

@@ -60,6 +60,8 @@ kc_set trove-api-key "YOUR_KEY"
 | `act` | Australian Capital Territory |
 | `national` | National/multi-state |
 
+**Note:** Use abbreviations (e.g., `vic`) in tool parameters. The MCP server automatically maps these to full names (e.g., `Victoria`) as required by the Trove search API.
+
 ---
 
 ## NUC Codes (Contributor Filtering)

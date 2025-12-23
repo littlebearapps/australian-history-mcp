@@ -54,6 +54,19 @@ export const TROVE_STATES: TroveState[] = [
   'national',
 ];
 
+// Map abbreviations to full names for search API l-state parameter
+export const STATE_TO_FULL_NAME: Record<TroveState, string> = {
+  'vic': 'Victoria',
+  'nsw': 'New South Wales',
+  'qld': 'Queensland',
+  'sa': 'South Australia',
+  'wa': 'Western Australia',
+  'tas': 'Tasmania',
+  'nt': 'Northern Territory',
+  'act': 'ACT',
+  'national': 'National',
+};
+
 export type TroveSortBy = 'relevance' | 'datedesc' | 'dateasc';
 
 export type TroveAvailability = 'y' | 'y/f' | 'y/r' | 'y/s';

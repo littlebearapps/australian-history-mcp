@@ -594,6 +594,7 @@ echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | node dist/index.js
 
 - **PROV API field names:** Uses hyphens (`iiif-manifest`) and dot notation (`is_part_of_series.title`)
 - **Trove rate limit:** 200 calls/minute - harvest tool handles pagination automatically
+- **Trove state parameter:** Use abbreviations (vic, nsw, etc.) - automatically mapped to full names for search API
 - **Multi-word queries:** PROV requires phrase wrapping for multi-word searches (handled automatically)
 - **data.gov.au URL:** The API base URL is `https://data.gov.au/data/api/3/action/` (note the `/data/` prefix)
 - **Datastore availability:** Only some data.gov.au resources have datastore enabled for direct querying
