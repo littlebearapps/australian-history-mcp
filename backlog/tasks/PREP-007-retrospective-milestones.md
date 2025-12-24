@@ -21,7 +21,7 @@ Create closed milestones to document project version history.
 ### Milestone: v0.1.0
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.1.0" \
     -f description="Initial release - PROV and Trove sources" \
     -f state="closed" \
@@ -32,7 +32,7 @@ Create closed milestones to document project version history.
 ### Milestone: v0.2.0
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.2.0" \
     -f description="data.gov.au and Museums Victoria sources" \
     -f state="closed" \
@@ -43,7 +43,7 @@ Create closed milestones to document project version history.
 ### Milestone: v0.3.0
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.3.0" \
     -f description="ALA, NMA, VHD sources" \
     -f state="closed" \
@@ -54,7 +54,7 @@ Create closed milestones to document project version history.
 ### Milestone: v0.4.0
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.4.0" \
     -f description="ACMI, PM Transcripts, GA HAP, IIIF sources" \
     -f state="closed" \
@@ -65,7 +65,7 @@ Create closed milestones to document project version history.
 ### Milestone: v0.5.0
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.5.0" \
     -f description="20 new tools, VHD/ACMI fixes, Trove enhancements" \
     -f state="closed" \
@@ -80,31 +80,31 @@ Create closed milestones to document project version history.
 #!/bin/bash
 # Create retrospective milestones with delays
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.1.0" \
   -f description="Initial release - PROV and Trove sources" \
   -f state="closed" \
   -f due_on="2024-12-01T00:00:00Z" && sleep 2
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.2.0" \
   -f description="data.gov.au and Museums Victoria sources" \
   -f state="closed" \
   -f due_on="2024-12-08T00:00:00Z" && sleep 2
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.3.0" \
   -f description="ALA, NMA, VHD sources" \
   -f state="closed" \
   -f due_on="2024-12-15T00:00:00Z" && sleep 2
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.4.0" \
   -f description="ACMI, PM Transcripts, GA HAP, IIIF sources" \
   -f state="closed" \
   -f due_on="2024-12-20T00:00:00Z" && sleep 2
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.5.0" \
   -f description="20 new tools, VHD/ACMI fixes, Trove enhancements" \
   -f state="closed" \
@@ -137,5 +137,5 @@ echo "Created 5 retrospective milestones"
 
 ## Verification
 
-- [ ] Run `gh api repos/littlebearapps/australian-archives-mcp/milestones?state=closed`
+- [ ] Run `gh api repos/littlebearapps/australian-history-mcp/milestones?state=closed`
 - [ ] All 5 milestones show as closed

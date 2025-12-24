@@ -10,7 +10,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in the Australian Archives MCP Server, please report it responsibly.
+If you discover a security vulnerability in the Australian History MCP Server, please report it responsibly.
 
 ### How to Report
 
@@ -79,4 +79,4 @@ We follow responsible disclosure practices:
 4. We publicly disclose after the fix is available
 5. We credit the reporter (with permission)
 
-Thank you for helping keep Australian Archives MCP secure!
+Thank you for helping keep Australian History MCP secure!

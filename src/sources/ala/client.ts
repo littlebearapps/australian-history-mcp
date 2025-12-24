@@ -69,7 +69,7 @@ export class ALAClient extends BaseClient {
         signal: controller.signal,
         headers: {
           'Accept': 'application/json',
-          'User-Agent': 'australian-archives-mcp/0.5.0',
+          'User-Agent': 'australian-history-mcp/0.6.0',
         },
       });
 

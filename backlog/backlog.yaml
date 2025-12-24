@@ -1,5 +1,5 @@
 project:
-  name: australian-archives-mcp
+  name: australian-history-mcp
   description: MCP server for Australian historical archives - PROV, Trove, data.gov.au, Museums Victoria and more
 
 settings:

@@ -280,8 +280,8 @@ echo '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"prov_search","arg
 
 ## Questions?
 
-- Open a [Discussion](https://github.com/littlebearapps/australian-archives-mcp/discussions) for questions
-- Check existing [Issues](https://github.com/littlebearapps/australian-archives-mcp/issues) for known problems
+- Open a [Discussion](https://github.com/littlebearapps/australian-history-mcp/discussions) for questions
+- Check existing [Issues](https://github.com/littlebearapps/australian-history-mcp/issues) for known problems
 - Read the [README](README.md) for usage documentation
 
 Thank you for contributing!

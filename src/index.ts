@@ -61,8 +61,8 @@ registry.register(gaHapSource);
 
 const server = new Server(
   {
-    name: 'australian-archives-mcp',
-    version: '0.5.0',
+    name: 'australian-history-mcp',
+    version: '0.6.0',
   },
   {
     capabilities: {
@@ -96,7 +96,7 @@ async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
-  console.error('Australian Archives MCP Server running on stdio');
+  console.error('Australian History MCP Server running on stdio');
 
   // Show source status
   const sources = registry.getSourcesStatus();
