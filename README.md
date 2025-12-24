@@ -114,7 +114,7 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
-## Tools (69 total)
+## Tools (75 total)
 
 ### PROV Tools (5)
 
@@ -126,17 +126,23 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `prov_get_agency` | Get agency details by VA number |
 | `prov_get_series` | Get series details by VPRS number |
 
-### Trove Tools (7)
+### Trove Tools (13)
 
 | Tool | Description |
 |------|-------------|
-| `trove_search` | Search Trove with illustrationType filter for newspapers, gazettes, images, books |
+| `trove_search` | Search Trove with sortby, filters, holdings for newspapers, gazettes, images, books |
 | `trove_newspaper_article` | Get full article details including OCR text and PDF link |
 | `trove_list_titles` | List available newspaper or gazette titles by state |
 | `trove_title_details` | Get title details with available years and issue counts |
 | `trove_harvest` | Bulk download Trove records with cursor-based pagination |
 | `trove_get_contributor` | Get contributor details by NUC code |
+| `trove_list_contributors` | List/search all 1500+ contributing libraries |
 | `trove_list_magazine_titles` | List available magazine titles |
+| `trove_get_magazine_title` | Get magazine title details with years/issues |
+| `trove_get_work` | Get book/image/map/music details by ID (with holdings, links, versions) |
+| `trove_get_person` | Get person/organisation biographical data |
+| `trove_get_list` | Get user-curated research list by ID |
+| `trove_search_people` | Search people and organisations |
 
 ### data.gov.au Tools (11)
 
