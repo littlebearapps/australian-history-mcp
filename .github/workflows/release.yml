@@ -49,4 +49,4 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Verify publication
-        run: npm view @littlebearapps/australian-archives-mcp version
+        run: npm view @littlebearapps/australian-history-mcp version

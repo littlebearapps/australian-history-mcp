@@ -1,10 +1,10 @@
 {
-  "name": "@littlebearapps/australian-archives-mcp",
-  "version": "0.5.0",
-  "description": "MCP server for Australian archives - PROV, Trove, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts",
+  "name": "@littlebearapps/australian-history-mcp",
+  "version": "0.6.0",
+  "description": "MCP server for Australian history - PROV, Trove, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP",
   "main": "dist/index.js",
   "bin": {
-    "australian-archives-mcp": "./dist/index.js"
+    "australian-history-mcp": "./dist/index.js"
   },
   "type": "module",
   "scripts": {
@@ -46,11 +46,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/littlebearapps/australian-archives-mcp"
+    "url": "https://github.com/littlebearapps/australian-history-mcp"
   },
-  "homepage": "https://github.com/littlebearapps/australian-archives-mcp#readme",
+  "homepage": "https://github.com/littlebearapps/australian-history-mcp#readme",
   "bugs": {
-    "url": "https://github.com/littlebearapps/australian-archives-mcp/issues"
+    "url": "https://github.com/littlebearapps/australian-history-mcp/issues"
   },
   "files": [
     "dist/**/*",

@@ -35,7 +35,7 @@ const LISTS_API_BASE = 'https://lists.ala.org.au/ws';
 
 export class ALAClient extends BaseClient {
   constructor() {
-    super(BIOCACHE_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(BIOCACHE_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
   }
 
   // =========================================================================

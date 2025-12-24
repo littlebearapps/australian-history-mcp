@@ -25,7 +25,7 @@ const DATAGOVAU_API_BASE = 'https://data.gov.au/data/api/3/action';
 
 export class DataGovAUClient extends BaseClient {
   constructor() {
-    super(DATAGOVAU_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(DATAGOVAU_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
   }
 
   // =========================================================================

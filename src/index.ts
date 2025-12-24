@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Australian Archives MCP Server
+ * Australian History MCP Server
  *
  * Provides Claude Code with programmatic access to:
  * - PROV (Public Record Office Victoria) - Victorian state archives
@@ -15,7 +15,7 @@
  * - IIIF - Generic IIIF manifest and image tools (any institution)
  * - GA HAP (Geoscience Australia) - Historical aerial photography (1928-1996)
  *
- * @package @littlebearapps/australian-archives-mcp
+ * @package @littlebearapps/australian-history-mcp
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';

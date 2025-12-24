@@ -1,6 +1,6 @@
-# Contributing to Australian Archives MCP
+# Contributing to Australian History MCP
 
-Thank you for your interest in contributing to the Australian Archives MCP Server! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the Australian History MCP Server! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
 
@@ -29,8 +29,8 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 ### Clone and Install
 
 ```bash
-git clone https://github.com/littlebearapps/australian-archives-mcp.git
-cd australian-archives-mcp
+git clone https://github.com/littlebearapps/australian-history-mcp.git
+cd australian-history-mcp
 npm install
 ```
 

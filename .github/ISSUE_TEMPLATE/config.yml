@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Documentation
-    url: https://github.com/littlebearapps/australian-archives-mcp#readme
+    url: https://github.com/littlebearapps/australian-history-mcp#readme
     about: Read the README for usage instructions and API documentation
   - name: Discussions
-    url: https://github.com/littlebearapps/australian-archives-mcp/discussions
+    url: https://github.com/littlebearapps/australian-history-mcp/discussions
     about: Ask questions and share ideas in Discussions

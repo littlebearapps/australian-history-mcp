@@ -1,6 +1,6 @@
-# Australian Archives MCP - Backlog
+# Australian History MCP - Backlog
 
-This backlog tracks implementation tasks for the australian-archives-mcp server.
+This backlog tracks implementation tasks for the australian-history-mcp server.
 
 ## Currently Implemented (v0.5.0)
 

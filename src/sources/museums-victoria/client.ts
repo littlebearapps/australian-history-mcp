@@ -24,7 +24,7 @@ const MUSEUMS_VIC_API_BASE = 'https://collections.museumsvictoria.com.au/api';
 
 export class MuseumsVictoriaClient extends BaseClient {
   constructor() {
-    super(MUSEUMS_VIC_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(MUSEUMS_VIC_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
   }
 
   // =========================================================================

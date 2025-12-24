@@ -41,7 +41,7 @@ export class TroveClient extends BaseClient {
   private readonly apiKey: string;
 
   constructor(apiKey?: string) {
-    super(TROVE_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(TROVE_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
     this.apiKey = apiKey ?? process.env.TROVE_API_KEY ?? '';
 
     if (!this.apiKey) {

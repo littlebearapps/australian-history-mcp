@@ -27,7 +27,7 @@ const VHD_API_BASE = 'https://api.heritagecouncil.vic.gov.au/v1';
 
 export class VHDClient extends BaseClient {
   constructor() {
-    super(VHD_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(VHD_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
   }
 
   // =========================================================================

@@ -1,6 +1,6 @@
-# Australian Archives MCP Server
+# Australian History MCP Server
 
-[![npm version](https://img.shields.io/npm/v/@littlebearapps/australian-archives-mcp.svg)](https://www.npmjs.com/package/@littlebearapps/australian-archives-mcp)
+[![npm version](https://img.shields.io/npm/v/@littlebearapps/australian-history-mcp.svg)](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
@@ -29,21 +29,21 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 No installation required - run directly:
 
 ```bash
-npx @littlebearapps/australian-archives-mcp
+npx @littlebearapps/australian-history-mcp
 ```
 
 ### Global Install
 
 ```bash
-npm install -g @littlebearapps/australian-archives-mcp
-australian-archives-mcp
+npm install -g @littlebearapps/australian-history-mcp
+australian-history-mcp
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/littlebearapps/australian-archives-mcp
-cd australian-archives-mcp
+git clone https://github.com/littlebearapps/australian-history-mcp
+cd australian-history-mcp
 npm install
 npm run build
 node dist/index.js
@@ -58,9 +58,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "australian-archives": {
+    "australian-history": {
       "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-archives-mcp"],
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
       "env": {
         "TROVE_API_KEY": "your-trove-api-key"
       }
@@ -76,9 +76,9 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 ```json
 {
   "servers": {
-    "australian-archives": {
+    "australian-history": {
       "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-archives-mcp"],
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
       "env": {
         "TROVE_API_KEY": "your-trove-api-key"
       }
@@ -94,9 +94,9 @@ Add to `.mcp.json` in your project:
 ```json
 {
   "mcpServers": {
-    "australian-archives": {
+    "australian-history": {
       "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-archives-mcp"],
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
       "env": {
         "TROVE_API_KEY": "your-trove-api-key"
       }
