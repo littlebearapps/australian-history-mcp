@@ -23,7 +23,7 @@ export class NMAClient extends BaseClient {
   private apiKey?: string;
 
   constructor() {
-    super(NMA_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(NMA_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
     this.apiKey = process.env.NMA_API_KEY;
   }
 

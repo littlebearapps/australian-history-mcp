@@ -1,6 +1,6 @@
-# Australian Archives MCP Server
+# Australian History MCP Server
 
-[![npm version](https://img.shields.io/npm/v/@littlebearapps/australian-archives-mcp.svg)](https://www.npmjs.com/package/@littlebearapps/australian-archives-mcp)
+[![npm version](https://img.shields.io/npm/v/@littlebearapps/australian-history-mcp.svg)](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
 
@@ -29,21 +29,21 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 No installation required - run directly:
 
 ```bash
-npx @littlebearapps/australian-archives-mcp
+npx @littlebearapps/australian-history-mcp
 ```
 
 ### Global Install
 
 ```bash
-npm install -g @littlebearapps/australian-archives-mcp
-australian-archives-mcp
+npm install -g @littlebearapps/australian-history-mcp
+australian-history-mcp
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/littlebearapps/australian-archives-mcp
-cd australian-archives-mcp
+git clone https://github.com/littlebearapps/australian-history-mcp
+cd australian-history-mcp
 npm install
 npm run build
 node dist/index.js
@@ -58,9 +58,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "australian-archives": {
+    "australian-history": {
       "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-archives-mcp"],
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
       "env": {
         "TROVE_API_KEY": "your-trove-api-key"
       }
@@ -76,9 +76,9 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 ```json
 {
   "servers": {
-    "australian-archives": {
+    "australian-history": {
       "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-archives-mcp"],
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
       "env": {
         "TROVE_API_KEY": "your-trove-api-key"
       }
@@ -94,9 +94,9 @@ Add to `.mcp.json` in your project:
 ```json
 {
   "mcpServers": {
-    "australian-archives": {
+    "australian-history": {
       "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-archives-mcp"],
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
       "env": {
         "TROVE_API_KEY": "your-trove-api-key"
       }
@@ -114,7 +114,7 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
-## Tools (69 total)
+## Tools (75 total)
 
 ### PROV Tools (5)
 
@@ -126,17 +126,23 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `prov_get_agency` | Get agency details by VA number |
 | `prov_get_series` | Get series details by VPRS number |
 
-### Trove Tools (7)
+### Trove Tools (13)
 
 | Tool | Description |
 |------|-------------|
-| `trove_search` | Search Trove with illustrationType filter for newspapers, gazettes, images, books |
+| `trove_search` | Search Trove with sortby, filters, holdings for newspapers, gazettes, images, books |
 | `trove_newspaper_article` | Get full article details including OCR text and PDF link |
 | `trove_list_titles` | List available newspaper or gazette titles by state |
 | `trove_title_details` | Get title details with available years and issue counts |
 | `trove_harvest` | Bulk download Trove records with cursor-based pagination |
 | `trove_get_contributor` | Get contributor details by NUC code |
+| `trove_list_contributors` | List/search all 1500+ contributing libraries |
 | `trove_list_magazine_titles` | List available magazine titles |
+| `trove_get_magazine_title` | Get magazine title details with years/issues |
+| `trove_get_work` | Get book/image/map/music details by ID (with holdings, links, versions) |
+| `trove_get_person` | Get person/organisation biographical data |
+| `trove_get_list` | Get user-curated research list by ID |
+| `trove_search_people` | Search people and organisations |
 
 ### data.gov.au Tools (11)
 

@@ -2,7 +2,7 @@
  * Base Source Interface
  *
  * Defines the contract that all data sources must implement
- * to integrate with the Australian Archives MCP server.
+ * to integrate with the Australian History MCP server.
  */
 
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';

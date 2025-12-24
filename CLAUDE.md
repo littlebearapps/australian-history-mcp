@@ -1,15 +1,15 @@
-# CLAUDE.md - Australian Archives MCP Server
+# CLAUDE.md - Australian History MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-22
-**Version:** 0.5.0
+**Last Updated:** 2025-12-24
+**Version:** 0.6.0
 
 ---
 
 ## Quick Facts
 
-**Project:** Australian Archives MCP Server
-**Package:** `@littlebearapps/australian-archives-mcp`
+**Project:** Australian History MCP Server
+**Package:** `@littlebearapps/australian-history-mcp`
 **Purpose:** Programmatic search and batch harvesting of Australian historical archives
 
 **Data Sources:**
@@ -318,7 +318,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 └───────────────────────────────────┬─────────────────────────────────────────────┘
                                     │ stdio
 ┌───────────────────────────────────▼─────────────────────────────────────────────┐
-│               Australian Archives MCP Server (75 tools, 11 sources)              │
+│               Australian History MCP Server (75 tools, 11 sources)               │
 │  ┌──────────────────────────────────────────────────────────────────────────┐   │
 │  │                         Tool Registry (Map-based)                         │   │
 │  └──────────────────────────────────────────────────────────────────────────┘   │
@@ -530,14 +530,14 @@ or ga_hap_harvest
 
 **Location:** Root `claude-code-tools/` only (lean profile)
 
-**Fragment:** `mcp/profiles/fragments/australian-archives.json`
+**Fragment:** `mcp/profiles/fragments/australian-history.json`
 
 ```json
 {
   "command": "bash",
   "args": [
     "-c",
-    "source ~/bin/kc.sh && export TROVE_API_KEY=$(kc_get trove-api-key 2>/dev/null || echo '') && exec node /Users/nathanschram/claude-code-tools/lba/apps/mcp-servers/australian-archives-mcp/dist/index.js"
+    "source ~/bin/kc.sh && export TROVE_API_KEY=$(kc_get trove-api-key 2>/dev/null || echo '') && exec node /Users/nathanschram/claude-code-tools/lba/apps/mcp-servers/australian-history-mcp/dist/index.js"
   ]
 }
 ```

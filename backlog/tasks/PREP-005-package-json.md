@@ -18,14 +18,14 @@ Add repository metadata fields to package.json for npm discoverability and linki
 
 ### 1. Add homepage field
 - [ ] Add `homepage` field to package.json
-- [ ] Value: `"https://github.com/littlebearapps/australian-archives-mcp#readme"`
+- [ ] Value: `"https://github.com/littlebearapps/australian-history-mcp#readme"`
 
 ### 2. Add bugs field
 - [ ] Add `bugs` object to package.json
 - [ ] Value:
   ```json
   "bugs": {
-    "url": "https://github.com/littlebearapps/australian-archives-mcp/issues"
+    "url": "https://github.com/littlebearapps/australian-history-mcp/issues"
   }
   ```
 
@@ -38,9 +38,9 @@ Add repository metadata fields to package.json for npm discoverability and linki
 **Add fields:**
 ```json
 {
-  "homepage": "https://github.com/littlebearapps/australian-archives-mcp#readme",
+  "homepage": "https://github.com/littlebearapps/australian-history-mcp#readme",
   "bugs": {
-    "url": "https://github.com/littlebearapps/australian-archives-mcp/issues"
+    "url": "https://github.com/littlebearapps/australian-history-mcp/issues"
   }
 }
 ```

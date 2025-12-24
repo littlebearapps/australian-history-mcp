@@ -1,6 +1,6 @@
 # Tools Reference
 
-Complete parameter documentation for all 24 Australian Archives MCP tools.
+Complete parameter documentation for all 75 Australian History MCP tools.
 
 ---
 

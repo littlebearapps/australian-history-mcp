@@ -20,7 +20,7 @@ const ACMI_API_BASE = 'https://api.acmi.net.au';
 
 export class ACMIClient extends BaseClient {
   constructor() {
-    super(ACMI_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(ACMI_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
   }
 
   // =========================================================================

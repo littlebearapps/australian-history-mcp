@@ -21,7 +21,7 @@ Create open milestones for current and upcoming releases.
 ### Milestone: v0.5.0 Public Release
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.5.0 Public Release" \
     -f description="Documentation and GitHub setup for public release" \
     -f state="open"
@@ -31,7 +31,7 @@ Create open milestones for current and upcoming releases.
 ### Milestone: v0.6.0
 - [ ] Create milestone:
   ```bash
-  gh api repos/littlebearapps/australian-archives-mcp/milestones \
+  gh api repos/littlebearapps/australian-history-mcp/milestones \
     -f title="v0.6.0" \
     -f description="Next feature release" \
     -f state="open"
@@ -45,12 +45,12 @@ Create open milestones for current and upcoming releases.
 #!/bin/bash
 # Create current milestones with delays
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.5.0 Public Release" \
   -f description="Documentation and GitHub setup for public release" \
   -f state="open" && sleep 2
 
-gh api repos/littlebearapps/australian-archives-mcp/milestones \
+gh api repos/littlebearapps/australian-history-mcp/milestones \
   -f title="v0.6.0" \
   -f description="Next feature release" \
   -f state="open"
@@ -79,5 +79,5 @@ echo "Created 2 current milestones"
 
 ## Verification
 
-- [ ] Run `gh api repos/littlebearapps/australian-archives-mcp/milestones?state=open`
+- [ ] Run `gh api repos/littlebearapps/australian-history-mcp/milestones?state=open`
 - [ ] Both milestones show as open

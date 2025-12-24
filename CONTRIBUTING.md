@@ -1,6 +1,6 @@
-# Contributing to Australian Archives MCP
+# Contributing to Australian History MCP
 
-Thank you for your interest in contributing to the Australian Archives MCP Server! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the Australian History MCP Server! This document provides guidelines and instructions for contributing.
 
 ## Table of Contents
 
@@ -29,8 +29,8 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 ### Clone and Install
 
 ```bash
-git clone https://github.com/littlebearapps/australian-archives-mcp.git
-cd australian-archives-mcp
+git clone https://github.com/littlebearapps/australian-history-mcp.git
+cd australian-history-mcp
 npm install
 ```
 
@@ -280,8 +280,8 @@ echo '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"prov_search","arg
 
 ## Questions?
 
-- Open a [Discussion](https://github.com/littlebearapps/australian-archives-mcp/discussions) for questions
-- Check existing [Issues](https://github.com/littlebearapps/australian-archives-mcp/issues) for known problems
+- Open a [Discussion](https://github.com/littlebearapps/australian-history-mcp/discussions) for questions
+- Check existing [Issues](https://github.com/littlebearapps/australian-history-mcp/issues) for known problems
 - Read the [README](README.md) for usage documentation
 
 Thank you for contributing!

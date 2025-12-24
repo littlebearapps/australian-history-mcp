@@ -23,7 +23,7 @@ const PROV_API_BASE = 'https://api.prov.vic.gov.au/search';
 
 export class PROVClient extends BaseClient {
   constructor() {
-    super(PROV_API_BASE, { userAgent: 'australian-archives-mcp/0.5.0' });
+    super(PROV_API_BASE, { userAgent: 'australian-history-mcp/0.6.0' });
   }
 
   /**
