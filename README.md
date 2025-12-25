@@ -13,7 +13,7 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 - [History Data Sources](#history-data-sources)
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Trove API Key](#trove-api-key)
+- [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Tools (75 total)](#tools-75-total)
 - [Usage Examples](#usage-examples)
 - [Content Types](#content-types)
@@ -25,12 +25,15 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 
 ## History Data Sources
 
-Most data sources are ready to use immediately with no registration required. Only Trove (National Library of Australia) requires an API key, which is [free to apply for](#trove-api-key).
+Most data sources are ready to use immediately with no registration required.
+
+> [!NOTE]
+> Only Trove (National Library of Australia) requires an API key, which is [free to apply for](#trove-api-key---how-to-apply).
 
 | Source | Access | Content |
 |--------|--------|---------|
 | **PROV** (Public Record Office Victoria) | Ready to use | Victorian state archives: photos, maps, council records, court files |
-| **Trove** (National Library of Australia) | [Free API Key](#trove-api-key) | Digitised newspapers, gazettes, books, images, magazines |
+| **Trove** (National Library of Australia) | [Free API Key needed](#trove-api-key---how-to-apply) | Digitised newspapers, gazettes, books, images, magazines |
 | **data.gov.au** | Ready to use | 85,000+ government datasets from 800+ organisations |
 | **Museums Victoria** | Ready to use | Museum objects, natural science specimens, species info, articles |
 | **ALA** (Atlas of Living Australia) | Ready to use | 165M+ species occurrence records, 153,000+ species profiles |
@@ -139,7 +142,7 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 }
 ```
 
-## Trove API Key
+## Trove API Key - How to Apply
 
 Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work without authentication.
 
@@ -150,7 +153,8 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 
 ## Tools (75 total)
 
-### PROV Tools (5)
+<details open>
+<summary><h3>PROV Tools (5)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -160,7 +164,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `prov_get_agency` | Get agency details by VA number |
 | `prov_get_series` | Get series details by VPRS number |
 
-### Trove Tools (13)
+</details>
+
+<details>
+<summary><h3>Trove Tools (13)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -178,7 +185,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `trove_get_list` | Get user-curated research list by ID |
 | `trove_search_people` | Search people and organisations |
 
-### data.gov.au Tools (11)
+</details>
+
+<details>
+<summary><h3>data.gov.au Tools (11)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -194,7 +204,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `datagovau_harvest` | Bulk download dataset metadata with pagination |
 | `datagovau_autocomplete` | Autocomplete dataset names and titles |
 
-### Museums Victoria Tools (6)
+</details>
+
+<details>
+<summary><h3>Museums Victoria Tools (6)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -205,7 +218,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `museumsvic_get_specimen` | Get a natural science specimen with taxonomy and collection info |
 | `museumsvic_harvest` | Bulk download Museums Victoria records with pagination |
 
-### ALA Tools (8)
+</details>
+
+<details>
+<summary><h3>ALA Tools (8)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -218,7 +234,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `ala_list_species_lists` | List user-curated species lists |
 | `ala_get_species_list` | Get species list details by druid |
 
-### NMA Tools (9)
+</details>
+
+<details>
+<summary><h3>NMA Tools (9)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -232,7 +251,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `nma_search_media` | Search images, video, and sound |
 | `nma_get_media` | Get media details by ID |
 
-### VHD Tools (9)
+</details>
+
+<details>
+<summary><h3>VHD Tools (9)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -246,7 +268,10 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `vhd_list_themes` | List heritage themes (history, economics, etc.) |
 | `vhd_list_periods` | List historical periods |
 
-### ACMI Tools (7)
+</details>
+
+<details>
+<summary><h3>ACMI Tools (7)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -258,27 +283,38 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `acmi_list_constellations` | List curated thematic collections |
 | `acmi_get_constellation` | Get constellation details with works |
 
-### PM Transcripts Tools (2)
+</details>
+
+<details>
+<summary><h3>PM Transcripts Tools (2)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
 | `pm_transcripts_get_transcript` | Get Prime Ministerial transcript by ID |
 | `pm_transcripts_harvest` | Bulk download transcripts (see limitations below) |
 
-### IIIF Tools (2)
+</details>
+
+<details>
+<summary><h3>IIIF Tools (2)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
 | `iiif_get_manifest` | Fetch and parse IIIF manifest from any institution |
 | `iiif_get_image_url` | Construct IIIF Image API URLs for various sizes/formats |
 
-### GA HAP Tools (3)
+</details>
+
+<details>
+<summary><h3>GA HAP Tools (3)</h3></summary>
 
 | Tool | Description |
 |------|-------------|
 | `ga_hap_search` | Search historical aerial photos by state, year, location, bbox |
 | `ga_hap_get_photo` | Get photo details by OBJECTID or film/run/frame |
 | `ga_hap_harvest` | Bulk download photo records with pagination |
+
+</details>
 
 > **⚠️ GA HAP Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
 
