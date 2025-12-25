@@ -139,7 +139,9 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 ## Tools & Examples by Data Source
 
 <details open>
-<summary><h3>PROV Tools (5)</h3></summary>
+<summary><h3>Public Record Office Victoria (PROV)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -164,7 +166,9 @@ prov_get_images with manifestUrl: "<manifest-url-from-search>", size: "full"
 </details>
 
 <details>
-<summary><h3>Trove Tools (13)</h3></summary>
+<summary><h3>Trove (National Library of Australia)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -199,7 +203,9 @@ trove_search with query: "bushrangers", sortby: "dateasc",
 </details>
 
 <details>
-<summary><h3>data.gov.au Tools (11)</h3></summary>
+<summary><h3>data.gov.au</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -231,7 +237,9 @@ datagovau_datastore_search with resourceId: "<resource-id>",
 </details>
 
 <details>
-<summary><h3>Museums Victoria Tools (6)</h3></summary>
+<summary><h3>Museums Victoria</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -257,7 +265,9 @@ museumsvic_search with recordType: "specimen", hasImages: true, random: true
 </details>
 
 <details>
-<summary><h3>ALA Tools (8)</h3></summary>
+<summary><h3>Atlas of Living Australia (ALA)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -286,7 +296,9 @@ ala_search_images with query: "Eucalyptus", limit: 50
 </details>
 
 <details>
-<summary><h3>NMA Tools (9)</h3></summary>
+<summary><h3>National Museum of Australia (NMA)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -315,7 +327,9 @@ nma_search_parties with query: "explorer", limit: 30
 </details>
 
 <details>
-<summary><h3>VHD Tools (9)</h3></summary>
+<summary><h3>Victorian Heritage Database (VHD)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -345,7 +359,9 @@ vhd_get_place with id: 12345
 </details>
 
 <details>
-<summary><h3>ACMI Tools (7)</h3></summary>
+<summary><h3>Australian Centre for the Moving Image (ACMI)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -372,7 +388,9 @@ acmi_get_creator with id: 12345
 </details>
 
 <details>
-<summary><h3>PM Transcripts Tools (2)*</h3></summary>
+<summary><h3>PM Transcripts*</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -399,7 +417,9 @@ pm_transcripts_harvest with primeMinister: "Hawke", maxRecords: 100
 </details>
 
 <details>
-<summary><h3>IIIF Tools (2)</h3></summary>
+<summary><h3>IIIF (Any Institution)</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -424,7 +444,9 @@ iiif_get_image_url with imageServiceUrl: "<url-from-manifest>",
 </details>
 
 <details>
-<summary><h3>GA HAP Tools (3)*</h3></summary>
+<summary><h3>Geoscience Australia Historical Aerial Photography (GA HAP)*</h3></summary>
+
+**Tools:**
 
 | Tool | Description |
 |------|-------------|
@@ -452,67 +474,66 @@ _* Section contains usage notes_
 
 ## What You Can Find
 
-> **🏛️ PROV (Victorian Archives)**
-> 📷 Photos & Maps | 📁 Government Files | 📋 Council Minutes | ⚖️ Court Records | 🚢 Immigration | 🏢 Agency & Series Records
-
-> **📰 Trove (National Library)**
-> 📰 Newspapers 1803-1954+ | 📜 Gazettes | 📖 Books & Magazines | 🖼️ Images | 🗺️ Maps | 📔 Diaries & Archives
-
-> **📊 data.gov.au**
-> 📈 Census & Demographics | 🗺️ Geographic & Spatial | 🌿 Environmental | 🏥 Health | 🚗 Transport | 📋 85,000+ Datasets
-
-> **🦘 Museums Victoria**
-> 🏺 Museum Objects | 🔬 Natural Specimens | 🦎 Species Info | 📝 Educational Articles
-
-> **🌿 Atlas of Living Australia**
-> 📍 165M+ Occurrence Records | 🦜 153,000+ Species Profiles | 🗺️ Distribution Maps | 👀 Citizen Science
-
-> **🏛️ National Museum of Australia**
-> 🏺 85,000+ Objects | 👤 People & Organisations | 📍 Places | 🎬 Media
-
-> **🏚️ Victorian Heritage Database**
-> 🏛️ 12,000+ Heritage Places | ⚓ 700+ Shipwrecks | 🏗️ Architectural Styles
-
-> **🎬 ACMI**
-> 🎬 42,000+ Films | 📺 Television | 🎮 Videogames | 🎨 Digital Art | 👤 Creators
-
-> **🎤 PM Transcripts**
-> 🎤 26,000+ Speeches | 📰 Media Releases | 🎙️ Interviews | 📄 PDF Documents
-
-> **✈️ Geoscience Australia HAP**
-> 📸 1.2M+ Aerial Photos 1928-1996 | 🗺️ All States/Territories | 📍 Coordinates
-
-> **🖼️ IIIF (Any Institution)**
-> 📜 Manifest Parsing | 🔗 Image URL Construction | 📐 Size/Format Options
+| Source | Content Types |
+|--------|---------------|
+| 🏛️ **PROV** | Photos & Maps, Government Files, Council Minutes, Court Records, Immigration, Agency & Series Records |
+| 📰 **Trove** | Newspapers 1803-1954+, Gazettes, Books & Magazines, Images, Maps, Diaries & Archives |
+| 📊 **data.gov.au** | Census & Demographics, Geographic & Spatial, Environmental, Health, Transport, 85,000+ Datasets |
+| 🦘 **Museums Victoria** | Museum Objects, Natural Specimens, Species Info, Educational Articles |
+| 🌿 **Atlas of Living Australia** | 165M+ Occurrence Records, 153,000+ Species Profiles, Distribution Maps, Citizen Science |
+| 🏛️ **National Museum** | 85,000+ Objects, People & Organisations, Places, Media |
+| 🏚️ **Victorian Heritage** | 12,000+ Heritage Places, 700+ Shipwrecks, Architectural Styles |
+| 🎬 **ACMI** | 42,000+ Films, Television, Videogames, Digital Art, Creators |
+| 🎤 **PM Transcripts** | 26,000+ Speeches, Media Releases, Interviews, PDF Documents |
+| ✈️ **GA HAP** | 1.2M+ Aerial Photos 1928-1996, All States/Territories, Coordinates |
+| 🖼️ **IIIF** | Manifest Parsing, Image URL Construction, Size/Format Options |
 
 ## Frequently Asked Questions
 
-### How do I search historical newspapers?
+<details open>
+<summary><strong>1. How do I search historical newspapers?</strong></summary>
 
 Use `trove_search` with `category: "newspaper"`. Filter by date with `dateFrom` and `dateTo` parameters (format: YYYY or YYYY-MM-DD), and by state with the `state` parameter (e.g., "vic", "nsw", "qld").
 
-### Which sources need an API key?
+</details>
+
+<details>
+<summary><strong>2. Which sources need an API key?</strong></summary>
 
 Only **Trove** requires an API key. All 10 other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work immediately with no registration required.
 
-### How do I download images from digitised records?
+</details>
+
+<details>
+<summary><strong>3. How do I download images from digitised records?</strong></summary>
 
 For **PROV records**, use `prov_get_images` with the manifest URL from search results. For **any IIIF-compliant institution**, use `iiif_get_manifest` to get canvas details, then `iiif_get_image_url` to construct download URLs in your preferred size and format.
 
-### How do I bulk download records?
+</details>
+
+<details>
+<summary><strong>4. How do I bulk download records?</strong></summary>
 
 Each source has a `_harvest` tool for bulk downloads with pagination:
 - `prov_harvest`, `trove_harvest`, `datagovau_harvest`
 - `museumsvic_harvest`, `ala_harvest`, `nma_harvest`
 - `vhd_harvest`, `acmi_harvest`, `pm_transcripts_harvest`, `ga_hap_harvest`
 
-### Can I search by location or coordinates?
+</details>
+
+<details>
+<summary><strong>5. Can I search by location or coordinates?</strong></summary>
 
 Yes. Use `ga_hap_search` with `bbox` for aerial photos by bounding box (format: "minLon,minLat,maxLon,maxLat"). ALA tools support `stateProvince` filtering (e.g., "Victoria", "New South Wales"). VHD supports `municipality` filtering for Victorian local government areas.
 
-### How do I find species information?
+</details>
+
+<details>
+<summary><strong>6. How do I find species information?</strong></summary>
 
 Use `ala_search_species` for scientific or common names, or `museumsvic_search` with `recordType: "species"`. Get detailed profiles with `ala_get_species` using the GUID from search results. ALA covers all Australian species; Museums Victoria focuses on Victorian fauna and flora.
+
+</details>
 
 ## Rate Limits
 
