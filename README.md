@@ -43,7 +43,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 - [Data Sources Available](#data-sources-available)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Configuration](#configuration)
-- [Tools & Examples by Data Source](#tools--examples-by-data-source)
+- [Data Sources - Tools & Examples](#data-sources---tools--examples)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Rate Limits](#rate-limits)
 - [Licensing Notes](#licensing-notes)
@@ -153,7 +153,7 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 }
 ```
 
-## Tools & Examples by Data Source
+## Data Sources - Tools & Examples
 
 <details open>
 <summary><h3>Public Record Office Victoria (PROV)</h3></summary>
@@ -183,7 +183,9 @@ prov_get_images with manifestUrl: "<manifest-url-from-search>", size: "full"
 </details>
 
 <details>
-<summary><h3>Trove (National Library of Australia)</h3></summary>
+<summary><h3>Trove (National Library of Australia)*</h3></summary>
+
+> **⚠️ API Key Required**: Trove tools require a free API key. [Apply for your key](#trove-api-key---how-to-apply) before using these tools.
 
 **Tools:**
 
