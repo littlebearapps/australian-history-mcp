@@ -176,122 +176,62 @@ Bulk download Trove search results.
 
 ---
 
-## data.gov.au Tools (No API Key Required)
+## GHAP Tools (No API Key Required)
 
-### datagovau_search
+### ghap_search
 
-Search datasets on data.gov.au.
+Search historical placenames from ANPS gazetteer and community datasets.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `query` | string | No | - | Search keywords |
-| `organization` | string | No | - | Organisation slug (e.g., "abs", "bom") |
-| `format` | string | No | - | Resource format (e.g., "CSV", "JSON") |
-| `tags` | string[] | No | - | Filter by tags |
-| `sort` | string | No | `relevance` | `relevance`, `metadata_modified desc`, `title asc` |
+| `query` | string | No | - | Placename to search (partial match) |
+| `state` | string | No | - | Filter by state (VIC, NSW, QLD, SA, WA, TAS, NT, ACT) |
+| `lga` | string | No | - | Filter by Local Government Area |
+| `bbox` | string | No | - | Bounding box: minLon,minLat,maxLon,maxLat |
+| `fuzzy` | boolean | No | false | Use fuzzy matching (handles typos) |
 | `limit` | number | No | 20 | Maximum results (1-100) |
-| `offset` | number | No | 0 | Pagination offset |
 
 ---
 
-### datagovau_get_dataset
+### ghap_get_place
 
-Get full dataset details including all resources.
+Get place details by TLCMap ID.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `dataset` | string | **Yes** | - | Dataset ID or name slug |
+| `id` | string | **Yes** | - | TLCMap place ID (e.g., "a1b4b8", "t3408") |
 
 ---
 
-### datagovau_get_resource
+### ghap_list_layers
 
-Get individual resource details.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `resource` | string | **Yes** | - | Resource UUID |
-
----
-
-### datagovau_datastore_search
-
-Query tabular data directly (if datastore enabled).
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `resource` | string | **Yes** | - | Resource UUID |
-| `query` | string | No | - | Full-text search |
-| `filters` | object | No | - | Field filters (e.g., `{"state": "VIC"}`) |
-| `fields` | string[] | No | - | Fields to return |
-| `sort` | string | No | - | Sort field |
-| `limit` | number | No | 100 | Maximum rows (1-1000) |
-| `offset` | number | No | 0 | Pagination offset |
-
----
-
-### datagovau_list_organizations
-
-List publishing organisations.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `limit` | number | No | 50 | Maximum to return |
-
----
-
-### datagovau_get_organization
-
-Get organisation details.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `organization` | string | **Yes** | - | Organisation ID or slug |
-| `includeDatasets` | boolean | No | false | Include dataset list |
-
----
-
-### datagovau_list_groups
-
-List dataset groups/categories.
+List all available community data layers. Returns 1990+ layers.
 
 No parameters required.
 
 ---
 
-### datagovau_get_group
+### ghap_get_layer
 
-Get group details.
+Get all places from a specific data layer.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `group` | string | **Yes** | - | Group ID or slug |
-| `includeDatasets` | boolean | No | false | Include dataset list |
+| `layerId` | number | **Yes** | - | Layer ID (from ghap_list_layers) |
 
 ---
 
-### datagovau_list_tags
+### ghap_harvest
 
-List popular tags.
-
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `query` | string | No | - | Filter tags by prefix |
-
----
-
-### datagovau_harvest
-
-Bulk download dataset metadata.
+Bulk download placename records with filters.
 
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
-| `query` | string | No | - | Search keywords |
-| `organization` | string | No | - | Organisation slug |
-| `format` | string | No | - | Resource format filter |
-| `tags` | string[] | No | - | Filter by tags |
-| `maxRecords` | number | No | 100 | Maximum datasets (1-1000) |
-| `startFrom` | number | No | 0 | Pagination offset |
+| `query` | string | No | - | Placename to search |
+| `state` | string | No | - | Filter by state |
+| `lga` | string | No | - | Filter by Local Government Area |
+| `bbox` | string | No | - | Bounding box filter |
+| `maxRecords` | number | No | 100 | Maximum records (1-500) |
 
 ---
 

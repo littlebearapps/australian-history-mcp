@@ -128,11 +128,11 @@ Natural science collection items. Contains:
 
 ## Key Differences from Other Sources
 
-| | PROV/Trove | data.gov.au | Museums Victoria |
-|--|------------|-------------|------------------|
-| **Content** | Archives, newspapers | Datasets, statistics | Museum objects, specimens |
-| **Use case** | Historical research | Data analysis | Natural history, cultural heritage |
-| **Formats** | Images, PDFs, text | CSV, JSON, GIS | JSON with images |
+| | PROV/Trove | GHAP | Museums Victoria |
+|--|------------|------|------------------|
+| **Content** | Archives, newspapers | Historical placenames | Museum objects, specimens |
+| **Use case** | Historical research | Geographic research | Natural history, cultural heritage |
+| **Formats** | Images, PDFs, text | GeoJSON | JSON with images |
 
 ---
 

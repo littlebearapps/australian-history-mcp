@@ -1,6 +1,6 @@
 # Australian History MCP Server
 
-> Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos, species records, heritage buildings, or government datasets - no manual searching required.
+> Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos, species records, heritage buildings, or historical placenames - no manual searching required.
 
 ## Quick Start
 
