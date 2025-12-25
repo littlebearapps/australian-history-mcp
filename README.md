@@ -8,7 +8,24 @@
 
 A Model Context Protocol (MCP) server for searching and harvesting Australian historical archives, government data, and museum collections.
 
-## Data Sources — Ready to Use & Registration Required
+## Table of Contents
+
+- [History Data Sources](#history-data-sources)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Trove API Key](#trove-api-key)
+- [Tools (75 total)](#tools-75-total)
+- [Usage Examples](#usage-examples)
+- [Content Types](#content-types)
+- [Rate Limits](#rate-limits)
+- [Licensing Notes](#licensing-notes)
+- [Resources](#resources)
+- [Contributing](#contributing)
+- [License](#license)
+
+## History Data Sources
+
+Most data sources are ready to use immediately with no registration required. Only Trove (National Library of Australia) requires an API key, which is [free to apply for](#trove-api-key).
 
 | Source | Access | Content |
 |--------|--------|---------|
@@ -55,45 +72,11 @@ node dist/index.js
 
 ## Configuration
 
-### Claude Desktop
+### Claude Desktop & Claude Code
 
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "australian-history": {
-      "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-history-mcp"],
-      "env": {
-        "TROVE_API_KEY": "your-trove-api-key"
-      }
-    }
-  }
-}
-```
-
-### VS Code
-
-Add to `.vscode/mcp.json` or user MCP configuration:
-
-```json
-{
-  "servers": {
-    "australian-history": {
-      "command": "npx",
-      "args": ["-y", "@littlebearapps/australian-history-mcp"],
-      "env": {
-        "TROVE_API_KEY": "your-trove-api-key"
-      }
-    }
-  }
-}
-```
-
-### Claude Code
-
-Add to `.mcp.json` in your project:
+Add to your config file:
+- **Claude Desktop**: `claude_desktop_config.json`
+- **Claude Code**: `.mcp.json` in your project directory
 
 ```json
 {
@@ -127,6 +110,24 @@ Add to your `~/.gemini/settings.json`:
 ```json
 {
   "mcpServers": {
+    "australian-history": {
+      "command": "npx",
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
+      "env": {
+        "TROVE_API_KEY": "your-trove-api-key"
+      }
+    }
+  }
+}
+```
+
+### VS Code
+
+Add to `.vscode/mcp.json` or user MCP configuration:
+
+```json
+{
+  "servers": {
     "australian-history": {
       "command": "npx",
       "args": ["-y", "@littlebearapps/australian-history-mcp"],
