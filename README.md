@@ -10,8 +10,6 @@ _Last updated: December 2025_
 
 Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos from 1928, species records, heritage buildings, or government datasets - no manual searching required.
 
-**75 tools. 11 archives. One connection.**
-
 ## Quick Start
 
 Run directly with npx - no installation required:
@@ -63,17 +61,17 @@ Most data sources are ready to use immediately with no registration required.
 
 | Source | Access | Content |
 |--------|--------|---------|
-| **PROV** (Public Record Office Victoria) | Ready to use | Victorian state archives: photos, maps, council records, court files |
-| **Trove** (National Library of Australia) | [Free API Key needed](#trove-api-key---how-to-apply) | Digitised newspapers, gazettes, books, images, magazines |
+| **Public Record Office Victoria (PROV)** | Ready to use | Victorian state archives: photos, maps, council records, court files |
+| **Trove (National Library of Australia)** | [Free API Key needed](#trove-api-key---how-to-apply) | Digitised newspapers, gazettes, books, images, magazines |
 | **data.gov.au** | Ready to use | 85,000+ government datasets from 800+ organisations |
 | **Museums Victoria** | Ready to use | Museum objects, natural science specimens, species info, articles |
-| **ALA** (Atlas of Living Australia) | Ready to use | 165M+ species occurrence records, 153,000+ species profiles |
-| **NMA** (National Museum of Australia) | Ready to use | 85,000+ museum objects, people, places, media |
-| **VHD** (Victorian Heritage Database) | Ready to use | 12,000+ heritage places, 700+ shipwrecks, architectural data |
-| **ACMI** (Australian Centre for the Moving Image) | Ready to use | 42,000+ films, TV, videogames, digital art |
+| **Atlas of Living Australia (ALA)** | Ready to use | 165M+ species occurrence records, 153,000+ species profiles |
+| **National Museum of Australia (NMA)** | Ready to use | 85,000+ museum objects, people, places, media |
+| **Victorian Heritage Database (VHD)** | Ready to use | 12,000+ heritage places, 700+ shipwrecks, architectural data |
+| **Australian Centre for the Moving Image (ACMI)** | Ready to use | 42,000+ films, TV, videogames, digital art |
 | **PM Transcripts** | Ready to use | 26,000+ Prime Ministerial speeches, media releases, interviews |
 | **IIIF** | Ready to use | Generic IIIF manifest/image tools for any institution |
-| **GA HAP** (Geoscience Australia) | Ready to use | 1.2M+ historical aerial photos (1928-1996), all states/territories |
+| **Geoscience Australia Historical Aerial Photography (GA HAP)** | Ready to use | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
 
