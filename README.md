@@ -20,6 +20,8 @@ npx @littlebearapps/australian-history-mcp
 
 That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](#trove-api-key---how-to-apply) requires a free API key.
 
+→ **Next:** Add to your MCP client via [Configuration](#configuration)
+
 ## Table of Contents
 
 - [Quick Start](#quick-start)
