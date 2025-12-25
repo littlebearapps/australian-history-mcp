@@ -15,7 +15,6 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 - [Configuration](#configuration)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Tools by Data Source (75)](#tools-by-data-source-75)
-- [Usage Examples](#usage-examples)
 - [Content Types](#content-types)
 - [Rate Limits](#rate-limits)
 - [Licensing Notes](#licensing-notes)
@@ -164,6 +163,11 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `prov_get_agency` | Get agency details by VA number |
 | `prov_get_series` | Get series details by VPRS number |
 
+**Example:** Search historical railway photos
+```
+prov_search with query: "railway", digitisedOnly: true
+```
+
 </details>
 
 <details>
@@ -185,6 +189,12 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `trove_get_list` | Get user-curated research list by ID |
 | `trove_search_people` | Search people and organisations |
 
+**Example:** Find 1930s newspaper articles about Melbourne floods
+```
+trove_search with query: "Melbourne flood", category: "newspaper",
+  dateFrom: "1930", dateTo: "1939", state: "vic"
+```
+
 </details>
 
 <details>
@@ -204,6 +214,11 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `datagovau_harvest` | Bulk download dataset metadata with pagination |
 | `datagovau_autocomplete` | Autocomplete dataset names and titles |
 
+**Example:** Find government heritage datasets in CSV format
+```
+datagovau_search with query: "heritage", format: "CSV"
+```
+
 </details>
 
 <details>
@@ -217,6 +232,11 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `museumsvic_get_species` | Get species info (taxonomy, biology, habitat, distribution) by ID |
 | `museumsvic_get_specimen` | Get a natural science specimen with taxonomy and collection info |
 | `museumsvic_harvest` | Bulk download Museums Victoria records with pagination |
+
+**Example:** Search for platypus species information
+```
+museumsvic_search with query: "platypus", recordType: "species"
+```
 
 </details>
 
@@ -233,6 +253,11 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `ala_match_name` | Resolve taxonomic names to classification |
 | `ala_list_species_lists` | List user-curated species lists |
 | `ala_get_species_list` | Get species list details by druid |
+
+**Example:** Search for koala occurrence records
+```
+ala_search_occurrences with scientificName: "Phascolarctos cinereus", limit: 50
+```
 
 </details>
 
@@ -251,6 +276,11 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `nma_search_media` | Search images, video, and sound |
 | `nma_get_media` | Get media details by ID |
 
+**Example:** Find boomerang artefacts
+```
+nma_search_objects with query: "boomerang", limit: 20
+```
+
 </details>
 
 <details>
@@ -268,6 +298,15 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `vhd_list_themes` | List heritage themes (history, economics, etc.) |
 | `vhd_list_periods` | List historical periods |
 
+**Examples:**
+```
+# Search heritage railway stations in Melbourne
+vhd_search_places with query: "railway station", municipality: "Melbourne"
+
+# Search for barque shipwrecks
+vhd_search_shipwrecks with query: "barque"
+```
+
 </details>
 
 <details>
@@ -282,6 +321,11 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `acmi_get_creator` | Get creator details and filmography |
 | `acmi_list_constellations` | List curated thematic collections |
 | `acmi_get_constellation` | Get constellation details with works |
+
+**Example:** Search for Mad Max films
+```
+acmi_search_works with query: "Mad Max", type: "Film"
+```
 
 </details>
 
@@ -300,6 +344,15 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 > - Hawke/Keating (1983-1996): ~5000-10000
 > - Howard (1996-2007): ~10000-18000
 > - Rudd/Gillard/Abbott+ (2007+): ~18000-26000
+
+**Examples:**
+```
+# Get a specific transcript
+pm_transcripts_get_transcript with id: 12345
+
+# Harvest Hawke era transcripts
+pm_transcripts_harvest with primeMinister: "Hawke", maxRecords: 100
+```
 
 </details>
 
@@ -324,133 +377,21 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 
 > **⚠️ Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
 
+**Examples:**
+```
+# Search 1950s Victorian aerial photos
+ga_hap_search with state: "VIC", yearFrom: 1950, yearTo: 1960, scannedOnly: true
+
+# Get photo details by ID
+ga_hap_get_photo with objectId: 12345
+
+# Harvest photos by Melbourne bounding box
+ga_hap_harvest with bbox: "144.9,-37.9,145.1,-37.7", maxRecords: 100
+```
+
 </details>
 
 _* Section contains usage notes_
-
-## Usage Examples
-
-### Search Historical Railway Photos (PROV)
-
-```
-Use prov_search with query "railway" and digitisedOnly=true
-```
-
-### Find 1930s Newspaper Articles (Trove)
-
-```
-Use trove_search with:
-  query: "Melbourne flood"
-  category: "newspaper"
-  dateFrom: "1930"
-  dateTo: "1939"
-  state: "vic"
-```
-
-### Find Government Heritage Data (data.gov.au)
-
-```
-Use datagovau_search with:
-  query: "heritage"
-  format: "CSV"
-```
-
-### Search for Australian Wildlife (Museums Victoria)
-
-```
-Use museumsvic_search with:
-  query: "platypus"
-  recordType: "species"
-```
-
-### Search for Koalas (ALA)
-
-```
-Use ala_search_occurrences with:
-  scientificName: "Phascolarctos cinereus"
-  limit: 50
-```
-
-### Find Museum Artefacts (NMA)
-
-```
-Use nma_search_objects with:
-  query: "boomerang"
-  limit: 20
-```
-
-### Search Heritage Places (VHD)
-
-```
-Use vhd_search_places with:
-  query: "railway station"
-  municipality: "Melbourne"
-```
-
-### Search Shipwrecks (VHD)
-
-```
-Use vhd_search_shipwrecks with:
-  query: "barque"
-```
-
-### Search Australian Films (ACMI)
-
-```
-Use acmi_search_works with:
-  query: "Mad Max"
-  type: "Film"
-```
-
-### Get PM Transcript (PM Transcripts)
-
-```
-Use pm_transcripts_get_transcript with:
-  id: 12345
-```
-
-### Harvest Hawke Era Transcripts (PM Transcripts)
-
-```
-Use pm_transcripts_harvest with:
-  primeMinister: "Hawke"
-  maxRecords: 100
-```
-
-### Search Victorian Aerial Photos (GA HAP)
-
-```
-Use ga_hap_search with:
-  state: "VIC"
-  yearFrom: 1950
-  yearTo: 1960
-  scannedOnly: true
-```
-
-### Get Aerial Photo Details (GA HAP)
-
-```
-Use ga_hap_get_photo with:
-  objectId: 12345
-```
-
-### Harvest Aerial Photos by Location (GA HAP)
-
-```
-Use ga_hap_harvest with:
-  bbox: "144.9,-37.9,145.1,-37.7"
-  maxRecords: 100
-```
-
-### Bulk Download Records
-
-All sources have harvest tools for batch downloading:
-
-```
-Use prov_harvest, trove_harvest, datagovau_harvest, museumsvic_harvest,
-ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, pm_transcripts_harvest,
-or ga_hap_harvest with maxRecords parameter (up to 1000)
-```
 
 ## Content Types
 
