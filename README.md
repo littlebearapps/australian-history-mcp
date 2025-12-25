@@ -55,19 +55,19 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 
 Most sources work immediately with no registration. Only Trove requires a free API key.
 
-| Source | Access | Content |
-|--------|--------|---------|
-| 🏛️ **PROV** | Ready to use | Victorian state archives: photos, maps, council records, court files, immigration |
-| 📰 **Trove** | [Free API key](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
-| 📊 **data.gov.au** | Ready to use | 85,000+ government datasets: census, demographics, geographic, environmental, health |
-| 🦘 **Museums Victoria** | Ready to use | Museum objects, natural specimens, species info, educational articles |
-| 🌿 **ALA** | Ready to use | 165M+ species records, 153,000+ profiles, distribution maps, citizen science |
-| 🏛️ **NMA** | Ready to use | 85,000+ museum objects, people, organisations, places, media |
-| 🏚️ **VHD** | Ready to use | 12,000+ heritage places, 700+ shipwrecks, architectural styles |
-| 🎬 **ACMI** | Ready to use | 42,000+ films, TV, videogames, digital art, creator info |
-| 🎤 **PM Transcripts** | Ready to use | 26,000+ Prime Ministerial speeches, media releases, interviews |
-| 🖼️ **IIIF** | Ready to use | Generic manifest/image tools for any IIIF-compliant institution |
-| ✈️ **GA HAP** | Ready to use | 1.2M+ historical aerial photos (1928-1996), all states/territories |
+| Source | API Key | Content |
+|--------|---------|---------|
+| 🏛️ **Public Record Office Victoria (PROV)** | — | Victorian state archives: photos, maps, council records, court files, immigration |
+| 📰 **Trove (National Library of Australia)** | [Free*](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
+| 📊 **data.gov.au** | — | 85,000+ government datasets: census, demographics, geographic, environmental, health |
+| 🦘 **Museums Victoria** | — | Museum objects, natural specimens, species info, educational articles |
+| 🌿 **Atlas of Living Australia (ALA)** | — | 165M+ species records, 153,000+ profiles, distribution maps, citizen science |
+| 🏛️ **National Museum of Australia (NMA)** | — | 85,000+ museum objects, people, organisations, places, media |
+| 🏚️ **Victorian Heritage Database (VHD)** | — | 12,000+ heritage places, 700+ shipwrecks, architectural styles |
+| 🎬 **Australian Centre for the Moving Image (ACMI)** | — | 42,000+ films, TV, videogames, digital art, creator info |
+| 🎤 **PM Transcripts** | — | 26,000+ Prime Ministerial speeches, media releases, interviews |
+| 🖼️ **IIIF** | — | Generic manifest/image tools for any IIIF-compliant institution |
+| ✈️ **Geoscience Australia Historical Aerial Photography (GA HAP)** | — | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
 
