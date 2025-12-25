@@ -1,26 +1,30 @@
 # Australian History MCP Server
 
-[![npm version](https://img.shields.io/npm/v/@littlebearapps/australian-history-mcp.svg)](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/@littlebearapps/australian-history-mcp?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp)
+[![Downloads](https://img.shields.io/npm/dm/@littlebearapps/australian-history-mcp?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp)
+[![CI](https://img.shields.io/github/actions/workflow/status/littlebearapps/australian-history-mcp/ci.yml?branch=main&label=CI&style=for-the-badge&logo=github&logoColor=white)](https://github.com/littlebearapps/australian-history-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 
 A Model Context Protocol (MCP) server for searching and harvesting Australian historical archives, government data, and museum collections.
 
-## Data Sources
+## Data Sources — Ready to Use & Registration Required
 
-| Source | Auth Required | Content |
-|--------|---------------|---------|
-| **PROV** (Public Record Office Victoria) | None | Victorian state archives: photos, maps, council records, court files |
-| **Trove** (National Library of Australia) | API Key | Digitised newspapers, gazettes, books, images, magazines |
-| **data.gov.au** | None | 85,000+ government datasets from 800+ organisations |
-| **Museums Victoria** | None | Museum objects, natural science specimens, species info, articles |
-| **ALA** (Atlas of Living Australia) | None | 165M+ species occurrence records, 153,000+ species profiles |
-| **NMA** (National Museum of Australia) | None | 85,000+ museum objects, people, places, media |
-| **VHD** (Victorian Heritage Database) | None | 12,000+ heritage places, 700+ shipwrecks, architectural data |
-| **ACMI** (Australian Centre for the Moving Image) | None | 42,000+ films, TV, videogames, digital art |
-| **PM Transcripts** | None | 26,000+ Prime Ministerial speeches, media releases, interviews |
-| **IIIF** | None | Generic IIIF manifest/image tools for any institution |
-| **GA HAP** (Geoscience Australia) | None | 1.2M+ historical aerial photos (1928-1996), all states/territories |
+| Source | Access | Content |
+|--------|--------|---------|
+| **PROV** (Public Record Office Victoria) | Ready to use | Victorian state archives: photos, maps, council records, court files |
+| **Trove** (National Library of Australia) | [Free API Key](#trove-api-key) | Digitised newspapers, gazettes, books, images, magazines |
+| **data.gov.au** | Ready to use | 85,000+ government datasets from 800+ organisations |
+| **Museums Victoria** | Ready to use | Museum objects, natural science specimens, species info, articles |
+| **ALA** (Atlas of Living Australia) | Ready to use | 165M+ species occurrence records, 153,000+ species profiles |
+| **NMA** (National Museum of Australia) | Ready to use | 85,000+ museum objects, people, places, media |
+| **VHD** (Victorian Heritage Database) | Ready to use | 12,000+ heritage places, 700+ shipwrecks, architectural data |
+| **ACMI** (Australian Centre for the Moving Image) | Ready to use | 42,000+ films, TV, videogames, digital art |
+| **PM Transcripts** | Ready to use | 26,000+ Prime Ministerial speeches, media releases, interviews |
+| **IIIF** | Ready to use | Generic IIIF manifest/image tools for any institution |
+| **GA HAP** (Geoscience Australia) | Ready to use | 1.2M+ historical aerial photos (1928-1996), all states/territories |
+
+> **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
 
 ## Installation
 
@@ -90,6 +94,35 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 ### Claude Code
 
 Add to `.mcp.json` in your project:
+
+```json
+{
+  "mcpServers": {
+    "australian-history": {
+      "command": "npx",
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
+      "env": {
+        "TROVE_API_KEY": "your-trove-api-key"
+      }
+    }
+  }
+}
+```
+
+### Codex CLI
+
+Add to your `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.australian-history]
+command = "npx"
+args = ["-y", "@littlebearapps/australian-history-mcp"]
+env = { "TROVE_API_KEY" = "your-trove-api-key" }
+```
+
+### Gemini CLI
+
+Add to your `~/.gemini/settings.json`:
 
 ```json
 {
