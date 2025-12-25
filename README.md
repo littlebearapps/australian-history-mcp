@@ -286,7 +286,7 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 </details>
 
 <details>
-<summary><h3>PM Transcripts Tools (2)</h3></summary>
+<summary><h3>PM Transcripts Tools (2)*</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -314,7 +314,7 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 </details>
 
 <details>
-<summary><h3>GA HAP Tools (3)</h3></summary>
+<summary><h3>GA HAP Tools (3)*</h3></summary>
 
 | Tool | Description |
 |------|-------------|
@@ -325,6 +325,8 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 > **⚠️ Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
 
 </details>
+
+_* Section contains usage notes_
 
 ## Usage Examples
 
