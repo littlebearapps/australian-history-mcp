@@ -1,8 +1,8 @@
 # CLAUDE.md - Australian History MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-24
-**Version:** 0.6.0
+**Last Updated:** 2025-12-25
+**Version:** 0.6.1
 
 ---
 
@@ -528,7 +528,19 @@ or ga_hap_harvest
 
 ## MCP Configuration
 
-**Location:** Root `claude-code-tools/` only (lean profile)
+### Via npm (recommended for users)
+
+```json
+{
+  "australian-history": {
+    "command": "npx",
+    "args": ["-y", "@littlebearapps/australian-history-mcp"],
+    "env": { "TROVE_API_KEY": "your-key-here" }
+  }
+}
+```
+
+### Via local development
 
 **Fragment:** `mcp/profiles/fragments/australian-history.json`
 
@@ -587,6 +599,17 @@ or ga_hap_harvest
 npm run build
 echo '{"jsonrpc":"2.0","method":"tools/list","id":1}' | node dist/index.js
 ```
+
+### Publishing to npm
+
+Uses GitHub Actions OIDC trusted publishing (no NPM_TOKEN needed):
+
+```bash
+npm version patch   # Bump version (updates package.json + creates git tag)
+git push origin main --tags   # Push commit and tag → triggers publish workflow
+```
+
+Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 
 ---
 
