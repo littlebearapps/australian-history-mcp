@@ -40,9 +40,9 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 
 - [Quick Start](#quick-start)
 - [What You Can Ask](#what-you-can-ask)
-- [Data Sources](#data-sources)
-- [Configuration](#configuration)
+- [Data Sources Available](#data-sources-available)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
+- [Configuration](#configuration)
 - [Tools & Examples by Data Source](#tools--examples-by-data-source)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Rate Limits](#rate-limits)
@@ -51,25 +51,38 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 - [Contributing](#contributing)
 - [License](#license)
 
-## Data Sources
+## Data Sources Available
 
-Most sources work immediately with no registration. Only Trove requires a free API key.
+> [!NOTE]
+> Most sources work immediately with no registration. Only Trove requires a [free API key](#trove-api-key---how-to-apply).
 
-| Source | API Key | Content |
-|--------|---------|---------|
-| 🏛️ **Public Record Office Victoria (PROV)** | — | Victorian state archives: photos, maps, council records, court files, immigration |
-| 📰 **Trove (National Library of Australia)** | [Free*](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
-| 📊 **data.gov.au** | — | 85,000+ government datasets: census, demographics, geographic, environmental, health |
-| 🦘 **Museums Victoria** | — | Museum objects, natural specimens, species info, educational articles |
-| 🌿 **Atlas of Living Australia (ALA)** | — | 165M+ species records, 153,000+ profiles, distribution maps, citizen science |
-| 🏛️ **National Museum of Australia (NMA)** | — | 85,000+ museum objects, people, organisations, places, media |
-| 🏚️ **Victorian Heritage Database (VHD)** | — | 12,000+ heritage places, 700+ shipwrecks, architectural styles |
-| 🎬 **Australian Centre for the Moving Image (ACMI)** | — | 42,000+ films, TV, videogames, digital art, creator info |
-| 🎤 **PM Transcripts** | — | 26,000+ Prime Ministerial speeches, media releases, interviews |
-| 🖼️ **IIIF** | — | Generic manifest/image tools for any IIIF-compliant institution |
-| ✈️ **Geoscience Australia Historical Aerial Photography (GA HAP)** | — | 1.2M+ historical aerial photos (1928-1996), all states/territories |
+| Source | Content |
+|--------|---------|
+| 🏛️ **Public Record Office Victoria (PROV)** | Victorian state archives: photos, maps, council records, court files, immigration |
+| 📰 [***Trove (National Library of Australia)****](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
+| 📊 **data.gov.au** | 85,000+ government datasets: census, demographics, geographic, environmental, health |
+| 🦘 **Museums Victoria** | Museum objects, natural specimens, species info, educational articles |
+| 🌿 **Atlas of Living Australia (ALA)** | 165M+ species records, 153,000+ profiles, distribution maps, citizen science |
+| 🏛️ **National Museum of Australia (NMA)** | 85,000+ museum objects, people, organisations, places, media |
+| 🏚️ **Victorian Heritage Database (VHD)** | 12,000+ heritage places, 700+ shipwrecks, architectural styles |
+| 🎬 **Australian Centre for the Moving Image (ACMI)** | 42,000+ films, TV, videogames, digital art, creator info |
+| 🎤 **PM Transcripts** | 26,000+ Prime Ministerial speeches, media releases, interviews |
+| 🖼️ **IIIF** | Generic manifest/image tools for any IIIF-compliant institution |
+| ✈️ **Geoscience Australia Historical Aerial Photography (GA HAP)** | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
+
+## Trove API Key - How to Apply
+
+Trove tools require an API key. All other sources work without any registration or API key.
+
+> [!IMPORTANT]
+> Before applying, review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and ensure your intended use is eligible.
+
+1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
+2. Select "Level 1" (personal/research use)
+3. Approval typically within 1 week
+4. Add `TROVE_API_KEY` to your MCP configuration (see below)
 
 ## Configuration
 
@@ -139,18 +152,6 @@ Add to `.vscode/mcp.json` or user MCP configuration:
   }
 }
 ```
-
-## Trove API Key - How to Apply
-
-Trove tools require an API key. All other sources work without any registration or API key.
-
-> [!IMPORTANT]
-> Before applying, review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and ensure your intended use is eligible.
-
-1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
-2. Select "Level 1" (personal/research use)
-3. Approval typically within 1 week
-4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
 ## Tools & Examples by Data Source
 
