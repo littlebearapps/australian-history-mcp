@@ -117,11 +117,66 @@ Trove tools require an API key. All other sources work without any registration 
 
 Copy the configuration for your preferred AI client:
 
-### Claude Desktop & Claude Code
+### Claude Desktop
 
-Add to your config file:
-- **Claude Desktop**: `claude_desktop_config.json`
-- **Claude Code**: `.mcp.json` in your project directory
+> [!NOTE]
+> Works on **all plans including Free**. This MCP runs locally via `npx`, so no paid subscription is required.
+
+Add to your `claude_desktop_config.json`:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "australian-history": {
+      "command": "npx",
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
+      "env": {
+        "TROVE_API_KEY": "your-trove-api-key"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop after saving the file.
+
+### Claude Code
+
+**Option 1 - CLI command (recommended):**
+
+```bash
+claude mcp add australian-history -- npx -y @littlebearapps/australian-history-mcp
+```
+
+To include the Trove API key:
+
+```bash
+claude mcp add australian-history -e TROVE_API_KEY=your-trove-api-key -- npx -y @littlebearapps/australian-history-mcp
+```
+
+**Option 2 - Config file:**
+
+Add to `.mcp.json` in your project directory:
+
+```json
+{
+  "mcpServers": {
+    "australian-history": {
+      "command": "npx",
+      "args": ["-y", "@littlebearapps/australian-history-mcp"],
+      "env": {
+        "TROVE_API_KEY": "your-trove-api-key"
+      }
+    }
+  }
+}
+```
+
+### Cursor
+
+Add to Cursor Settings → MCP → Add Server, or edit `~/.cursor/mcp.json`:
 
 ```json
 {
