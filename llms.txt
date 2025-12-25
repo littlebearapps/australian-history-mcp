@@ -1,12 +1,23 @@
 # Australian History MCP Server
 
-> MCP server for searching Australian historical archives, government data, and museum collections.
+> Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos, species records, heritage buildings, or government datasets - no manual searching required.
+
+**75 tools. 11 archives. One connection.**
 
 ## Quick Start
 
 ```bash
 npx @littlebearapps/australian-history-mcp
 ```
+
+## What You Can Ask
+
+Instead of navigating 11 different websites, just ask:
+- "Find newspaper articles about the 1939 bushfires in Victoria"
+- "Show me historical aerial photos of Melbourne from the 1950s"
+- "Get species sightings of platypus in Tasmania"
+
+Your AI handles the API calls, pagination, and formatting.
 
 ## Documentation
 

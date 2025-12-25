@@ -8,7 +8,9 @@
 
 _Last updated: December 2025_
 
-A Model Context Protocol (MCP) server for searching and harvesting Australian historical archives, government data, and museum collections.
+Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos from 1928, species records, heritage buildings, or government datasets - no manual searching required.
+
+**75 tools. 11 archives. One connection.**
 
 ## Quick Start
 
@@ -22,9 +24,24 @@ That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](
 
 → **Next:** Add to your MCP client via [Configuration](#configuration)
 
+## What You Can Ask
+
+Instead of navigating 11 different archive websites, just ask your AI:
+
+- *"Find newspaper articles about the 1939 bushfires in Victoria"*
+- *"Show me historical aerial photos of Melbourne from the 1950s"*
+- *"What heritage buildings are in Carlton?"*
+- *"Get species sightings of platypus in Tasmania since 2020"*
+- *"Find Prime Ministerial speeches from the Hawke era"*
+- *"Search for gold rush artefacts in the National Museum"*
+- *"Download government datasets about water quality"*
+
+Your AI handles the API calls, pagination, and formatting - you just ask questions in plain English.
+
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+- [What You Can Ask](#what-you-can-ask)
 - [Data Sources](#data-sources)
 - [Configuration](#configuration)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)

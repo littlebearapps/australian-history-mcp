@@ -62,7 +62,7 @@ registry.register(gaHapSource);
 const server = new Server(
   {
     name: 'australian-history-mcp',
-    version: '0.6.0',
+    version: '0.6.1',
   },
   {
     capabilities: {
