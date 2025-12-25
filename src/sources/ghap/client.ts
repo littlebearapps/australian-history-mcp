@@ -15,7 +15,6 @@ import type {
   GHAPPlace,
   GHAPLayer,
   GHAPLayerResult,
-  GHAPState,
 } from './types.js';
 
 const TLCMAP_BASE = 'https://tlcmap.org';
