@@ -40,7 +40,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 
 - [Quick Start](#quick-start)
 - [What You Can Ask](#what-you-can-ask)
-- [Data Sources Available](#data-sources-available)
+- [Data Sources - What You Can Find](#data-sources---what-you-can-find)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Configuration](#configuration)
 - [Data Sources - Tools & Examples](#data-sources---tools--examples)
@@ -51,9 +51,9 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 - [Contributing](#contributing)
 - [License](#license)
 
-## Data Sources Available
+## Data Sources - What You Can Find
 
-> [!NOTE]
+> [!IMPORTANT]
 > Most sources work immediately with no registration. Only Trove requires a [free API key](#trove-api-key---how-to-apply).
 
 | Source | Content |
