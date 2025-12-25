@@ -14,7 +14,7 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
-- [Tools (75 total)](#tools-75-total)
+- [Tools by Data Source (75)](#tools-by-data-source-75)
 - [Usage Examples](#usage-examples)
 - [Content Types](#content-types)
 - [Rate Limits](#rate-limits)
@@ -151,7 +151,7 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
-## Tools (75 total)
+## Tools by Data Source (75)
 
 <details open>
 <summary><h3>PROV Tools (5)</h3></summary>
@@ -291,7 +291,15 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | Tool | Description |
 |------|-------------|
 | `pm_transcripts_get_transcript` | Get Prime Ministerial transcript by ID |
-| `pm_transcripts_harvest` | Bulk download transcripts (see limitations below) |
+| `pm_transcripts_harvest` | Bulk download transcripts with PM name filter |
+
+> **⚠️ Harvest Limitation**: The PM Transcripts API has no search endpoint, so harvesting scans IDs sequentially. Filtering by PM name can be slow. For targeted PM research, use `startFrom` near the PM's era:
+> - Curtin/Chifley (1940s): ~1-2000
+> - Menzies (1950s-60s): ~2000-4000
+> - Whitlam/Fraser (1970s-80s): ~4000-5000
+> - Hawke/Keating (1983-1996): ~5000-10000
+> - Howard (1996-2007): ~10000-18000
+> - Rudd/Gillard/Abbott+ (2007+): ~18000-26000
 
 </details>
 
@@ -314,19 +322,9 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `ga_hap_get_photo` | Get photo details by OBJECTID or film/run/frame |
 | `ga_hap_harvest` | Bulk download photo records with pagination |
 
+> **⚠️ Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
+
 </details>
-
-<!-- End of Tools section -->
-
-> **⚠️ GA HAP Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
-
-> **⚠️ PM Transcripts Harvest Limitation**: The PM Transcripts API has no search endpoint, so harvesting scans IDs sequentially. Filtering by PM name can be slow. For targeted PM research, use `startFrom` near the PM's era:
-> - Curtin/Chifley (1940s): ~1-2000
-> - Menzies (1950s-60s): ~2000-4000
-> - Whitlam/Fraser (1970s-80s): ~4000-5000
-> - Hawke/Keating (1983-1996): ~5000-10000
-> - Howard (1996-2007): ~10000-18000
-> - Rudd/Gillard/Abbott+ (2007+): ~18000-26000
 
 ## Usage Examples
 
