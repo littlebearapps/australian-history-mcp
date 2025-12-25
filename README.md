@@ -42,7 +42,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 - [What You Can Ask](#what-you-can-ask)
 - [Data Sources - What You Can Find](#data-sources---what-you-can-find)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
-- [Configuration](#configuration)
+- [Add this MCP to Your AI Agent](#add-this-mcp-to-your-ai-agent)
 - [Data Sources - Tools & Examples](#data-sources---tools--examples)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Rate Limits](#rate-limits)
@@ -84,7 +84,9 @@ Trove tools require an API key. All other sources work without any registration 
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see below)
 
-## Configuration
+## Add this MCP to Your AI Agent
+
+Copy the configuration for your preferred AI client:
 
 ### Claude Desktop & Claude Code
 
