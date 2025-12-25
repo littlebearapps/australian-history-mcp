@@ -1,5 +1,8 @@
 # Atlas of Living Australia (ALA) API Quick Reference
 
+> [!NOTE]
+> This is a third-party API. Terms and access may change at any time. See the [Important Notice](../../README.md#important-notice---third-party-data-sources) in the README.
+
 ## API Endpoints
 
 - **Occurrences:** `https://biocache-ws.ala.org.au/ws/`

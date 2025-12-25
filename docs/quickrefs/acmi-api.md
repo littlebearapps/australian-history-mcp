@@ -1,5 +1,8 @@
 # ACMI (Australian Centre for the Moving Image) API Quick Reference
 
+> [!NOTE]
+> This is a third-party API. Terms and access may change at any time. See the [Important Notice](../../README.md#important-notice---third-party-data-sources) in the README.
+
 ## API Endpoint
 
 - **Base URL:** `https://api.acmi.net.au/`

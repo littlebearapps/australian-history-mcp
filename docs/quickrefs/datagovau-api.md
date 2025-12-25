@@ -3,6 +3,9 @@
 **Base URL:** `https://data.gov.au/data/api/3/action/`
 **Auth:** None required | **Rate Limits:** Generous (undocumented)
 
+> [!NOTE]
+> This is a third-party API. Terms and access may change at any time. See the [Important Notice](../../README.md#important-notice---third-party-data-sources) in the README.
+
 ---
 
 ## What's Available

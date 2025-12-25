@@ -2,6 +2,9 @@
 
 Public Record Office Victoria API details and tips.
 
+> [!NOTE]
+> This is a third-party API. Terms and access may change at any time. See the [Important Notice](../../README.md#important-notice---third-party-data-sources) in the README.
+
 ---
 
 ## API Details

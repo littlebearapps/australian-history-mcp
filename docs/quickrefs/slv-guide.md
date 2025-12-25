@@ -2,6 +2,9 @@
 
 How to find and access State Library Victoria content using this MCP server.
 
+> [!NOTE]
+> SLV content is accessed via third-party APIs (Trove and IIIF). Terms and access may change at any time. See the [Important Notice](../../README.md#important-notice---third-party-data-sources) in the README.
+
 ---
 
 ## Quick Start

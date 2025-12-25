@@ -41,6 +41,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 - [Quick Start](#quick-start)
 - [What You Can Ask](#what-you-can-ask)
 - [Data Sources - What You Can Find](#data-sources---what-you-can-find)
+- [Important Notice - Third-Party Data Sources](#important-notice---third-party-data-sources)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Add this MCP to Your AI Agent](#add-this-mcp-to-your-ai-agent)
 - [Data Sources - Tools & Examples](#data-sources---tools--examples)
@@ -71,6 +72,34 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 | ✈️ **Geoscience Australia Historical Aerial Photography (GA HAP)** | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
+
+## Important Notice - Third-Party Data Sources
+
+> [!CAUTION]
+> This MCP server provides programmatic access to **third-party public APIs** that we do not own or control.
+
+**Please be aware:**
+
+- **Terms may change**: Each data source has its own terms of use and API policies that may change at any time without notice.
+- **Access may change**: API endpoints, rate limits, data availability, or access requirements could be modified or discontinued by the source providers.
+- **User responsibility**: You are responsible for reviewing and complying with each data source's terms of use, licensing requirements, and acceptable use policies.
+- **No warranty**: We make no guarantees about the availability, accuracy, or completeness of data from these sources.
+
+**Review the terms of use for each data source you access:**
+
+| Source | Terms of Use |
+|--------|--------------|
+| PROV | [Copyright Statement](https://prov.vic.gov.au/copyright-statement) |
+| Trove | [API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) |
+| data.gov.au | [Terms of Use](https://data.gov.au/about) |
+| Museums Victoria | [Legals](https://museumsvictoria.com.au/legals) |
+| ALA | [Terms of Use](https://www.ala.org.au/terms-of-use/) |
+| NMA | [Conditions of Use](https://www.nma.gov.au/about/contact-us/conditions-of-use) |
+| VHD | [Disclaimer](https://www.heritagecouncil.vic.gov.au/disclaimer) |
+| ACMI | [Terms & Conditions](https://www.acmi.net.au/about/terms-conditions) |
+| PM Transcripts | [Disclaimer](https://pmtranscripts.pmc.gov.au/disclaimer) |
+| GA (HAP) | [Copyright](https://www.ga.gov.au/copyright) |
+| IIIF | Varies by institution - check manifest attribution |
 
 ## Trove API Key - How to Apply
 
@@ -554,6 +583,9 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 - **GA HAP**: No documented rate limit (standard ArcGIS Feature Service)
 
 ## Licensing Notes
+
+> [!NOTE]
+> The licences below apply to **content** from each source. For API usage terms and conditions, see [Important Notice - Third-Party Data Sources](#important-notice---third-party-data-sources).
 
 - **PROV**: CC-BY-NC (non-commercial use)
 - **Trove**: Terms vary by content contributor; check individual items
