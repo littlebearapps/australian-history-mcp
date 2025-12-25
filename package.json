@@ -1,6 +1,6 @@
 {
   "name": "@littlebearapps/australian-history-mcp",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "MCP server for Australian history - PROV, Trove, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP",
   "main": "dist/index.js",
   "bin": {
