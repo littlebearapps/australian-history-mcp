@@ -316,6 +316,8 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 
 </details>
 
+<!-- End of Tools section -->
+
 > **⚠️ GA HAP Lookup Note**: The RUN and FRAME fields are strings (e.g., "COAST TIE 2", "C-KEY"), not integers. For reliable lookups, use `objectId` from search results rather than film/run/frame combination.
 
 > **⚠️ PM Transcripts Harvest Limitation**: The PM Transcripts API has no search endpoint, so harvesting scans IDs sequentially. Filtering by PM name can be slow. For targeted PM research, use `startFrom` near the PM's era:
