@@ -6,23 +6,36 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D18-brightgreen?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
 
+_Last updated: December 2025_
+
 A Model Context Protocol (MCP) server for searching and harvesting Australian historical archives, government data, and museum collections.
+
+## Quick Start
+
+Run directly with npx - no installation required:
+
+```bash
+npx @littlebearapps/australian-history-mcp
+```
+
+That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](#trove-api-key---how-to-apply) requires a free API key.
 
 ## Table of Contents
 
-- [History Data Sources](#history-data-sources)
-- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Data Sources](#data-sources)
 - [Configuration](#configuration)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Tools & Examples by Data Source](#tools--examples-by-data-source)
-- [Content Types](#content-types)
+- [What You Can Find](#what-you-can-find)
+- [Frequently Asked Questions](#frequently-asked-questions)
 - [Rate Limits](#rate-limits)
 - [Licensing Notes](#licensing-notes)
 - [Resources](#resources)
 - [Contributing](#contributing)
 - [License](#license)
 
-## History Data Sources
+## Data Sources
 
 Most data sources are ready to use immediately with no registration required.
 
@@ -44,33 +57,6 @@ Most data sources are ready to use immediately with no registration required.
 | **GA HAP** (Geoscience Australia) | Ready to use | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
-
-## Installation
-
-### Quick Start (npx)
-
-No installation required - run directly:
-
-```bash
-npx @littlebearapps/australian-history-mcp
-```
-
-### Global Install
-
-```bash
-npm install -g @littlebearapps/australian-history-mcp
-australian-history-mcp
-```
-
-### From Source
-
-```bash
-git clone https://github.com/littlebearapps/australian-history-mcp
-cd australian-history-mcp
-npm install
-npm run build
-node dist/index.js
-```
 
 ## Configuration
 
@@ -163,9 +149,16 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 | `prov_get_agency` | Get agency details by VA number |
 | `prov_get_series` | Get series details by VPRS number |
 
-**Example:** Search historical railway photos
+**Examples:**
 ```
-prov_search with query: "railway", digitisedOnly: true
+# Research: Find digitised historical railway photographs
+prov_search with query: "railway", digitisedOnly: true, limit: 50
+
+# Research: Search council meeting minutes from early 1900s
+prov_search with query: "council meeting", dateFrom: "1900", dateTo: "1920"
+
+# Technical: Extract all images from a digitised record
+prov_get_images with manifestUrl: "<manifest-url-from-search>", size: "full"
 ```
 
 </details>
@@ -189,10 +182,18 @@ prov_search with query: "railway", digitisedOnly: true
 | `trove_get_list` | Get user-curated research list by ID |
 | `trove_search_people` | Search people and organisations |
 
-**Example:** Find 1930s newspaper articles about Melbourne floods
+**Examples:**
 ```
+# Research: Find 1930s newspaper articles about Melbourne floods
 trove_search with query: "Melbourne flood", category: "newspaper",
   dateFrom: "1930", dateTo: "1939", state: "vic"
+
+# Research: Search State Library Victoria collections only
+trove_search with query: "gold rush", category: "image", nuc: "VSL"
+
+# Technical: Sort results by date (oldest first) with full text
+trove_search with query: "bushrangers", sortby: "dateasc",
+  includeFullText: true, limit: 100
 ```
 
 </details>
@@ -214,9 +215,17 @@ trove_search with query: "Melbourne flood", category: "newspaper",
 | `datagovau_harvest` | Bulk download dataset metadata with pagination |
 | `datagovau_autocomplete` | Autocomplete dataset names and titles |
 
-**Example:** Find government heritage datasets in CSV format
+**Examples:**
 ```
-datagovau_search with query: "heritage", format: "CSV"
+# Research: Find government heritage datasets in CSV format
+datagovau_search with query: "heritage", format: "CSV", limit: 20
+
+# Research: Search ABS census and demographic data
+datagovau_search with query: "census", organization: "australianbureauofstatistics"
+
+# Technical: Query tabular data directly from a datastore resource
+datagovau_datastore_search with resourceId: "<resource-id>",
+  query: "Melbourne", limit: 100
 ```
 
 </details>
@@ -233,9 +242,16 @@ datagovau_search with query: "heritage", format: "CSV"
 | `museumsvic_get_specimen` | Get a natural science specimen with taxonomy and collection info |
 | `museumsvic_harvest` | Bulk download Museums Victoria records with pagination |
 
-**Example:** Search for platypus species information
+**Examples:**
 ```
+# Research: Find platypus species information
 museumsvic_search with query: "platypus", recordType: "species"
+
+# Research: Search gold rush era museum objects
+museumsvic_search with query: "gold rush", category: "history & technology"
+
+# Technical: Discover random specimens with images
+museumsvic_search with recordType: "specimen", hasImages: true, random: true
 ```
 
 </details>
@@ -254,9 +270,17 @@ museumsvic_search with query: "platypus", recordType: "species"
 | `ala_list_species_lists` | List user-curated species lists |
 | `ala_get_species_list` | Get species list details by druid |
 
-**Example:** Search for koala occurrence records
+**Examples:**
 ```
-ala_search_occurrences with scientificName: "Phascolarctos cinereus", limit: 50
+# Research: Find koala sightings in Victoria since 2020
+ala_search_occurrences with scientificName: "Phascolarctos cinereus",
+  stateProvince: "Victoria", startYear: 2020
+
+# Research: Get detailed species profile with images
+ala_get_species with guid: "<species-guid-from-search>"
+
+# Technical: Search images of eucalyptus species
+ala_search_images with query: "Eucalyptus", limit: 50
 ```
 
 </details>
@@ -276,9 +300,16 @@ ala_search_occurrences with scientificName: "Phascolarctos cinereus", limit: 50
 | `nma_search_media` | Search images, video, and sound |
 | `nma_get_media` | Get media details by ID |
 
-**Example:** Find boomerang artefacts
+**Examples:**
 ```
+# Research: Find boomerang artefacts in the collection
 nma_search_objects with query: "boomerang", limit: 20
+
+# Research: Search for historical photographs
+nma_search_objects with query: "convict", type: "Photographs"
+
+# Technical: Find people and organisations related to exploration
+nma_search_parties with query: "explorer", limit: 30
 ```
 
 </details>
@@ -300,11 +331,15 @@ nma_search_objects with query: "boomerang", limit: 20
 
 **Examples:**
 ```
-# Search heritage railway stations in Melbourne
-vhd_search_places with query: "railway station", municipality: "Melbourne"
+# Research: Find Victorian-era heritage buildings in Melbourne CBD
+vhd_search_places with query: "bank", municipality: "MELBOURNE CITY",
+  architecturalStyle: "Victorian Period (1851-1901)"
 
-# Search for barque shipwrecks
-vhd_search_shipwrecks with query: "barque"
+# Research: Search shipwrecks along the Victorian coast
+vhd_search_shipwrecks with query: "barque", limit: 20
+
+# Technical: Get detailed heritage place record with history
+vhd_get_place with id: 12345
 ```
 
 </details>
@@ -322,9 +357,16 @@ vhd_search_shipwrecks with query: "barque"
 | `acmi_list_constellations` | List curated thematic collections |
 | `acmi_get_constellation` | Get constellation details with works |
 
-**Example:** Search for Mad Max films
+**Examples:**
 ```
-acmi_search_works with query: "Mad Max", type: "Film"
+# Research: Find Australian feature films from the 1970s
+acmi_search_works with query: "Australian", type: "Film", year: 1975
+
+# Research: Search for classic videogames in the collection
+acmi_search_works with query: "arcade", type: "Videogame"
+
+# Technical: Get creator filmography and biography
+acmi_get_creator with id: 12345
 ```
 
 </details>
@@ -364,6 +406,21 @@ pm_transcripts_harvest with primeMinister: "Hawke", maxRecords: 100
 | `iiif_get_manifest` | Fetch and parse IIIF manifest from any institution |
 | `iiif_get_image_url` | Construct IIIF Image API URLs for various sizes/formats |
 
+**Examples:**
+```
+# Research: Access State Library Victoria digitised content
+iiif_get_manifest with manifestUrl:
+  "https://rosetta.slv.vic.gov.au/delivery/iiif/presentation/2.1/IE145082/manifest"
+
+# Technical: Construct thumbnail URL for a specific image
+iiif_get_image_url with imageServiceUrl: "<url-from-manifest>",
+  size: "!200,200", format: "jpg"
+
+# Technical: Get full resolution image URL
+iiif_get_image_url with imageServiceUrl: "<url-from-manifest>",
+  size: "max", format: "jpg", quality: "default"
+```
+
 </details>
 
 <details>
@@ -393,73 +450,69 @@ ga_hap_harvest with bbox: "144.9,-37.9,145.1,-37.7", maxRecords: 100
 
 _* Section contains usage notes_
 
-## Content Types
+## What You Can Find
 
-### PROV Victoria
-- Historical photographs and maps
-- Government files and correspondence
-- Council meeting minutes
-- Court and immigration records
-- Agency records (VA numbers)
-- Series records (VPRS numbers)
+> **🏛️ PROV (Victorian Archives)**
+> 📷 Photos & Maps | 📁 Government Files | 📋 Council Minutes | ⚖️ Court Records | 🚢 Immigration | 🏢 Agency & Series Records
 
-### Trove
-- Digitised newspapers (1803-1954+)
-- Government gazettes
-- Books, periodicals, magazines
-- Images and photographs
-- Maps and sheet music
-- Diaries and archives
+> **📰 Trove (National Library)**
+> 📰 Newspapers 1803-1954+ | 📜 Gazettes | 📖 Books & Magazines | 🖼️ Images | 🗺️ Maps | 📔 Diaries & Archives
 
-### data.gov.au
-- Statistical data (ABS census, demographics)
-- Geographic and spatial data (GeoJSON, SHP)
-- Environmental, health, transport datasets
-- Formats: CSV, JSON, XML, API, and more
+> **📊 data.gov.au**
+> 📈 Census & Demographics | 🗺️ Geographic & Spatial | 🌿 Environmental | 🏥 Health | 🚗 Transport | 📋 85,000+ Datasets
 
-### Museums Victoria
-- Museum objects (photographs, artefacts, technology, textiles)
-- Natural science specimens (insects, fossils, minerals)
-- Species information (Victorian fauna and flora)
-- Educational articles and stories
+> **🦘 Museums Victoria**
+> 🏺 Museum Objects | 🔬 Natural Specimens | 🦎 Species Info | 📝 Educational Articles
 
-### Atlas of Living Australia
-- Species occurrence records (165M+ observations)
-- Species profiles with taxonomy and images
-- Distribution maps and conservation status
-- Citizen science observations
+> **🌿 Atlas of Living Australia**
+> 📍 165M+ Occurrence Records | 🦜 153,000+ Species Profiles | 🗺️ Distribution Maps | 👀 Citizen Science
 
-### National Museum of Australia
-- Museum objects (artefacts, artwork, photographs)
-- People and organisations (parties)
-- Places of significance
-- Media and documentation
+> **🏛️ National Museum of Australia**
+> 🏺 85,000+ Objects | 👤 People & Organisations | 📍 Places | 🎬 Media
 
-### Victorian Heritage Database
-- Heritage places (buildings, sites, gardens)
-- Victorian shipwrecks (700+ wrecks)
-- Architectural styles and periods
-- Heritage overlays and protection status
+> **🏚️ Victorian Heritage Database**
+> 🏛️ 12,000+ Heritage Places | ⚓ 700+ Shipwrecks | 🏗️ Architectural Styles
 
-### ACMI (Australian Centre for the Moving Image)
-- Films (feature films, documentaries, shorts)
-- Television programs and series
-- Videogames and interactive media
-- Digital art and installations
-- Creator information (directors, actors, studios)
+> **🎬 ACMI**
+> 🎬 42,000+ Films | 📺 Television | 🎮 Videogames | 🎨 Digital Art | 👤 Creators
 
-### PM Transcripts
-- Prime Ministerial speeches (1945-present)
-- Media releases and statements
-- Interviews and press conferences
-- PDF document links for original transcripts
+> **🎤 PM Transcripts**
+> 🎤 26,000+ Speeches | 📰 Media Releases | 🎙️ Interviews | 📄 PDF Documents
 
-### Geoscience Australia HAP
-- 1.2 million+ aerial photographs (1928-1996)
-- All Australian states and territories
-- Preview images and full resolution TIFFs
-- Flight, run, and frame metadata
-- Photo centre coordinates
+> **✈️ Geoscience Australia HAP**
+> 📸 1.2M+ Aerial Photos 1928-1996 | 🗺️ All States/Territories | 📍 Coordinates
+
+> **🖼️ IIIF (Any Institution)**
+> 📜 Manifest Parsing | 🔗 Image URL Construction | 📐 Size/Format Options
+
+## Frequently Asked Questions
+
+### How do I search historical newspapers?
+
+Use `trove_search` with `category: "newspaper"`. Filter by date with `dateFrom` and `dateTo` parameters (format: YYYY or YYYY-MM-DD), and by state with the `state` parameter (e.g., "vic", "nsw", "qld").
+
+### Which sources need an API key?
+
+Only **Trove** requires an API key. All 10 other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work immediately with no registration required.
+
+### How do I download images from digitised records?
+
+For **PROV records**, use `prov_get_images` with the manifest URL from search results. For **any IIIF-compliant institution**, use `iiif_get_manifest` to get canvas details, then `iiif_get_image_url` to construct download URLs in your preferred size and format.
+
+### How do I bulk download records?
+
+Each source has a `_harvest` tool for bulk downloads with pagination:
+- `prov_harvest`, `trove_harvest`, `datagovau_harvest`
+- `museumsvic_harvest`, `ala_harvest`, `nma_harvest`
+- `vhd_harvest`, `acmi_harvest`, `pm_transcripts_harvest`, `ga_hap_harvest`
+
+### Can I search by location or coordinates?
+
+Yes. Use `ga_hap_search` with `bbox` for aerial photos by bounding box (format: "minLon,minLat,maxLon,maxLat"). ALA tools support `stateProvince` filtering (e.g., "Victoria", "New South Wales"). VHD supports `municipality` filtering for Victorian local government areas.
+
+### How do I find species information?
+
+Use `ala_search_species` for scientific or common names, or `museumsvic_search` with `recordType: "species"`. Get detailed profiles with `ala_get_species` using the GUID from search results. ALA covers all Australian species; Museums Victoria focuses on Victorian fauna and flora.
 
 ## Rate Limits
 

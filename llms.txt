@@ -1,0 +1,58 @@
+# Australian History MCP Server
+
+> MCP server for searching Australian historical archives, government data, and museum collections.
+
+## Quick Start
+
+```bash
+npx @littlebearapps/australian-history-mcp
+```
+
+## Documentation
+
+- [README](README.md): Full documentation with all 75 tools
+- [npm](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp): Package page
+- [GitHub](https://github.com/littlebearapps/australian-history-mcp): Source code
+
+## Data Sources (11)
+
+| Source | API Key | Description |
+|--------|---------|-------------|
+| PROV | None | Victorian state archives (photos, maps, council records) |
+| Trove | Required | National Library newspapers, books, images |
+| data.gov.au | None | 85,000+ government datasets |
+| Museums Victoria | None | Museum collections and species info |
+| ALA | None | 165M+ species occurrence records |
+| NMA | None | National Museum collections |
+| VHD | None | Victorian heritage places and shipwrecks |
+| ACMI | None | Films, TV, videogames, digital art |
+| PM Transcripts | None | Prime Ministerial speeches 1945-present |
+| IIIF | None | Generic IIIF manifest/image tools |
+| GA HAP | None | 1.2M+ historical aerial photos 1928-1996 |
+
+## Key Tools
+
+### Search Tools
+- `prov_search`: Search Victorian state archives
+- `trove_search`: Search newspapers, books, images (needs API key)
+- `ala_search_occurrences`: Search species sightings
+- `nma_search_objects`: Search museum collection
+- `vhd_search_places`: Search heritage places
+- `acmi_search_works`: Search films and media
+- `ga_hap_search`: Search aerial photographs
+
+### Harvest Tools (Bulk Download)
+- `prov_harvest`: Bulk download PROV records
+- `trove_harvest`: Bulk download Trove records
+- `ala_harvest`: Bulk download species occurrences
+- `nma_harvest`: Bulk download museum objects
+
+### Image Tools
+- `prov_get_images`: Extract PROV image URLs
+- `iiif_get_manifest`: Parse any IIIF manifest
+- `iiif_get_image_url`: Construct image download URLs
+- `ga_hap_get_photo`: Get aerial photo details
+
+## License
+
+MIT
