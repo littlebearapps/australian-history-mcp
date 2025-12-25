@@ -12,7 +12,7 @@ Which data source is affected?
 
 - [ ] PROV (Public Record Office Victoria)
 - [ ] Trove (National Library of Australia)
-- [ ] data.gov.au
+- [ ] GHAP (Gazetteer of Historical Australian Placenames)
 - [ ] Museums Victoria
 - [ ] ALA (Atlas of Living Australia)
 - [ ] NMA (National Museum of Australia)

@@ -57,7 +57,7 @@ Some data sources require API keys:
 |--------|----------|------------|
 | Trove | Yes | [Apply at NLA](https://trove.nla.gov.au/about/create-something/using-api) |
 | PROV | No | - |
-| data.gov.au | No | - |
+| GHAP | No | - |
 | Museums Victoria | No | - |
 | ALA | No | - |
 | NMA | No | - |
@@ -97,7 +97,7 @@ src/
 └── sources/              # Data source modules
     ├── prov/             # Public Record Office Victoria
     ├── trove/            # National Library of Australia
-    ├── datagovau/        # data.gov.au CKAN
+    ├── ghap/             # GHAP (TLCMap)
     ├── museums-victoria/ # Museums Victoria
     ├── ala/              # Atlas of Living Australia
     ├── nma/              # National Museum of Australia

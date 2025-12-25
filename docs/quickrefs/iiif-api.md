@@ -2,6 +2,9 @@
 
 International Image Interoperability Framework - works with any compliant institution.
 
+> [!NOTE]
+> IIIF is an open standard used by many institutions. Terms of use vary by institution - check the manifest attribution field for each item.
+
 ---
 
 ## What is IIIF?

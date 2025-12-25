@@ -8,7 +8,7 @@ This backlog tracks implementation tasks for the australian-history-mcp server.
 |--------|-------|------|--------|
 | PROV (Public Record Office Victoria) | 5 | None | ✅ Complete |
 | Trove (National Library) | 13 | API Key | ✅ Complete |
-| data.gov.au (CKAN) | 11 | None | ✅ Complete |
+| GHAP (TLCMap) | 5 | None | ✅ Complete |
 | Museums Victoria | 6 | None | ✅ Complete |
 | Atlas of Living Australia (ALA) | 8 | None | ✅ Complete |
 | National Museum of Australia (NMA) | 9 | None | ✅ Complete |
@@ -18,7 +18,7 @@ This backlog tracks implementation tasks for the australian-history-mcp server.
 | IIIF (Generic) | 2 | None | ✅ Complete |
 | Geoscience Australia HAP | 3 | None | ✅ Complete |
 
-**Total: 75 tools across 11 sources**
+**Total: 69 tools across 11 sources**
 
 ---
 
@@ -80,7 +80,7 @@ curl -sL "https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_
 | API-007 | Australian War Memorial | Medium | 4-5 | Not Started |
 | API-008 | Victorian Collections | Medium | 3-4 | Not Started |
 | API-009 | AusStage | Medium | 4 | Not Started |
-| API-010 | GHAP/TLCMap | Medium | 3-4 | Not Started |
+| API-010 | GHAP/TLCMap | Medium | 5 | ✅ Implemented |
 | API-011 | HuNI | Medium | 3-4 | Not Started |
 
 ### Phase 4: Limited API Access

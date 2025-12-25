@@ -1,5 +1,8 @@
 # Geoscience Australia Historical Aerial Photography (HAP) API Reference
 
+> [!NOTE]
+> This is a third-party API. Terms and access may change at any time. See the [Important Notice](../../README.md#important-notice---third-party-data-sources) in the README.
+
 ## Overview
 
 **Provider:** Geoscience Australia (Commonwealth)

@@ -1,7 +1,7 @@
 {
   "name": "@littlebearapps/australian-history-mcp",
   "version": "0.6.1",
-  "description": "MCP server for Australian history - PROV, Trove, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP",
+  "description": "MCP server for Australian history - PROV, Trove, GHAP, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP",
   "main": "dist/index.js",
   "bin": {
     "australian-history-mcp": "./dist/index.js"
@@ -68,6 +68,6 @@
     "eslint": "^9.39.2",
     "typescript": "^5.3.0",
     "typescript-eslint": "^8.50.1",
-    "vitest": "^1.0.0"
+    "vitest": "^4.0.16"
   }
 }

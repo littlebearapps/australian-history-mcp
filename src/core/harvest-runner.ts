@@ -11,7 +11,7 @@ import type { HarvestConfig, HarvestResult } from './types.js';
  * Run a harvest operation with consistent pagination handling
  *
  * Supports three pagination modes:
- * - 'offset': Numeric offset (PROV, data.gov.au)
+ * - 'offset': Numeric offset (PROV, GHAP)
  * - 'cursor': String-based cursor (Trove)
  * - 'page': Page numbers (Museums Victoria)
  */

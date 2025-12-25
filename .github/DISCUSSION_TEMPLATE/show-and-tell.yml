@@ -25,7 +25,7 @@ body:
       options:
         - label: PROV (Victorian State Archives)
         - label: Trove (National Library)
-        - label: data.gov.au (Open Data)
+        - label: GHAP (Historical Placenames)
         - label: Museums Victoria
         - label: ALA (Atlas of Living Australia)
         - label: NMA (National Museum)
