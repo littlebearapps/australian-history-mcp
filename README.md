@@ -32,7 +32,7 @@ Instead of navigating 11 different archive websites, just ask your AI:
 - *"Get species sightings of platypus in Tasmania since 2020"*
 - *"Find Prime Ministerial speeches from the Hawke era"*
 - *"Search for gold rush artefacts in the National Museum"*
-- *"Download government datasets about water quality"*
+- *"Find historical placenames near Ballarat"*
 
 Your AI handles the API calls, pagination, and formatting - you just ask questions in plain English.
 
@@ -61,9 +61,9 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 |--------|---------|
 | 🏛️ **Public Record Office Victoria (PROV)** | Victorian state archives: photos, maps, council records, court files, immigration |
 | 📰 [***Trove (National Library of Australia)****](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
-| 📊 **data.gov.au** | 85,000+ government datasets: census, demographics, geographic, environmental, health |
+| 📍 **Gazetteer of Historical Australian Placenames (GHAP)** | 330,000+ historical placenames with coordinates from ANPS and community datasets via TLCMap |
 | 🦘 **Museums Victoria** | Museum objects, natural specimens, species info, educational articles |
-| 🌿 **Atlas of Living Australia (ALA)** | 165M+ species records, 153,000+ profiles, distribution maps, citizen science |
+| 🌿 **Atlas of Living Australia (ALA)** | 165M+ records including historical museum specimens (1800s-1900s), contemporary citizen science, 153,000+ species profiles |
 | 🏛️ **National Museum of Australia (NMA)** | 85,000+ museum objects, people, organisations, places, media |
 | 🏚️ **Victorian Heritage Database (VHD)** | 12,000+ heritage places, 700+ shipwrecks, architectural styles |
 | 🎬 **Australian Centre for the Moving Image (ACMI)** | 42,000+ films, TV, videogames, digital art, creator info |
@@ -91,7 +91,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 |--------|--------------|
 | PROV | [Copyright Statement](https://prov.vic.gov.au/copyright-statement) |
 | Trove | [API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) |
-| data.gov.au | [Terms of Use](https://data.gov.au/about) |
+| GHAP/TLCMap | [Terms of Use](https://tlcmap.org/help/terms-of-use) |
 | Museums Victoria | [Legals](https://museumsvictoria.com.au/legals) |
 | ALA | [Terms of Use](https://www.ala.org.au/terms-of-use/) |
 | NMA | [Conditions of Use](https://www.nma.gov.au/about/contact-us/conditions-of-use) |
@@ -308,35 +308,28 @@ trove_search with query: "bushrangers", sortby: "dateasc",
 </details>
 
 <details>
-<summary><h3>data.gov.au</h3></summary>
+<summary><h3>Gazetteer of Historical Australian Placenames (GHAP)</h3></summary>
 
 **Tools:**
 
 | Tool | Description |
 |------|-------------|
-| `datagovau_search` | Search data.gov.au for Australian government open datasets |
-| `datagovau_get_dataset` | Get full dataset details including all resources and metadata |
-| `datagovau_get_resource` | Get resource details including download URL and datastore status |
-| `datagovau_datastore_search` | Query tabular data directly from a datastore-enabled resource |
-| `datagovau_list_organizations` | List government organisations publishing on data.gov.au |
-| `datagovau_get_organization` | Get organisation details and optionally their datasets |
-| `datagovau_list_groups` | List dataset groups (thematic categories) |
-| `datagovau_get_group` | Get group details and optionally datasets in this group |
-| `datagovau_list_tags` | List popular tags used on datasets |
-| `datagovau_harvest` | Bulk download dataset metadata with pagination |
-| `datagovau_autocomplete` | Autocomplete dataset names and titles |
+| `ghap_search` | Search historical placenames by name, state, LGA, or bounding box |
+| `ghap_get_place` | Get place details by TLCMap ID |
+| `ghap_list_layers` | List all available community data layers |
+| `ghap_get_layer` | Get all places from a specific data layer |
+| `ghap_harvest` | Bulk download placename records with filters |
 
 **Examples:**
 ```
-# Research: Find government heritage datasets in CSV format
-datagovau_search with query: "heritage", format: "CSV", limit: 20
+# Research: Find historical places named "Melbourne"
+ghap_search with query: "Melbourne", state: "VIC"
 
-# Research: Search ABS census and demographic data
-datagovau_search with query: "census", organization: "australianbureauofstatistics"
+# Research: Search for placenames in a specific Local Government Area
+ghap_search with query: "creek", lga: "Yarra"
 
-# Technical: Query tabular data directly from a datastore resource
-datagovau_datastore_search with resourceId: "<resource-id>",
-  query: "Melbourne", limit: 100
+# Technical: Get all places from a community-contributed layer
+ghap_get_layer with layerId: 123
 ```
 
 </details>
@@ -589,7 +582,7 @@ Use `trove_search` with `category: "newspaper"`. Filter by date with `dateFrom` 
 <details>
 <summary><strong>2. Which sources need an API key?</strong></summary>
 
-Only **Trove** requires an API key. All 10 other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work immediately with no registration required.
+Only **Trove** requires an API key. All 10 other sources (PROV, GHAP, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work immediately with no registration required.
 
 </details>
 
@@ -604,7 +597,7 @@ For **PROV records**, use `prov_get_images` with the manifest URL from search re
 <summary><strong>4. How do I bulk download records?</strong></summary>
 
 Each source has a `_harvest` tool for bulk downloads with pagination:
-- `prov_harvest`, `trove_harvest`, `datagovau_harvest`
+- `prov_harvest`, `trove_harvest`, `ghap_harvest`
 - `museumsvic_harvest`, `ala_harvest`, `nma_harvest`
 - `vhd_harvest`, `acmi_harvest`, `pm_transcripts_harvest`, `ga_hap_harvest`
 
@@ -628,7 +621,7 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 
 - **PROV**: No documented rate limit
 - **Trove**: 200 API calls per minute
-- **data.gov.au**: No documented rate limit
+- **GHAP/TLCMap**: No documented rate limit
 - **Museums Victoria**: No documented rate limit
 - **ALA**: No documented rate limit
 - **NMA**: No documented rate limit
@@ -644,7 +637,7 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 
 - **PROV**: CC-BY-NC (non-commercial use)
 - **Trove**: Terms vary by content contributor; check individual items
-- **data.gov.au**: Mostly CC-BY; check individual datasets
+- **GHAP/TLCMap**: CC-BY 4.0 (data contributed to TLCMap)
 - **Museums Victoria**: CC-BY 4.0 (most records), Public Domain (some)
 - **ALA**: Various (data contributors specify); mostly CC-BY
 - **NMA**: CC-BY-NC (non-commercial use)
@@ -659,8 +652,7 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 
 - [PROV Collection API](https://prov.vic.gov.au/prov-collection-api)
 - [Trove API v3 Guide](https://trove.nla.gov.au/about/create-something/using-api/v3/api-technical-guide)
-- [data.gov.au Portal](https://data.gov.au/)
-- [CKAN API Guide](https://docs.ckan.org/en/latest/api/)
+- [GHAP/TLCMap Developer Docs](https://docs.tlcmap.org/help/developers)
 - [Museums Victoria Collections API](https://collections.museumsvictoria.com.au/developers)
 - [ALA Web Services](https://api.ala.org.au/)
 - [National Museum of Australia API](https://data.nma.gov.au/)

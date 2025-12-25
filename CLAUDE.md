@@ -15,9 +15,9 @@
 **Data Sources:**
 - **PROV** (Public Record Office Victoria) - Victorian state government archives (no API key)
 - **Trove** (National Library of Australia) - Federal digitised collections (requires API key)
-- **data.gov.au** (CKAN) - Australian government open data portal (no API key)
+- **GHAP** (Gazetteer of Historical Australian Placenames) - Historical placenames via TLCMap (no API key)
 - **Museums Victoria** - Victorian museum collections (no API key)
-- **ALA** (Atlas of Living Australia) - Australian biodiversity data (no API key)
+- **ALA** (Atlas of Living Australia) - Historical specimens + contemporary biodiversity (no API key)
 - **NMA** (National Museum of Australia) - National museum collections (no API key)
 - **VHD** (Victorian Heritage Database) - Heritage places and shipwrecks (no API key)
 - **ACMI** (Australian Centre for the Moving Image) - Films, TV, videogames, digital art (no API key)
@@ -36,11 +36,11 @@
 - Government gazettes
 - Books, magazines, images
 
-**data.gov.au Content (Open Data Portal):**
-- 85,000+ datasets from 800+ government organisations
-- Statistical data (ABS census, demographics)
-- Geographic and spatial data
-- Environmental, health, transport datasets
+**GHAP Content (Historical Placenames):**
+- 330,000+ historical placenames with coordinates
+- Australian National Placename Survey (ANPS) gazetteer
+- Community-contributed TLCMap data layers
+- State, LGA, and bounding box filtering
 
 **Museums Victoria Content (Museum Collections):**
 - Museum objects (photographs, artefacts, technology, textiles)
@@ -48,11 +48,11 @@
 - Species information (Victorian fauna and flora)
 - Educational articles and stories
 
-**ALA Content (Biodiversity Data):**
-- 165M+ species occurrence records
-- 153,000+ species profiles with taxonomy
-- Distribution maps and conservation status
-- Citizen science observations
+**ALA Content (Historical + Contemporary Biodiversity):**
+- 165M+ species occurrence records (including historical museum specimens from 1800s-1900s)
+- 153,000+ species profiles with taxonomy and conservation status
+- Historical collection data from museums and herbaria
+- Contemporary citizen science observations
 
 **NMA Content (Museum Collections):**
 - 85,000+ museum objects (artefacts, artwork, photographs)
@@ -135,20 +135,14 @@ npx tsc --noEmit
 | `trove_get_list` | Required | Get user-curated research list by ID |
 | `trove_search_people` | Required | Search people and organisations |
 
-### data.gov.au Tools (11)
+### GHAP Tools (5)
 | Tool | API Key | Purpose |
 |------|---------|---------|
-| `datagovau_search` | None | Search datasets by keyword, organisation, format |
-| `datagovau_get_dataset` | None | Get full dataset details with resources |
-| `datagovau_get_resource` | None | Get individual resource details |
-| `datagovau_datastore_search` | None | Query tabular data directly |
-| `datagovau_list_organizations` | None | List publishing organisations |
-| `datagovau_get_organization` | None | Get organisation details |
-| `datagovau_list_groups` | None | List dataset groups/categories |
-| `datagovau_get_group` | None | Get group details |
-| `datagovau_list_tags` | None | List popular tags |
-| `datagovau_harvest` | None | Bulk download dataset metadata |
-| `datagovau_autocomplete` | None | Autocomplete dataset names and titles |
+| `ghap_search` | None | Search historical placenames by name, state, LGA, bbox |
+| `ghap_get_place` | None | Get place details by TLCMap ID |
+| `ghap_list_layers` | None | List all available community data layers |
+| `ghap_get_layer` | None | Get all places from a specific layer |
+| `ghap_harvest` | None | Bulk download placename records with filters |
 
 ### Museums Victoria Tools (6)
 | Tool | API Key | Purpose |
@@ -237,8 +231,8 @@ npx tsc --noEmit
 ### PROV (No Key Required)
 PROV tools work immediately with no configuration.
 
-### data.gov.au (No Key Required)
-data.gov.au tools work immediately with no configuration.
+### GHAP (No Key Required)
+GHAP/TLCMap tools work immediately with no configuration.
 
 ### Museums Victoria (No Key Required)
 Museums Victoria tools work immediately with no configuration.
@@ -286,7 +280,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (75 tools via registry) |
+| `src/index.ts` | MCP server entry point (69 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
@@ -295,7 +289,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 | `src/core/harvest-runner.ts` | Shared pagination logic |
 | `src/sources/prov/` | PROV source (5 tools) |
 | `src/sources/trove/` | Trove source (13 tools) |
-| `src/sources/datagovau/` | data.gov.au source (11 tools) |
+| `src/sources/ghap/` | GHAP source (5 tools) |
 | `src/sources/museums-victoria/` | Museums Victoria source (6 tools) |
 | `src/sources/ala/` | ALA source (8 tools) |
 | `src/sources/nma/` | NMA source (9 tools) |
@@ -318,19 +312,19 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 └───────────────────────────────────┬─────────────────────────────────────────────┘
                                     │ stdio
 ┌───────────────────────────────────▼─────────────────────────────────────────────┐
-│               Australian History MCP Server (75 tools, 11 sources)               │
+│               Australian History MCP Server (69 tools, 11 sources)               │
 │  ┌──────────────────────────────────────────────────────────────────────────┐   │
 │  │                         Tool Registry (Map-based)                         │   │
 │  └──────────────────────────────────────────────────────────────────────────┘   │
-│  ┌────┐ ┌─────┐ ┌───────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐│
-│  │PROV│ │Trove│ │dataGov│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA ││
-│  │(5) │ │(13) │ │(11)   │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) ││
-│  └──┬─┘ └──┬──┘ └───┬───┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘│
-└─────┼──────┼────────┼────────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼────┘
-      │      │        │        │       │     │     │     │      │      │      │
-      ▼      ▼        ▼        ▼       ▼     ▼     ▼     ▼      ▼      ▼      ▼
-   PROV   Trove   data.gov  MusVic  ALA   NMA   VHD   ACMI   PMC   Any    GA
-   Solr   API v3  CKAN API  API     API   API   API   API    XML  IIIF  ArcGIS
+│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐  │
+│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA │  │
+│  │(5) │ │(13) │ │(5) │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) │  │
+│  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘  │
+└─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼──────┘
+      │      │      │       │       │     │     │     │      │      │      │
+      ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼      ▼      ▼      ▼
+   PROV   Trove  TLCMap  MusVic  ALA   NMA   VHD   ACMI   PMC   Any    GA
+   Solr   API v3  WSAPI   API    API   API   API   API    XML  IIIF  ArcGIS
 ```
 
 ---
@@ -387,20 +381,20 @@ Use trove_list_contributors to list all 1500+ libraries,
 or with query "university" to filter
 ```
 
-### Find Heritage Datasets (data.gov.au)
+### Find Historical Placenames (GHAP)
 ```
-Use datagovau_search with query "heritage" and format "CSV"
-```
-
-### Find ABS Census Data (data.gov.au)
-```
-Use datagovau_search with organization "abs" and query "census"
+Use ghap_search with query "Melbourne" and state "VIC"
 ```
 
-### Query Tabular Data Directly (data.gov.au)
+### Search Placenames by LGA (GHAP)
 ```
-1. Use datagovau_get_dataset to find a resource with datastoreActive=true
-2. Use datagovau_datastore_search with the resource ID
+Use ghap_search with query "creek" and lga "Yarra"
+```
+
+### Get Community Layer Data (GHAP)
+```
+1. Use ghap_list_layers to browse available datasets
+2. Use ghap_get_layer with layerId to get all places from a layer
 ```
 
 ### Search Museum Objects (Museums Victoria)
@@ -499,7 +493,7 @@ State codes: NSW, VIC, QLD, SA, WA, TAS, NT, ACT
 
 ### Bulk Download Research Results
 ```
-Use prov_harvest, trove_harvest, datagovau_harvest, museumsvic_harvest,
+Use prov_harvest, trove_harvest, ghap_harvest, museumsvic_harvest,
 ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, pm_transcripts_harvest,
 or ga_hap_harvest
 ```
@@ -512,7 +506,7 @@ or ga_hap_harvest
 2. **`docs/quickrefs/tools-reference.md`** - Complete tool parameters
 3. **`docs/quickrefs/prov-api.md`** - PROV API details and tips
 4. **`docs/quickrefs/trove-api.md`** - Trove API details and tips
-5. **`docs/quickrefs/datagovau-api.md`** - data.gov.au CKAN API details
+5. **`docs/quickrefs/ghap-api.md`** - GHAP/TLCMap API details
 6. **`docs/quickrefs/museums-victoria-api.md`** - Museums Victoria API details
 7. **`docs/quickrefs/ala-api.md`** - Atlas of Living Australia API details
 8. **`docs/quickrefs/nma-api.md`** - National Museum of Australia API details
@@ -560,7 +554,7 @@ or ga_hap_harvest
 
 - **PROV:** CC-BY-NC license (non-commercial use)
 - **Trove:** Terms vary by content contributor; check individual items
-- **data.gov.au:** Mostly CC-BY licensed; check individual datasets
+- **GHAP/TLCMap:** CC-BY 4.0 (data contributed to TLCMap)
 - **Museums Victoria:** CC-BY 4.0 (most records), Public Domain (some)
 - **ALA:** Various (data contributors specify); mostly CC-BY
 - **NMA:** CC-BY-NC (non-commercial use)
@@ -619,8 +613,9 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 - **Trove rate limit:** 200 calls/minute - harvest tool handles pagination automatically
 - **Trove state parameter:** Use abbreviations (vic, nsw, etc.) - automatically mapped to full names for search API
 - **Multi-word queries:** PROV requires phrase wrapping for multi-word searches (handled automatically)
-- **data.gov.au URL:** The API base URL is `https://data.gov.au/data/api/3/action/` (note the `/data/` prefix)
-- **Datastore availability:** Only some data.gov.au resources have datastore enabled for direct querying
+- **GHAP/TLCMap API:** Uses GeoJSON FeatureCollection format; coordinates in WGS84
+- **GHAP search modes:** Supports fuzzy, contains, and exact name matching
+- **GHAP layers:** Community datasets accessed via layer ID from ghap_list_layers
 - **Museums Victoria pagination:** Uses Link header; harvest tool handles automatically
 - **Museums Victoria IDs:** Record IDs are type-prefixed (e.g., `articles/12345`, `items/67890`)
 - **ALA dual APIs:** Uses biocache-ws for occurrences and bie-ws for species profiles

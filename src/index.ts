@@ -5,7 +5,6 @@
  * Provides Claude Code with programmatic access to:
  * - PROV (Public Record Office Victoria) - Victorian state archives
  * - Trove (National Library of Australia) - Federal digitised collections
- * - data.gov.au (CKAN) - Australian government open data portal
  * - Museums Victoria - Victorian museum collections
  * - ALA (Atlas of Living Australia) - Australian biodiversity data
  * - NMA (National Museum of Australia) - National museum collections
@@ -14,6 +13,7 @@
  * - PM Transcripts - Prime Ministerial speeches and media releases
  * - IIIF - Generic IIIF manifest and image tools (any institution)
  * - GA HAP (Geoscience Australia) - Historical aerial photography (1928-1996)
+ * - GHAP (Gazetteer of Historical Australian Placenames) - Historical placenames
  *
  * @package @littlebearapps/australian-history-mcp
  */
@@ -29,7 +29,6 @@ import {
 import { registry } from './registry.js';
 import { provSource } from './sources/prov/index.js';
 import { troveSource } from './sources/trove/index.js';
-import { dataGovAUSource } from './sources/datagovau/index.js';
 import { museumsVictoriaSource } from './sources/museums-victoria/index.js';
 import { alaSource } from './sources/ala/index.js';
 import { nmaSource } from './sources/nma/index.js';
@@ -38,6 +37,7 @@ import { acmiSource } from './sources/acmi/index.js';
 import { pmTranscriptsSource } from './sources/pm-transcripts/index.js';
 import { iiifSource } from './sources/iiif/index.js';
 import { gaHapSource } from './sources/ga-hap/index.js';
+import { ghapSource } from './sources/ghap/index.js';
 
 // ============================================================================
 // Register Source Modules
@@ -45,7 +45,6 @@ import { gaHapSource } from './sources/ga-hap/index.js';
 
 registry.register(provSource);
 registry.register(troveSource);
-registry.register(dataGovAUSource);
 registry.register(museumsVictoriaSource);
 registry.register(alaSource);
 registry.register(nmaSource);
@@ -54,6 +53,7 @@ registry.register(acmiSource);
 registry.register(pmTranscriptsSource);
 registry.register(iiifSource);
 registry.register(gaHapSource);
+registry.register(ghapSource);
 
 // ============================================================================
 // Server Setup
