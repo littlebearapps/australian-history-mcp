@@ -14,7 +14,7 @@ A Model Context Protocol (MCP) server for searching and harvesting Australian hi
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
-- [Tools by Data Source (75)](#tools-by-data-source-75)
+- [Tools & Examples by Data Source](#tools--examples-by-data-source)
 - [Content Types](#content-types)
 - [Rate Limits](#rate-limits)
 - [Licensing Notes](#licensing-notes)
@@ -150,7 +150,7 @@ Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Vi
 3. Approval typically within 1 week
 4. Add `TROVE_API_KEY` to your MCP configuration (see above)
 
-## Tools by Data Source (75)
+## Tools & Examples by Data Source
 
 <details open>
 <summary><h3>PROV Tools (5)</h3></summary>
