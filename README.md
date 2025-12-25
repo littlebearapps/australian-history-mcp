@@ -148,10 +148,14 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 
 Trove tools require an API key. All other sources (PROV, data.gov.au, Museums Victoria, ALA, NMA, VHD, ACMI, PM Transcripts, IIIF, GA HAP) work without authentication.
 
-1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
-2. Select "Level 1" (personal/research use)
-3. Approval typically within 1 week
-4. Add `TROVE_API_KEY` to your MCP configuration (see above)
+1. **Read the terms first**: Review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and restrictions
+2. Apply at: https://trove.nla.gov.au/about/create-something/using-api
+3. Select "Level 1" (personal/research use) - ensure your intended use complies with the terms
+4. Approval typically within 1 week
+5. Add `TROVE_API_KEY` to your MCP configuration (see above)
+
+> [!NOTE]
+> API key approval is entirely at Trove's discretion. We recommend reading their terms carefully before applying to ensure your use case is eligible.
 
 ## Tools & Examples by Data Source
 
