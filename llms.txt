@@ -19,7 +19,7 @@ Your AI handles the API calls, pagination, and formatting.
 
 ## Documentation
 
-- [README](README.md): Full documentation with all 75 tools
+- [README](README.md): Full documentation with all 69 tools
 - [npm](https://www.npmjs.com/package/@littlebearapps/australian-history-mcp): Package page
 - [GitHub](https://github.com/littlebearapps/australian-history-mcp): Source code
 
@@ -29,7 +29,7 @@ Your AI handles the API calls, pagination, and formatting.
 |--------|---------|-------------|
 | PROV | None | Victorian state archives (photos, maps, council records) |
 | Trove | Required | National Library newspapers, books, images |
-| data.gov.au | None | 85,000+ government datasets |
+| GHAP | None | 330,000+ historical placenames via TLCMap |
 | Museums Victoria | None | Museum collections and species info |
 | ALA | None | 165M+ species occurrence records |
 | NMA | None | National Museum collections |
