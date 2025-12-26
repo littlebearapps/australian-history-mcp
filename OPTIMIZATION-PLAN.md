@@ -835,19 +835,103 @@ src/sources/[source-name]/
 
 ---
 
+## Integration with Dynamic Tool Loading
+
+**Critical:** All new tools must integrate with the Phase 2 dynamic loading strategy to avoid re-introducing context bloat.
+
+### Strategy: Consolidate UX Tools into Single Meta-Tool
+
+Instead of 5 separate UX tools (which would add ~1,500 tokens), create a single `utilities` tool:
+
+```typescript
+{
+  name: 'utilities',
+  description: 'Post-processing: open URLs, export CSV, generate download scripts',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      action: {
+        enum: ['open_url', 'list_urls', 'export_csv', 'download_script', 'save_images'],
+        description: 'Utility action to perform'
+      },
+      // Action-specific params handled dynamically
+      url: { type: 'string', description: 'For open_url' },
+      records: { type: 'array', description: 'For export actions' },
+      format: { enum: ['json', 'csv', 'markdown', 'bash'] },
+      outputDir: { type: 'string', description: 'For save_images' },
+    },
+    required: ['action'],
+  },
+}
+```
+
+**Token cost:** ~150 tokens (vs ~1,500 for 5 separate tools)
+
+### Revised Architecture: 4 Meta-Tools
+
+| Tool | Purpose | Always Exposed |
+|------|---------|----------------|
+| `search_tools` | Find tools by keyword/source | ✓ |
+| `describe_tool` | Get full schema on demand | ✓ |
+| `execute_tool` | Run any of the 69+ data tools | ✓ |
+| `utilities` | Post-processing (open, export, download) | ✓ |
+
+**Total tokens for 4 meta-tools:** ~700 tokens (vs 23,000+ current)
+
+### Where New Source Tools Live
+
+New sources (SLNSW, AWM, QSA, etc.) are added to the discoverable pool, NOT as always-exposed:
+
+```typescript
+// Added to TOOL_INDEX for discovery
+{ name: 'slnsw_search', source: 'slnsw', shortDescription: 'Search NSW library', keywords: ['photographs', 'manuscripts', 'nsw'] },
+{ name: 'awm_search', source: 'awm', shortDescription: 'Search War Memorial', keywords: ['soldiers', 'wwi', 'wwii', 'medals'] },
+// ... accessed via execute_tool after discovery
+```
+
+**Impact:** Adding 15 new tools (5 sources × 3 tools each) adds **0 tokens** to initial context with dynamic loading.
+
+### Hybrid Mode Adjustment
+
+If using hybrid mode (Phase 3), the always-exposed list becomes:
+
+```typescript
+const ALWAYS_EXPOSED = [
+  // Meta-tools (required)
+  'search_tools',
+  'describe_tool',
+  'execute_tool',
+  'utilities',
+
+  // Common data tools (optional, for quick access)
+  'trove_search',
+  'prov_search',
+  'ghap_search',
+];
+```
+
+**Token cost:** ~2,500 tokens (vs 23,000 current) - still 89% reduction
+
+---
+
 ## Enhanced Tool Recommendations Summary
 
-### New Tools to Add (by priority)
+### Meta-Tool Architecture (Zero Additional Context)
 
-| Tool | Purpose | Effort | Priority |
-|------|---------|--------|----------|
-| `open_url` | Open URL in browser | Low | P0 |
-| `list_urls` | Format URLs from search results | Low | P1 |
-| `export_csv` | Export search results as CSV | Medium | P1 |
-| `generate_download_script` | Create wget/curl script | Low | P2 |
-| `save_images` | Download images to filesystem | High | P3 |
+| Component | Tools | Token Cost |
+|-----------|-------|------------|
+| Discovery tools | 3 (search, describe, execute) | ~500 |
+| Utilities tool | 1 (consolidates 5 actions) | ~150 |
+| **Total meta-tools** | **4** | **~650** |
 
-### New Sources to Add (by priority)
+### Discoverable Tools (Hidden Until Needed)
+
+| Category | Current | New | Total | Token Cost |
+|----------|---------|-----|-------|------------|
+| Data source tools | 69 | +15 | 84 | 0 (hidden) |
+| Loaded on demand | - | - | - | ~300 each |
+
+### New Sources to Add (Discoverable)
 
 | Source | Tools | Effort | Priority |
 |--------|-------|--------|----------|
