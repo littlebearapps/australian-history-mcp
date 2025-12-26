@@ -525,6 +525,340 @@ Before/after measurements:
 
 ---
 
+## Phase 4: Enhanced UX Tooling
+
+Based on research into what exists and best practices, here are recommendations for three key UX enhancements.
+
+### 4.1 URL Listing for Users (Already Implemented ✓)
+
+**Current State:** Excellent coverage across all 11 sources.
+
+Every tool that returns records already includes URLs:
+
+| Source | URL Fields Returned |
+|--------|---------------------|
+| PROV | `url`, `iiifManifest` |
+| Trove | `troveUrl`, `pdfUrl`, `thumbnailUrl` |
+| GHAP | `url` (TLCMap link) |
+| Museums Victoria | `thumbnailUrl`, `imageUrl` |
+| ALA | `imageUrl`, `thumbnailUrl`, `largeImageUrl` |
+| NMA | `downloadUrl` (in media) |
+| VHD | `url`, `imageUrl` |
+| ACMI | `webUrl`, `apiUrl`, `wikidataUrl` |
+| PM Transcripts | `documentUrl`, `webUrl` |
+| GA HAP | `previewUrl`, `downloadUrl` (TIF) |
+| IIIF | `imageUrl`, `imageServiceUrl`, `fullImageUrl` |
+
+**Enhancement Opportunity:** Add a dedicated `list_urls` tool for aggregating URLs from search results:
+
+```typescript
+{
+  name: 'list_urls',
+  description: 'Extract and format all URLs from a search result for easy access',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      records: { type: 'array', description: 'Records from any search tool' },
+      urlTypes: {
+        type: 'array',
+        items: { enum: ['view', 'thumbnail', 'download', 'pdf', 'iiif'] },
+        description: 'Which URL types to include'
+      },
+      format: {
+        enum: ['list', 'markdown', 'csv'],
+        description: 'Output format'
+      },
+    },
+  },
+}
+```
+
+This would output:
+```markdown
+## Search Results URLs
+
+1. **Melbourne Town Hall** - [View](https://...) | [Download](https://...)
+2. **Flinders Street Station** - [View](https://...) | [Hi-Res TIFF](https://...)
+```
+
+### 4.2 Downloads & Batch Downloads (Partially Implemented ✓)
+
+**Current State:** All 10 harvest tools support batch downloading metadata with URLs.
+
+**What exists:**
+- All harvest tools return `downloadUrl` or equivalent for each record
+- GA HAP returns both `previewUrl` and `downloadUrl` (full-res TIFF)
+- IIIF tools construct download URLs in any size/format
+- Pagination handles batches up to 1000 records
+
+**What's missing:**
+- No actual file download to local filesystem
+- No batch download orchestration
+
+**Enhancement Options:**
+
+#### Option A: File System Integration (Recommended)
+
+Use the MCP Filesystem server pattern alongside this server:
+
+```typescript
+// New tool: save_images
+{
+  name: 'save_images',
+  description: 'Download images from URLs to local directory',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      urls: { type: 'array', items: { type: 'string' } },
+      outputDir: { type: 'string', description: 'Local directory path' },
+      prefix: { type: 'string', description: 'Filename prefix' },
+      format: { enum: ['jpg', 'png', 'tif', 'original'] },
+    },
+    required: ['urls', 'outputDir'],
+  },
+}
+```
+
+Implementation would:
+1. Accept array of image URLs (from IIIF, GA HAP, etc.)
+2. Download each to specified directory
+3. Return manifest of saved files
+
+#### Option B: Export Package Tool
+
+```typescript
+// New tool: export_package
+{
+  name: 'export_package',
+  description: 'Create downloadable package of records with metadata',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      records: { type: 'array', description: 'Records from harvest/search' },
+      format: { enum: ['json', 'csv', 'zip'] },
+      includeImages: { type: 'boolean', default: false },
+      imageSizes: { enum: ['thumbnail', 'medium', 'full'] },
+    },
+  },
+}
+```
+
+#### Option C: Download Script Generator
+
+Generate a shell script/manifest that users can run:
+
+```typescript
+// Returns:
+{
+  script: "#!/bin/bash\ncurl -O https://...\ncurl -O https://...",
+  manifest: [
+    { url: "https://...", filename: "photo_001.jpg", size: "2.3MB" },
+    // ...
+  ],
+}
+```
+
+**Recommendation:** Start with Option C (script generator) as it requires no filesystem access, then add Option A for power users.
+
+### 4.3 Browser Preview / Opening Files (Not Implemented)
+
+**Current State:** No browser opening functionality exists.
+
+**Why:** MCP is designed for IDE integration, not browser automation. The protocol returns data; the client decides how to present it.
+
+**Best Practice Options:**
+
+#### Option A: Return Formatted Click Links (Simplest)
+
+Claude Code and most MCP clients render markdown links as clickable. Ensure responses format URLs properly:
+
+```typescript
+// In tool responses:
+return successResponse({
+  // ... record data
+  _userTip: 'Click to view: [Open in Browser](https://example.com/record/123)',
+});
+```
+
+#### Option B: MCP Resources Primitive
+
+Use MCP's `resources` primitive instead of tools for browseable content:
+
+```typescript
+// Register as resource, not tool
+server.setResourceHandler({
+  uri: 'prov://record/123',
+  name: 'PROV Record 123',
+  mimeType: 'text/html',
+  description: 'Click to open in browser',
+});
+```
+
+Clients that support resources can open these directly.
+
+#### Option C: Integration with Browser MCP
+
+Reference the [Chrome DevTools MCP](https://developer.chrome.com/blog/chrome-devtools-mcp) or [Playwright MCP](https://github.com/modelcontextprotocol/servers) for browser automation:
+
+```typescript
+// User's MCP config would include both servers
+{
+  "australian-history": { ... },
+  "browser": {
+    "command": "npx",
+    "args": ["@anthropic/mcp-server-puppeteer"]
+  }
+}
+```
+
+Then chain tools: `australian-history → get URL → browser → open page`
+
+#### Option D: System Open Command (Desktop Only)
+
+For local MCP installations, add a simple open tool:
+
+```typescript
+// New tool: open_url
+{
+  name: 'open_url',
+  description: 'Open a URL in the default browser',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      url: { type: 'string' },
+    },
+    required: ['url'],
+  },
+}
+
+// Implementation:
+async execute(args: { url: string }) {
+  const { exec } = await import('child_process');
+  const cmd = process.platform === 'darwin' ? 'open'
+            : process.platform === 'win32' ? 'start'
+            : 'xdg-open';
+  exec(`${cmd} "${args.url}"`);
+  return successResponse({ opened: args.url });
+}
+```
+
+**Recommendation:**
+1. Implement Option A (markdown links) immediately - zero cost
+2. Add Option D (`open_url` tool) for desktop users
+3. Document Option C for users who need browser automation
+
+---
+
+## Phase 5: Potential New Data Sources
+
+Based on research, these Australian data sources have APIs or structured access that could be added:
+
+### 5.1 High Priority (Public APIs Available)
+
+#### Australian War Memorial (AWM)
+- **Content:** 1M+ photographs, diaries, medals, service records
+- **API:** Uses the same ALA infrastructure for some data
+- **Access:** Collection Search at awm.gov.au/digital-collection
+- **Priority:** HIGH - Major historical resource
+- **Note:** Need to verify API availability; may require screen scraping
+
+#### State Library NSW (SLNSW)
+- **Content:** 300,000+ digitised items, photographs, manuscripts
+- **API:** Funnelback search API at `www.sl.nsw.gov.au/api`
+- **Access:** Via Data.NSW portal with CKAN support
+- **Priority:** HIGH - Complements Trove's NSW content
+- **Reference:** [Data.NSW Collections](https://data.nsw.gov.au/data/dataset/collections)
+
+#### Queensland State Archives (QSA)
+- **Content:** Cabinet minutes, immigration, court records
+- **API:** ArchivesSearch + Open Data Portal CSV datasets
+- **Access:** data.qld.gov.au with full URL listings
+- **Priority:** MEDIUM - Good for genealogy research
+- **Reference:** [QSA Digitised Collection](https://www.data.qld.gov.au/dataset/queensland-state-archives-digitised-collection)
+
+### 5.2 Medium Priority (IIIF/Structured Access)
+
+#### State Library Victoria Enhanced
+- **Current:** SLV access via Trove NUC filter + IIIF
+- **Enhancement:** Direct SLV IIIF collection harvesting
+- **Source:** 170,000+ copyright-free images
+- **API:** IIIF manifests + Handle system
+- **Reference:** [SLV IIIF Guide](https://lab.slv.vic.gov.au/resources/using-iiif-to-work-with-the-librarys-digitised-collections)
+
+#### National Library of Australia (NLA) Direct
+- **Current:** NLA content via Trove
+- **Enhancement:** Direct NLA object access via IIIF
+- **Pattern:** `https://nla.gov.au/nla.obj-{ID}/manifest`
+- **Priority:** MEDIUM - Supplements Trove access
+
+#### Australian Museum (Sydney)
+- **Content:** 21M+ specimens and objects
+- **API:** Data flows through ALA for biodiversity
+- **Note:** May overlap with existing ALA tools
+- **Priority:** LOW - Mostly covered by ALA
+
+### 5.3 Future Consideration
+
+#### National Archives of Australia (NAA)
+- **Content:** 54M+ items including service records
+- **Status:** ⚠️ API access blocked as of May 2025
+- **Note:** Screen scrapers no longer work
+- **Reference:** [GLAM Workbench Note](https://glam-workbench.net/recordsearch/)
+- **Priority:** WAIT - Monitor for API availability
+
+#### State Records of South Australia
+- **Content:** Colonial and state government records
+- **Access:** ArchivesSearch SA portal
+- **Priority:** LOW - Limited digital access
+
+#### Western Australian Museum
+- **Content:** Maritime archaeology, natural science
+- **API:** WA Museum Sandbox (experimental)
+- **Priority:** LOW - Limited coverage
+
+### 5.4 Implementation Approach for New Sources
+
+For each new source, follow the established pattern:
+
+```
+src/sources/[source-name]/
+├── index.ts          # Source definition with defineSource()
+├── client.ts         # API client extending BaseClient
+├── types.ts          # TypeScript interfaces
+└── tools/
+    ├── search.ts     # Primary search tool
+    ├── get-[item].ts # Detail retrieval
+    └── harvest.ts    # Bulk download
+```
+
+**Minimum viable source:** 3 tools (search, get, harvest)
+
+---
+
+## Enhanced Tool Recommendations Summary
+
+### New Tools to Add (by priority)
+
+| Tool | Purpose | Effort | Priority |
+|------|---------|--------|----------|
+| `open_url` | Open URL in browser | Low | P0 |
+| `list_urls` | Format URLs from search results | Low | P1 |
+| `export_csv` | Export search results as CSV | Medium | P1 |
+| `generate_download_script` | Create wget/curl script | Low | P2 |
+| `save_images` | Download images to filesystem | High | P3 |
+
+### New Sources to Add (by priority)
+
+| Source | Tools | Effort | Priority |
+|--------|-------|--------|----------|
+| SLNSW (State Library NSW) | 3-5 | Medium | P1 |
+| AWM (War Memorial) | 3-5 | Medium | P1 |
+| QSA (Qld State Archives) | 3-5 | Medium | P2 |
+| SLV Enhanced (Direct IIIF) | 2-3 | Low | P2 |
+| NLA Direct (IIIF) | 2-3 | Low | P3 |
+
+---
+
 ## References
 
 1. [Anthropic Engineering: Code Execution with MCP](https://www.anthropic.com/engineering/code-execution-with-mcp)
@@ -532,3 +866,10 @@ Before/after measurements:
 3. [SEP-1576: Mitigating Token Bloat in MCP](https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1576)
 4. [CodeRabbit: Ballooning Context in the MCP Era](https://www.coderabbit.ai/blog/handling-ballooning-context-in-the-mcp-era-context-engineering-on-steroids)
 5. [K2View: MCP Strategies for Token-Efficient Context](https://www.k2view.com/blog/mcp-strategies-for-grounded-prompts-and-token-efficient-llm-context/)
+6. [MCP Tools Specification](https://modelcontextprotocol.io/docs/concepts/tools) - Resource links and content types
+7. [Chrome DevTools MCP](https://developer.chrome.com/blog/chrome-devtools-mcp) - Browser automation integration
+8. [SLV IIIF Guide](https://lab.slv.vic.gov.au/resources/using-iiif-to-work-with-the-librarys-digitised-collections) - State Library Victoria access
+9. [GLAM Workbench](https://glam-workbench.net/) - Australian GLAM data tools
+10. [Australian War Memorial Digital Collection](https://www.awm.gov.au/digital-collection)
+11. [Data.NSW Collections API](https://data.nsw.gov.au/data/dataset/collections)
+12. [Queensland State Archives Open Data](https://www.data.qld.gov.au/dataset/queensland-state-archives-digitised-collection)
