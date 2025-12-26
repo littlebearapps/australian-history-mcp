@@ -979,15 +979,212 @@ const ALWAYS_EXPOSED = [
 
 ---
 
+## Phase 2.5: Federated Search Tool (RECOMMENDED)
+
+### The Problem with Pure Dynamic Loading
+
+When a user asks *"Find photos of Melbourne from the 1920s"* without specifying a source, the pure dynamic pattern requires many round-trips:
+
+```
+1. find("photos 1920s") → Returns 6 relevant tools
+2-5. schema() for each tool (4 calls)
+6-9. run() for each source (4 calls)
+10. open(results[0].url)
+11. export(results, "markdown")
+```
+
+**That's 11 tool calls** for a simple query. Research shows this is a known problem:
+
+> *"Agents typically use about 4× more tokens than chat interactions, and multi-agent systems use about 15× more tokens."* — [Anthropic Engineering](https://www.anthropic.com/engineering/multi-agent-research-system)
+
+### The Solution: Unified `search` Meta-Tool
+
+Based on research from [Together.ai Parallel Workflows](https://docs.together.ai/docs/parallel-workflows), [Parallel.ai Search](https://parallel.ai/blog/introducing-parallel-search), and [Anthropic's Multi-Agent System](https://www.anthropic.com/engineering/multi-agent-research-system), add a federated search tool that:
+
+1. Accepts a natural language query
+2. Internally routes to relevant sources using smart selection
+3. Executes searches **in parallel** (Promise.all)
+4. Aggregates and ranks results
+5. Returns compressed, information-dense response
+
+### Implementation: search Meta-Tool
+
+```typescript
+{
+  name: 'search',
+  description: 'Search across all Australian history sources in parallel. ' +
+    'Auto-selects relevant sources based on query. ' +
+    'Sources: newspapers (Trove), archives (PROV), aerial photos (GA HAP), ' +
+    'heritage (VHD), museums (NMA, MuseumsVic, ACMI), biodiversity (ALA), placenames (GHAP)',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      query: { type: 'string', description: 'Natural language search query' },
+      sources: {
+        type: 'array',
+        items: { enum: ['trove', 'prov', 'ga_hap', 'vhd', 'nma', 'museumsvic', 'acmi', 'ala', 'ghap'] },
+        description: 'Limit to specific sources (auto-selects if omitted)'
+      },
+      types: {
+        type: 'array',
+        items: { enum: ['image', 'document', 'map', 'newspaper', 'object', 'place', 'species'] },
+        description: 'Filter by content type'
+      },
+      dateFrom: { type: 'string', description: 'Start year' },
+      dateTo: { type: 'string', description: 'End year' },
+      state: { type: 'string', enum: ['vic', 'nsw', 'qld', 'sa', 'wa', 'tas', 'nt', 'act'] },
+      limit: { type: 'number', description: 'Results per source (default: 10)' },
+    },
+    required: ['query'],
+  },
+}
+```
+
+### Smart Source Selection
+
+```typescript
+function selectSourcesForQuery(query: string, types?: string[]): string[] {
+  const q = query.toLowerCase();
+  const sources = new Set<string>();
+
+  // Content type routing
+  if (types?.includes('newspaper') || /newspaper|article|gazette/.test(q)) {
+    sources.add('trove');
+  }
+  if (types?.includes('image') || /photo|photograph|picture|image/.test(q)) {
+    sources.add('trove').add('prov').add('ga_hap').add('museumsvic');
+  }
+  if (types?.includes('map') || /map|aerial|survey/.test(q)) {
+    sources.add('ga_hap').add('prov');
+  }
+  if (/heritage|building|historic|architecture/.test(q)) {
+    sources.add('vhd');
+  }
+  if (/shipwreck|maritime|vessel|ship/.test(q)) {
+    sources.add('vhd');
+  }
+  if (/species|animal|plant|bird|insect/.test(q)) {
+    sources.add('ala').add('museumsvic');
+  }
+  if (/film|movie|television|tv|game/.test(q)) {
+    sources.add('acmi');
+  }
+  if (/place|location|town|creek|river/.test(q)) {
+    sources.add('ghap');
+  }
+
+  // Default: search the big 4 for general queries
+  if (sources.size === 0) {
+    sources.add('trove').add('prov').add('museumsvic').add('nma');
+  }
+
+  return Array.from(sources);
+}
+```
+
+### Parallel Execution with Aggregation
+
+```typescript
+async execute(args: SearchArgs) {
+  // 1. Smart source selection
+  const sources = args.sources ?? selectSourcesForQuery(args.query, args.types);
+
+  // 2. Execute all searches in parallel
+  const searchPromises = sources.map(source =>
+    executeSourceSearch(source, {
+      query: args.query,
+      dateFrom: args.dateFrom,
+      dateTo: args.dateTo,
+      state: args.state,
+      limit: args.limit ?? 10,
+    }).catch(err => ({ source, error: err.message, results: [] }))
+  );
+
+  const results = await Promise.all(searchPromises);
+
+  // 3. Aggregate results with source attribution
+  const aggregated = results.flatMap(r =>
+    r.results.map(item => ({ ...item, _source: r.source }))
+  );
+
+  // 4. Return compressed response
+  return successResponse({
+    query: args.query,
+    sourcesSearched: sources,
+    totalResults: aggregated.length,
+    results: aggregated.slice(0, 30).map(item => ({
+      title: item.title,
+      source: item._source,
+      date: item.date,
+      description: item.description?.substring(0, 150),
+      thumbnailUrl: item.thumbnailUrl,
+      viewUrl: item.viewUrl,
+      downloadUrl: item.downloadUrl,
+    })),
+    tip: 'Use open(url) to preview, export(results, format) to save',
+  });
+}
+```
+
+### New Workflow: 3 Calls Instead of 11
+
+```
+User: "Find photos of Melbourne from the 1920s"
+
+Agent:
+1. search(query: "Melbourne photographs", types: ["image"],
+          dateFrom: "1920", dateTo: "1929", state: "vic")
+   → Parallel search across Trove, PROV, GA HAP, MuseumsVic
+   → Returns aggregated results with source attribution
+
+2. open(results[0].viewUrl)
+   → Opens best result in browser
+
+3. export(results, "markdown")
+   → Saves all results with links
+```
+
+**Reduction: 11 calls → 3 calls (73% fewer tool invocations)**
+
+### When to Use Each Tool
+
+| User Intent | Tool Path | Why |
+|-------------|-----------|-----|
+| General research query | `search` → `open` → `export` | Federated search handles routing |
+| Specific source needed | `find` → `schema` → `run` | User knows what they want |
+| Bulk data download | `find` → `run("*_harvest")` | Harvest tools for large datasets |
+| Specialised lookup (magazines, contributors) | `find` → `schema` → `run` | Niche Trove tools |
+
+### Token Comparison
+
+| Scenario | 69 Tools | 5 Meta-Tools | 6 Meta-Tools + search |
+|----------|----------|--------------|----------------------|
+| Initial load | 23,000 | 220 | 300 |
+| "Find Melbourne photos 1920s" | 0 | ~2,000 (11 calls) | ~400 (3 calls) |
+| **Total** | **23,000** | **2,220** | **700** |
+
+**With federated search: 97% reduction** vs current architecture.
+
+### References
+
+- [Anthropic: Multi-Agent Research System](https://www.anthropic.com/engineering/multi-agent-research-system) - Token usage and parallel agent architecture
+- [Together.ai: Parallel Workflows](https://docs.together.ai/docs/parallel-workflows) - Scatter-gather pattern
+- [Parallel.ai: Search API](https://parallel.ai/blog/introducing-parallel-search) - Information-dense excerpts
+- [Patronus AI: Agent Routing](https://www.patronus.ai/ai-agent-development/ai-agent-routing) - Smart routing patterns
+- [Data Learning Science: Parallelization Pattern](https://datalearningscience.com/p/3-parallelization-agentic-design) - Aggregation best practices
+
+---
+
 ## Summary: Final Architecture
 
-### 5 Meta-Tools (~220 tokens total)
+### 6 Meta-Tools (~300 tokens total)
 
 | Tool | Purpose | Frequency |
 |------|---------|-----------|
-| `find` | Discover data tools | Start of session |
-| `schema` | Get tool parameters | Per new tool |
-| `run` | Execute any tool | Per search |
+| `search` | **Federated search (primary)** | Most queries |
+| `find` | Discover specific tools | Advanced use |
+| `schema` | Get tool parameters | Advanced use |
+| `run` | Execute specific tool | Advanced use |
 | `open` | Browser preview | After searches |
 | `export` | CSV/JSON/MD/script | End of research |
 
@@ -1013,9 +1210,21 @@ const ALWAYS_EXPOSED = [
 
 | Metric | Current | Optimized | Reduction |
 |--------|---------|-----------|-----------|
-| Initial context | ~23,000 tokens | ~220 tokens | **99%** |
-| Tools exposed | 69 | 5 | 93% |
+| Initial context | ~23,000 tokens | ~300 tokens | **99%** |
+| Tools exposed | 69 | 6 | 91% |
+| Typical search workflow | 0 extra (pre-loaded) | ~400 tokens (3 calls) | N/A |
 | Scalability | Linear growth | Constant | ∞ |
+
+### Typical Session Comparison
+
+| Workflow | Current (69 tools) | Optimized (6 meta-tools) |
+|----------|-------------------|-------------------------|
+| Initial load | 23,000 tokens | 300 tokens |
+| "Find Melbourne photos 1920s" | 0 (already loaded) | 400 (search + open + export) |
+| "Find shipwrecks in Victoria" | 0 (already loaded) | 350 (search + open) |
+| **Total for 2 searches** | **23,000 tokens** | **1,050 tokens** |
+
+**Real-world reduction: 95%+** for typical research sessions
 
 ---
 
