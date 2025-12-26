@@ -142,7 +142,7 @@ decade: { description: 'Decade prefix (see docs)' }
 
 ## Phase 2: Dynamic Tool Loading (RECOMMENDED)
 
-Implement the Speakeasy three-tool discovery pattern. Instead of exposing 69 tools, expose only 3 meta-tools.
+Implement the Speakeasy-inspired discovery pattern. Instead of exposing 69 tools, expose only 5 meta-tools with minimal, clear names.
 
 ### 2.1 Architecture Change
 
@@ -151,63 +151,17 @@ Implement the Speakeasy three-tool discovery pattern. Instead of exposing 69 too
 ListTools → Returns 69 tool schemas (~23,000 tokens)
 ```
 
-**After (3 tools):**
+**After (5 meta-tools):**
 ```
-ListTools → Returns 3 tool schemas (~500 tokens)
-  - search_tools(query, source?) → Find relevant tools
-  - describe_tool(toolName) → Get full schema
-  - execute_tool(toolName, args) → Run the tool
-```
-
-### 2.2 New Tool Implementations
-
-**search_tools:**
-```typescript
-{
-  name: 'search_tools',
-  description: 'Search available tools. Sources: PROV (archives), Trove (newspapers/books), GHAP (placenames), MuseumsVic, ALA (biodiversity), NMA (museum), VHD (heritage), ACMI (film/TV), PM Transcripts, GA HAP (aerial photos)',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      query: { type: 'string', description: 'What you want to do' },
-      source: { type: 'string', description: 'Filter by source name' },
-    },
-  },
-}
+ListTools → Returns 5 tool schemas (~220 tokens)
+  - find(query, source?) → Discover relevant tools
+  - schema(tool) → Get full tool definition
+  - run(tool, args) → Execute any data tool
+  - open(url) → Open in browser
+  - export(records, format) → Export to CSV/JSON/Markdown/script
 ```
 
-**describe_tool:**
-```typescript
-{
-  name: 'describe_tool',
-  description: 'Get full schema for a tool',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      toolName: { type: 'string' },
-    },
-    required: ['toolName'],
-  },
-}
-```
-
-**execute_tool:**
-```typescript
-{
-  name: 'execute_tool',
-  description: 'Execute a tool with parameters',
-  inputSchema: {
-    type: 'object',
-    properties: {
-      toolName: { type: 'string' },
-      args: { type: 'object' },
-    },
-    required: ['toolName', 'args'],
-  },
-}
-```
-
-### 2.3 Tool Index for Discovery
+### 2.2 Tool Index for Discovery
 
 Create `src/core/tool-index.ts`:
 
@@ -216,7 +170,7 @@ interface ToolIndexEntry {
   name: string;
   source: string;
   shortDescription: string;  // 3-5 words
-  keywords: string[];        // For semantic search
+  keywords: string[];        // For search matching
 }
 
 export const TOOL_INDEX: ToolIndexEntry[] = [
@@ -227,7 +181,7 @@ export const TOOL_INDEX: ToolIndexEntry[] = [
 ];
 ```
 
-### 2.4 Implementation: search_tools
+### 2.3 Implementation: find
 
 ```typescript
 async execute(args: { query?: string; source?: string }) {
@@ -251,32 +205,63 @@ async execute(args: { query?: string; source?: string }) {
       source: t.source,
       description: t.shortDescription,
     })),
-    tip: 'Use describe_tool(name) for full parameter schema',
+    tip: 'Use schema(tool) before run(tool, args)',
   });
 }
 ```
 
-### 2.5 Implementation: describe_tool
+### 2.4 Implementation: schema
 
 ```typescript
-async execute(args: { toolName: string }) {
-  const tool = registry.getTool(args.toolName);
+async execute(args: { tool: string }) {
+  const tool = registry.getTool(args.tool);
   if (!tool) {
-    return errorResponse(`Unknown tool: ${args.toolName}`);
+    return errorResponse(`Unknown tool: ${args.tool}`);
   }
 
   return successResponse({
-    schema: tool.schema,  // Full schema with all parameters
-    examples: getToolExamples(args.toolName),  // Optional usage examples
+    name: tool.schema.name,
+    description: tool.schema.description,
+    parameters: tool.schema.inputSchema,
   });
 }
 ```
 
-### 2.6 Implementation: execute_tool
+### 2.5 Implementation: run
 
 ```typescript
-async execute(args: { toolName: string; args: Record<string, unknown> }) {
-  return registry.executeTool(args.toolName, args.args);
+async execute(args: { tool: string; args?: Record<string, unknown> }) {
+  return registry.executeTool(args.tool, args.args ?? {});
+}
+```
+
+### 2.6 Implementation: open
+
+```typescript
+async execute(args: { url: string }) {
+  const { exec } = await import('child_process');
+  const cmd = process.platform === 'darwin' ? 'open'
+            : process.platform === 'win32' ? 'start'
+            : 'xdg-open';
+  exec(`${cmd} "${args.url}"`);
+  return successResponse({ opened: args.url });
+}
+```
+
+### 2.7 Implementation: export
+
+```typescript
+async execute(args: { records: any[]; format: 'csv' | 'json' | 'markdown' | 'script'; path?: string }) {
+  switch (args.format) {
+    case 'csv':
+      return exportAsCsv(args.records, args.path);
+    case 'json':
+      return exportAsJson(args.records, args.path);
+    case 'markdown':
+      return exportAsMarkdown(args.records, args.path);  // Table + links
+    case 'script':
+      return generateDownloadScript(args.records);
+  }
 }
 ```
 
@@ -285,25 +270,26 @@ async execute(args: { toolName: string; args: Record<string, unknown> }) {
 | Mode | Initial Load | Per-Tool Discovery | Per-Tool Execution |
 |------|--------------|-------------------|-------------------|
 | **Current (69 tools)** | 23,000 | 0 | 0 |
-| **Dynamic (3 tools)** | 500 | ~200-400 | 0 |
+| **Dynamic (5 meta-tools)** | 220 | ~100-300 | 0 |
 
 **Typical workflow (search 5 topics, use 8 tools):**
 - Current: 23,000 tokens (all upfront)
-- Dynamic: 500 + (5 × 100) + (8 × 300) = 3,400 tokens
+- Dynamic: 220 + (5 × 50) + (8 × 200) = 2,070 tokens
 
-**Savings: 85%**
+**Savings: 91%**
 
 ### Phase 2 Trade-offs
 
 **Pros:**
-- 85-90% token reduction
+- 91-99% token reduction
 - Scales to unlimited tools without context growth
-- Better tool discovery via semantic search
+- Clear, intuitive tool names
+- `open` and `export` enable complete research workflow
 
 **Cons:**
 - 2-3x more LLM calls per tool usage
-- ~50% slower initial tool execution
-- Requires agent to learn discovery pattern
+- ~30% slower initial tool execution
+- Requires agent to learn discovery pattern (mitigated by clear names)
 
 ---
 
@@ -839,97 +825,179 @@ src/sources/[source-name]/
 
 **Critical:** All new tools must integrate with the Phase 2 dynamic loading strategy to avoid re-introducing context bloat.
 
-### Strategy: Consolidate UX Tools into Single Meta-Tool
+### Naming Convention: Minimal but Clear
 
-Instead of 5 separate UX tools (which would add ~1,500 tokens), create a single `utilities` tool:
+Use short, clear names. Claude reads descriptions primarily, so names can be minimal:
+
+| Long Name | Short Name | Why |
+|-----------|------------|-----|
+| `search_tools` | `find` | Clear in context, saves tokens |
+| `describe_tool` | `schema` | More accurate - returns schema |
+| `execute_tool` | `run` | Universal, intuitive |
+| `open_url` | `open` | Obvious purpose |
+| `utilities` | `export` | Specific to actual use |
+
+### Final Architecture: 5 Meta-Tools
 
 ```typescript
+// 1. FIND - Discover available tools
 {
-  name: 'utilities',
-  description: 'Post-processing: open URLs, export CSV, generate download scripts',
+  name: 'find',
+  description: 'Find tools by keyword. Sources: PROV (archives), Trove (newspapers), GHAP (placenames), MuseumsVic, ALA (biodiversity), NMA, VHD (heritage), ACMI (film/TV), PM Transcripts, GA HAP (aerial photos)',
   inputSchema: {
     type: 'object',
     properties: {
-      action: {
-        enum: ['open_url', 'list_urls', 'export_csv', 'download_script', 'save_images'],
-        description: 'Utility action to perform'
-      },
-      // Action-specific params handled dynamically
-      url: { type: 'string', description: 'For open_url' },
-      records: { type: 'array', description: 'For export actions' },
-      format: { enum: ['json', 'csv', 'markdown', 'bash'] },
-      outputDir: { type: 'string', description: 'For save_images' },
+      query: { type: 'string', description: 'What you want to do' },
+      source: { type: 'string', description: 'Filter by source name' },
     },
-    required: ['action'],
+  },
+}
+
+// 2. SCHEMA - Get full tool definition
+{
+  name: 'schema',
+  description: 'Get full parameter schema for a tool before calling it',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      tool: { type: 'string', description: 'Tool name from find results' },
+    },
+    required: ['tool'],
+  },
+}
+
+// 3. RUN - Execute any data tool
+{
+  name: 'run',
+  description: 'Execute any data source tool by name',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      tool: { type: 'string', description: 'Tool name' },
+      args: { type: 'object', description: 'Tool arguments' },
+    },
+    required: ['tool'],
+  },
+}
+
+// 4. OPEN - Browser preview (high frequency, tiny footprint)
+{
+  name: 'open',
+  description: 'Open URL in default browser',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      url: { type: 'string' },
+    },
+    required: ['url'],
+  },
+}
+
+// 5. EXPORT - Data export utilities
+{
+  name: 'export',
+  description: 'Export records: CSV, JSON, Markdown, or download script',
+  inputSchema: {
+    type: 'object',
+    properties: {
+      records: { type: 'array', description: 'Records from search/harvest' },
+      format: { enum: ['csv', 'json', 'markdown', 'script'], description: 'Output format' },
+      path: { type: 'string', description: 'Output file path (optional)' },
+    },
+    required: ['records', 'format'],
   },
 }
 ```
 
-**Token cost:** ~150 tokens (vs ~1,500 for 5 separate tools)
+### Token Cost Analysis
 
-### Revised Architecture: 4 Meta-Tools
+| Tool | Purpose | Tokens |
+|------|---------|--------|
+| `find` | Discover tools | ~50 |
+| `schema` | Get tool definition | ~40 |
+| `run` | Execute any tool | ~50 |
+| `open` | Browser preview | ~30 |
+| `export` | CSV/JSON/script | ~50 |
+| **Total** | | **~220** |
 
-| Tool | Purpose | Always Exposed |
-|------|---------|----------------|
-| `search_tools` | Find tools by keyword/source | ✓ |
-| `describe_tool` | Get full schema on demand | ✓ |
-| `execute_tool` | Run any of the 69+ data tools | ✓ |
-| `utilities` | Post-processing (open, export, download) | ✓ |
-
-**Total tokens for 4 meta-tools:** ~700 tokens (vs 23,000+ current)
+**Comparison:**
+- Current (69 tools): ~23,000 tokens
+- New (5 meta-tools): ~220 tokens
+- **Reduction: 99%**
 
 ### Where New Source Tools Live
 
-New sources (SLNSW, AWM, QSA, etc.) are added to the discoverable pool, NOT as always-exposed:
+New sources (SLNSW, AWM, QSA, etc.) are added to the discoverable pool, accessed via `run`:
 
 ```typescript
-// Added to TOOL_INDEX for discovery
+// Added to TOOL_INDEX for discovery via find()
 { name: 'slnsw_search', source: 'slnsw', shortDescription: 'Search NSW library', keywords: ['photographs', 'manuscripts', 'nsw'] },
 { name: 'awm_search', source: 'awm', shortDescription: 'Search War Memorial', keywords: ['soldiers', 'wwi', 'wwii', 'medals'] },
-// ... accessed via execute_tool after discovery
+// ... accessed via run("slnsw_search", {...}) after discovery
 ```
 
-**Impact:** Adding 15 new tools (5 sources × 3 tools each) adds **0 tokens** to initial context with dynamic loading.
+**Impact:** Adding 15 new tools (5 sources × 3 tools each) adds **0 tokens** to initial context.
 
-### Hybrid Mode Adjustment
+### Example Research Workflow
 
-If using hybrid mode (Phase 3), the always-exposed list becomes:
+```
+User: "Find photos of WWI soldiers from Victoria"
+
+Agent:
+1. find(query="soldiers photos")
+   → Returns: awm_search, trove_search, prov_search
+
+2. schema(tool="awm_search")
+   → Returns: full parameter schema with filters
+
+3. run(tool="awm_search", args={query:"Victoria soldiers", type:"photograph"})
+   → Returns: 20 records with URLs
+
+4. open(url=results[0].url)
+   → Opens first result in browser for user
+
+5. export(records=results, format="markdown")
+   → Saves results as formatted markdown with links
+```
+
+### Hybrid Mode (Optional)
+
+For users who want instant access to common tools:
 
 ```typescript
 const ALWAYS_EXPOSED = [
   // Meta-tools (required)
-  'search_tools',
-  'describe_tool',
-  'execute_tool',
-  'utilities',
+  'find', 'schema', 'run', 'open', 'export',
 
   // Common data tools (optional, for quick access)
   'trove_search',
   'prov_search',
-  'ghap_search',
 ];
 ```
 
-**Token cost:** ~2,500 tokens (vs 23,000 current) - still 89% reduction
+**Token cost:** ~1,200 tokens (vs 23,000 current) - still 95% reduction
 
 ---
 
-## Enhanced Tool Recommendations Summary
+## Summary: Final Architecture
 
-### Meta-Tool Architecture (Zero Additional Context)
+### 5 Meta-Tools (~220 tokens total)
 
-| Component | Tools | Token Cost |
-|-----------|-------|------------|
-| Discovery tools | 3 (search, describe, execute) | ~500 |
-| Utilities tool | 1 (consolidates 5 actions) | ~150 |
-| **Total meta-tools** | **4** | **~650** |
+| Tool | Purpose | Frequency |
+|------|---------|-----------|
+| `find` | Discover data tools | Start of session |
+| `schema` | Get tool parameters | Per new tool |
+| `run` | Execute any tool | Per search |
+| `open` | Browser preview | After searches |
+| `export` | CSV/JSON/MD/script | End of research |
 
-### Discoverable Tools (Hidden Until Needed)
+### 84+ Discoverable Data Tools (0 initial tokens)
 
-| Category | Current | New | Total | Token Cost |
-|----------|---------|-----|-------|------------|
-| Data source tools | 69 | +15 | 84 | 0 (hidden) |
-| Loaded on demand | - | - | - | ~300 each |
+| Category | Tools | Accessed Via |
+|----------|-------|--------------|
+| Current sources | 69 | `run(tool, args)` |
+| New sources | +15 | `run(tool, args)` |
+| **Total** | **84+** | **~300 tokens each when loaded** |
 
 ### New Sources to Add (Discoverable)
 
@@ -940,6 +1008,14 @@ const ALWAYS_EXPOSED = [
 | QSA (Qld State Archives) | 3-5 | Medium | P2 |
 | SLV Enhanced (Direct IIIF) | 2-3 | Low | P2 |
 | NLA Direct (IIIF) | 2-3 | Low | P3 |
+
+### Before vs After
+
+| Metric | Current | Optimized | Reduction |
+|--------|---------|-----------|-----------|
+| Initial context | ~23,000 tokens | ~220 tokens | **99%** |
+| Tools exposed | 69 | 5 | 93% |
+| Scalability | Linear growth | Constant | ∞ |
 
 ---
 
