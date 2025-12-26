@@ -154,7 +154,7 @@ ListTools → Returns 69 tool schemas (~23,000 tokens)
 **After (5 meta-tools):**
 ```
 ListTools → Returns 5 tool schemas (~220 tokens)
-  - find(query, source?) → Discover relevant tools
+  - tools(query?, source?) → List/discover available tools
   - schema(tool) → Get full tool definition
   - run(tool, args) → Execute any data tool
   - open(url) → Open in browser
@@ -840,10 +840,10 @@ Use short, clear names. Claude reads descriptions primarily, so names can be min
 ### Final Architecture: 5 Meta-Tools
 
 ```typescript
-// 1. FIND - Discover available tools
+// 1. TOOLS - List/discover available tools
 {
-  name: 'find',
-  description: 'Find tools by keyword. Sources: PROV (archives), Trove (newspapers), GHAP (placenames), MuseumsVic, ALA (biodiversity), NMA, VHD (heritage), ACMI (film/TV), PM Transcripts, GA HAP (aerial photos)',
+  name: 'tools',
+  description: 'List available tools by keyword. Sources: PROV (archives), Trove (newspapers), GHAP (placenames), MuseumsVic, ALA (biodiversity), NMA, VHD (heritage), ACMI (film/TV), PM Transcripts, GA HAP (aerial photos)',
   inputSchema: {
     type: 'object',
     properties: {
@@ -860,7 +860,7 @@ Use short, clear names. Claude reads descriptions primarily, so names can be min
   inputSchema: {
     type: 'object',
     properties: {
-      tool: { type: 'string', description: 'Tool name from find results' },
+      tool: { type: 'string', description: 'Tool name from tools() results' },
     },
     required: ['tool'],
   },
@@ -930,7 +930,7 @@ Use short, clear names. Claude reads descriptions primarily, so names can be min
 New sources (SLNSW, AWM, QSA, etc.) are added to the discoverable pool, accessed via `run`:
 
 ```typescript
-// Added to TOOL_INDEX for discovery via find()
+// Added to TOOL_INDEX for discovery via tools()
 { name: 'slnsw_search', source: 'slnsw', shortDescription: 'Search NSW library', keywords: ['photographs', 'manuscripts', 'nsw'] },
 { name: 'awm_search', source: 'awm', shortDescription: 'Search War Memorial', keywords: ['soldiers', 'wwi', 'wwii', 'medals'] },
 // ... accessed via run("slnsw_search", {...}) after discovery
@@ -944,7 +944,7 @@ New sources (SLNSW, AWM, QSA, etc.) are added to the discoverable pool, accessed
 User: "Find photos of WWI soldiers from Victoria"
 
 Agent:
-1. find(query="soldiers photos")
+1. tools(query="soldiers photos")
    → Returns: awm_search, trove_search, prov_search
 
 2. schema(tool="awm_search")
@@ -986,7 +986,7 @@ const ALWAYS_EXPOSED = [
 When a user asks *"Find photos of Melbourne from the 1920s"* without specifying a source, the pure dynamic pattern requires many round-trips:
 
 ```
-1. find("photos 1920s") → Returns 6 relevant tools
+1. tools("photos 1920s") → Returns 6 relevant tools
 2-5. schema() for each tool (4 calls)
 6-9. run() for each source (4 calls)
 10. open(results[0].url)
@@ -1015,15 +1015,16 @@ Based on research from [Together.ai Parallel Workflows](https://docs.together.ai
   description: 'Search across all Australian history sources in parallel. ' +
     'Auto-selects relevant sources based on query. ' +
     'Sources: newspapers (Trove), archives (PROV), aerial photos (GA HAP), ' +
-    'heritage (VHD), museums (NMA, MuseumsVic, ACMI), biodiversity (ALA), placenames (GHAP)',
+    'heritage (VHD), museums (NMA, MuseumsVic, ACMI), biodiversity (ALA), ' +
+    'placenames (GHAP), PM speeches (pm). Note: IIIF excluded (use tools→run for direct manifest access)',
   inputSchema: {
     type: 'object',
     properties: {
       query: { type: 'string', description: 'Natural language search query' },
       sources: {
         type: 'array',
-        items: { enum: ['trove', 'prov', 'ga_hap', 'vhd', 'nma', 'museumsvic', 'acmi', 'ala', 'ghap'] },
-        description: 'Limit to specific sources (auto-selects if omitted)'
+        items: { enum: ['trove', 'prov', 'ga_hap', 'vhd', 'nma', 'museumsvic', 'acmi', 'ala', 'ghap', 'pm'] },
+        description: 'Limit to specific sources (auto-selects if omitted). Note: IIIF excluded (requires manifest URL)'
       },
       types: {
         type: 'array',
@@ -1072,11 +1073,16 @@ function selectSourcesForQuery(query: string, types?: string[]): string[] {
   if (/place|location|town|creek|river/.test(q)) {
     sources.add('ghap');
   }
+  if (/prime minister|speech|transcript|policy|government announcement/.test(q)) {
+    sources.add('pm');
+  }
 
   // Default: search the big 4 for general queries
   if (sources.size === 0) {
     sources.add('trove').add('prov').add('museumsvic').add('nma');
   }
+
+  // Note: IIIF is excluded - it requires a manifest URL, not search
 
   return Array.from(sources);
 }
@@ -1151,9 +1157,38 @@ Agent:
 | User Intent | Tool Path | Why |
 |-------------|-----------|-----|
 | General research query | `search` → `open` → `export` | Federated search handles routing |
-| Specific source needed | `find` → `schema` → `run` | User knows what they want |
-| Bulk data download | `find` → `run("*_harvest")` | Harvest tools for large datasets |
-| Specialised lookup (magazines, contributors) | `find` → `schema` → `run` | Niche Trove tools |
+| Specific source needed | `tools` → `schema` → `run` | User knows what they want |
+| Bulk data download | `tools` → `run("*_harvest")` | Harvest tools for large datasets |
+| Specialised lookup (magazines, contributors) | `tools` → `schema` → `run` | Niche Trove tools |
+| IIIF manifest access | `tools` → `run("iiif_get_manifest")` | Requires manifest URL |
+| Detailed record lookup | `tools` → `run("*_get_*")` | Get full details by ID |
+
+### What search() Covers vs Individual Tools
+
+**search() handles (10 sources):**
+| Source | Content Types | Auto-Selected When Query Contains |
+|--------|---------------|----------------------------------|
+| Trove | newspapers, books, images | "newspaper", "article", "gazette", "photo" |
+| PROV | archives, photos, maps | "photo", "map", "archive", "record" |
+| GA HAP | aerial photos | "aerial", "map", "survey" |
+| VHD | heritage places, shipwrecks | "heritage", "building", "shipwreck" |
+| NMA | museum objects | (default for general queries) |
+| Museums Victoria | specimens, species, objects | "species", "animal", "photo" |
+| ACMI | films, TV, games | "film", "movie", "tv", "game" |
+| ALA | biodiversity occurrences | "species", "animal", "plant" |
+| GHAP | historical placenames | "place", "town", "creek" |
+| PM Transcripts | speeches, media releases | "prime minister", "speech", "transcript" |
+
+**Individual tools still needed for:**
+| Tool Category | Example | Why Not in search() |
+|---------------|---------|---------------------|
+| IIIF tools | `iiif_get_manifest` | Requires manifest URL, not a search |
+| Harvest tools | `trove_harvest`, `prov_harvest` | Bulk download, pagination |
+| Get-by-ID tools | `trove_get_work`, `nma_get_object` | Fetch full record details |
+| Lookup tools | `trove_list_contributors`, `vhd_list_periods` | Reference data, not search |
+| Specialist tools | `trove_newspaper_article`, `ala_match_name` | Specific functions |
+
+**Result:** search() covers ~80% of typical research queries. Individual tools via `tools()` → `run()` handle the remaining 20% (bulk operations, lookups, IIIF).
 
 ### Token Comparison
 
@@ -1182,11 +1217,15 @@ Agent:
 | Tool | Purpose | Frequency |
 |------|---------|-----------|
 | `search` | **Federated search (primary)** | Most queries |
-| `find` | Discover specific tools | Advanced use |
+| `tools` | List/discover available tools | Advanced use |
 | `schema` | Get tool parameters | Advanced use |
 | `run` | Execute specific tool | Advanced use |
 | `open` | Browser preview | After searches |
 | `export` | CSV/JSON/MD/script | End of research |
+
+**Naming rationale:** `tools` (not `find`) avoids confusion with `search`. Clear domains:
+- **Data:** `search`, `open`, `export`
+- **Tool discovery:** `tools`, `schema`, `run`
 
 ### 84+ Discoverable Data Tools (0 initial tokens)
 
@@ -1348,9 +1387,16 @@ When Claude Code loads this MCP server, it sees only 5 tools. Without guidance, 
 
 ```typescript
 {
-  name: 'find',
-  description: 'REQUIRED FIRST STEP: Discover data tools (84+ available). ' +
-    'Returns tool names for use with schema() and run(). ' +
+  name: 'search',
+  description: 'PRIMARY TOOL: Search across all Australian history sources in parallel. ' +
+    'Auto-selects relevant sources based on query. ' +
+    'For specific tools, use tools() → schema() → run() instead.',
+}
+
+{
+  name: 'tools',
+  description: 'List available data tools (84+ available). ' +
+    'Use when you need a specific tool not covered by search(). ' +
     'Sources: PROV, Trove, GHAP, MuseumsVic, ALA, NMA, VHD, ACMI, PM Transcripts, GA HAP, IIIF',
 }
 
@@ -1363,7 +1409,7 @@ When Claude Code loads this MCP server, it sees only 5 tools. Without guidance, 
 {
   name: 'run',
   description: 'Execute a data tool by name. ' +
-    'Use find() to discover tools, schema() to get parameters, then run().',
+    'Use tools() to discover tools, schema() to get parameters, then run().',
 }
 ```
 
@@ -1375,7 +1421,7 @@ When Claude Code loads this MCP server, it sees only 5 tools. Without guidance, 
 This MCP exposes 5 meta-tools that provide access to 84+ data source tools.
 
 ### Workflow
-1. `find(query)` - Discover relevant tools (e.g., find("newspapers") → trove_search)
+1. `tools(query)` - Discover relevant tools (e.g., tools("newspapers") → trove_search)
 2. `schema(tool)` - Get parameters (e.g., schema("trove_search") → {query, category, ...})
 3. `run(tool, args)` - Execute the tool (e.g., run("trove_search", {query: "Melbourne"}))
 4. `open(url)` - Preview results in browser
@@ -1384,7 +1430,7 @@ This MCP exposes 5 meta-tools that provide access to 84+ data source tools.
 ### Quick Reference
 - Data tools are NOT directly callable - use run()
 - Always check schema() before run() for correct parameters
-- find() with no query lists all 84+ tools grouped by source
+- tools() with no query lists all 84+ tools grouped by source
 ```
 
 ### Error Handling for Better UX
@@ -1396,7 +1442,7 @@ Implement helpful errors when Claude makes mistakes:
 if (!TOOL_INDEX.some(t => t.name === args.tool)) {
   return errorResponse(
     `Unknown tool: ${args.tool}. ` +
-    `Use find() to discover available tools, then run(tool, args).`
+    `Use tools() to discover available tools, then run(tool, args).`
   );
 }
 
@@ -1427,11 +1473,11 @@ if (Object.keys(args.args || {}).length === 0) {
 
 | Check | Status |
 |-------|--------|
-| Clear meta-tool names | ✅ find, schema, run, open, export |
+| Clear meta-tool names | ✅ search, tools, schema, run, open, export |
 | Self-documenting descriptions | ✅ (enhanced above) |
 | Workflow guidance in CLAUDE.md | ✅ (added above) |
 | Helpful error messages | ✅ (guides to correct usage) |
-| Keywords for all 69 tools | ✅ (enables accurate find()) |
+| Keywords for all 69 tools | ✅ (enables accurate tools()) |
 
 ---
 
