@@ -6,59 +6,27 @@ import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { ALA_KINGDOMS, AU_STATES_FULL } from '../../../core/enums.js';
 import type { ALAOccurrence, ALAOccurrenceSearchParams } from '../types.js';
 
 export const alaHarvestTool: SourceTool = {
   schema: {
     name: 'ala_harvest',
-    description: 'Bulk download species occurrence records from Atlas of Living Australia with pagination.',
+    description: 'Bulk download species occurrence records.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (taxon name, location, or keyword)',
-        },
-        scientificName: {
-          type: 'string',
-          description: 'Filter by scientific name',
-        },
-        kingdom: {
-          type: 'string',
-          enum: ['Animalia', 'Plantae', 'Fungi', 'Chromista', 'Protozoa', 'Bacteria', 'Archaea', 'Viruses'],
-          description: 'Filter by kingdom',
-        },
-        family: {
-          type: 'string',
-          description: 'Filter by taxonomic family',
-        },
-        stateProvince: {
-          type: 'string',
-          enum: ['New South Wales', 'Victoria', 'Queensland', 'Western Australia', 'South Australia', 'Tasmania', 'Northern Territory', 'Australian Capital Territory'],
-          description: 'Filter by state/territory',
-        },
-        startYear: {
-          type: 'number',
-          description: 'Filter by start year',
-        },
-        endYear: {
-          type: 'number',
-          description: 'Filter by end year',
-        },
-        hasImages: {
-          type: 'boolean',
-          description: 'Only harvest records with images',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        startFrom: {
-          type: 'number',
-          description: 'Offset for pagination',
-          default: 0,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        scientificName: { type: 'string', description: PARAMS.SCIENTIFIC_NAME },
+        kingdom: { type: 'string', description: PARAMS.KINGDOM, enum: ALA_KINGDOMS },
+        family: { type: 'string', description: PARAMS.FAMILY },
+        stateProvince: { type: 'string', description: PARAMS.STATE_FULL, enum: AU_STATES_FULL },
+        startYear: { type: 'number', description: PARAMS.YEAR_FROM },
+        endYear: { type: 'number', description: PARAMS.YEAR_TO },
+        hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startFrom: { type: 'number', description: PARAMS.START_FROM, default: 0 },
       },
       required: [],
     },

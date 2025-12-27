@@ -5,55 +5,26 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { provClient } from '../client.js';
-import { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES, type PROVSearchParams } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES } from '../../../core/enums.js';
+import type { PROVSearchParams } from '../types.js';
 
 export const provSearchTool: SourceTool = {
   schema: {
     name: 'prov_search',
-    description: 'Search PROV for Victorian state archives: photos, maps, records, council minutes.',
+    description: 'Search Victorian state archives: photos, maps, records.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search text',
-        },
-        series: {
-          type: 'string',
-          description: 'VPRS series number',
-        },
-        agency: {
-          type: 'string',
-          description: 'VA agency number',
-        },
-        recordForm: {
-          type: 'string',
-          description: 'Record type filter',
-          enum: PROV_RECORD_FORMS,
-        },
-        category: {
-          type: 'string',
-          description: 'Document category filter (agency, function, series, consignment, item, image)',
-          enum: PROV_DOCUMENT_CATEGORIES,
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Start date (YYYY-MM-DD or YYYY)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'End date (YYYY-MM-DD or YYYY)',
-        },
-        digitisedOnly: {
-          type: 'boolean',
-          description: 'Only return records with digitised images',
-          default: false,
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        series: { type: 'string', description: PARAMS.SERIES },
+        agency: { type: 'string', description: PARAMS.AGENCY },
+        recordForm: { type: 'string', description: PARAMS.RECORD_FORM, enum: PROV_RECORD_FORMS },
+        category: { type: 'string', description: PARAMS.CATEGORY, enum: PROV_DOCUMENT_CATEGORIES },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
+        digitisedOnly: { type: 'boolean', description: PARAMS.DIGITISED_ONLY, default: false },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: [],
     },

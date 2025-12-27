@@ -1,0 +1,87 @@
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "backlog",
+      "args": [
+        "mcp",
+        "start"
+      ]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--browserUrl=http://127.0.0.1:9222"
+      ]
+    },
+    "cloudflare-docs": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx mcp-remote https://docs.mcp.cloudflare.com/mcp --header \"Authorization:Bearer $(kc_get cloudflare-api-token)\""
+      ]
+    },
+    "cloudflare-bindings": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx mcp-remote https://bindings.mcp.cloudflare.com/mcp --header \"Authorization:Bearer $(kc_get cloudflare-api-token)\""
+      ]
+    },
+    "cloudflare-observability": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx mcp-remote https://observability.mcp.cloudflare.com/mcp --header \"Authorization:Bearer $(kc_get cloudflare-api-token)\""
+      ]
+    },
+    "cloudflare-ai-gateway": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx mcp-remote https://ai-gateway.mcp.cloudflare.com/mcp --header \"Authorization:Bearer $(kc_get cloudflare-api-token)\""
+      ]
+    },
+    "cloudflare-builds": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx mcp-remote https://builds.mcp.cloudflare.com/mcp --header \"Authorization:Bearer $(kc_get cloudflare-api-token)\""
+      ]
+    },
+    "jina": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx -y mcp-remote https://mcp.jina.ai/sse --header \"Authorization:Bearer $(kc_get jina-api-key)\""
+      ]
+    },
+    "pal": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && source ~/.config/kc/profiles.sh && load_mcp_secrets australian-history-mcp main && exec /Users/nathanschram/claude-code-tools/mcp/zen/instances/instQ/venv/bin/pal-mcp-server"
+      ],
+      "cwd": "/Users/nathanschram/claude-code-tools/mcp/zen/instances/instQ",
+      "env": {
+        "ZEN_INSTANCE_NAME": "zen-project-q",
+        "ZEN_PORT": "7527",
+        "DEFAULT_MODEL": "gpt-5.2",
+        "ZEN_DISABLED": "0",
+        "ZEN_MAX_OUTPUT_TOKENS": "1024",
+        "ZEN_MAX_INPUT_TOKENS": "12000",
+        "ZEN_MAX_RETRIES": "1",
+        "ZEN_ENABLE_SAFE_CONTINUATION": "1",
+        "ZEN_DAILY_SOFT_BUDGET_USD": "2.50",
+        "ZEN_MINUTES_RATE_LIMIT": "60",
+        "OPENAI_ALLOWED_MODELS": "gpt-5.2",
+        "GOOGLE_ALLOWED_MODELS": "gemini-3-pro-preview",
+        "LOG_LEVEL": "INFO",
+        "DISABLED_TOOLS": "analyze,testgen,secaudit,docgen,tracer",
+        "CONVERSATION_TIMEOUT_HOURS": "24",
+        "MAX_CONVERSATION_TURNS": "40"
+      }
+    }
+  }
+}

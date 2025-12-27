@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const alaGetSpeciesListTool: SourceTool = {
   schema: {
     name: 'ala_get_species_list',
-    description: 'Get detailed species list from the Atlas of Living Australia by ID. Returns the list metadata and all species included in the list.',
+    description: 'Get species list by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'Species list ID (dataResourceUid, e.g., "dr649")',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },

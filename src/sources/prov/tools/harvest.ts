@@ -6,7 +6,9 @@ import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { provClient } from '../client.js';
-import { PROV_RECORD_FORMS, type PROVRecord } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { PROV_RECORD_FORMS } from '../../../core/enums.js';
+import type { PROVRecord } from '../types.js';
 
 export const provHarvestTool: SourceTool = {
   schema: {
@@ -15,46 +17,15 @@ export const provHarvestTool: SourceTool = {
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search text',
-        },
-        series: {
-          type: 'string',
-          description: 'VPRS series number',
-        },
-        agency: {
-          type: 'string',
-          description: 'VA agency number',
-        },
-        recordForm: {
-          type: 'string',
-          description: 'Record type filter',
-          enum: PROV_RECORD_FORMS,
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Start date (YYYY-MM-DD)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'End date (YYYY-MM-DD)',
-        },
-        digitisedOnly: {
-          type: 'boolean',
-          description: 'Only digitised records',
-          default: false,
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        startFrom: {
-          type: 'number',
-          description: 'Offset for pagination',
-          default: 0,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        series: { type: 'string', description: PARAMS.SERIES },
+        agency: { type: 'string', description: PARAMS.AGENCY },
+        recordForm: { type: 'string', description: PARAMS.RECORD_FORM, enum: PROV_RECORD_FORMS },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
+        digitisedOnly: { type: 'boolean', description: PARAMS.DIGITISED_ONLY, default: false },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startFrom: { type: 'number', description: PARAMS.START_FROM, default: 0 },
       },
       required: [],
     },

@@ -9,7 +9,7 @@ import { troveClient } from '../client.js';
 export const troveListMagazineTitlesTool: SourceTool = {
   schema: {
     name: 'trove_list_magazine_titles',
-    description: 'List magazine titles available in Trove. Returns publication metadata including date ranges and ISSN.',
+    description: 'List available magazine titles.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

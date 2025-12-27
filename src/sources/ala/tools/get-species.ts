@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const alaGetSpeciesTool: SourceTool = {
   schema: {
     name: 'ala_get_species',
-    description: 'Get detailed species profile from Atlas of Living Australia by species GUID. Returns taxonomy, common names, images, and conservation status.',
+    description: 'Get species profile by GUID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        guid: {
-          type: 'string',
-          description: 'Species GUID (from search results, e.g., "https://biodiversity.org.au/afd/taxa/...")',
-        },
+        guid: { type: 'string', description: PARAMS.GUID },
       },
       required: ['guid'],
     },

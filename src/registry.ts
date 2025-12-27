@@ -92,6 +92,14 @@ class ToolRegistry {
   }
 
   /**
+   * Get the schema for a specific tool (for dynamic loading)
+   */
+  getToolSchema(name: string): Tool | undefined {
+    const sourceTool = this.tools.get(name);
+    return sourceTool?.schema;
+  }
+
+  /**
    * Get status of all registered sources
    */
   getSourcesStatus(): SourceStatus[] {

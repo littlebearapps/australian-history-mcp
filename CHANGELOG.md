@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2025-12-27
+
+### Added
+- **Dynamic tool loading** - 6 meta-tools instead of 69 (93% token reduction)
+  - `tools` - Discover available data tools by keyword, source, or category
+  - `schema` - Get full input schema for a specific tool
+  - `run` - Execute any data tool with parameter validation
+  - `search` - Federated search across multiple sources in parallel
+  - `open` - Open URLs in the default browser
+  - `export` - Export records to CSV, JSON, Markdown, or download script
+- **Federated search** - Search PROV, Trove, NMA, Museums Victoria, ALA, VHD, ACMI, GHAP, GA HAP in parallel with a single call
+- **Parameter validation** in `run()` meta-tool for required parameters
+- **Date format validation** for Trove dateFrom/dateTo (YYYY, YYYY-MM, YYYY-MM-DD)
+- Shared parameter descriptions (PARAMS) for consistency across tools
+- Tool index with categories and keywords for discovery
+- Source router for federated queries
+
+### Fixed
+- `prov_get_images` HTTP 406 error - Added Accept header for IIIF manifests
+- `ghap_search` returning HTML - Fixed TLCMap API endpoint handling
+- NMA federated search returning empty records - Fixed record mapping in source router
+- Trove empty query validation - Now returns error for missing required params
+
+### Known Issues
+- `acmi_get_creator` returns "Creator not found" for valid IDs - This is an upstream ACMI API issue. Workaround: use `acmi_list_creators()` which returns full creator details.
+
+### Changed
+- Default mode is now `dynamic` (set `MCP_MODE=legacy` for backwards compatibility)
+
 ## [0.6.0] - 2025-12-24
 
 ### Changed
@@ -103,6 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shared base client with retry logic
 - Harvest runner for pagination
 
+[0.7.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.3.0...v0.4.0

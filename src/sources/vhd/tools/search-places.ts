@@ -5,35 +5,20 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { vhdClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const vhdSearchPlacesTool: SourceTool = {
   schema: {
     name: 'vhd_search_places',
-    description: 'Search Victorian Heritage Database for heritage places by name, location, or style. Returns registered heritage places across Victoria.',
+    description: 'Search Victorian heritage places.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (place name, location, or keyword)',
-        },
-        municipality: {
-          type: 'string',
-          description: 'Filter by municipality (e.g., "MELBOURNE CITY", "YARRA CITY")',
-        },
-        architecturalStyle: {
-          type: 'string',
-          description: 'Filter by architectural style (e.g., "Victorian Period (1851-1901)")',
-        },
-        period: {
-          type: 'string',
-          description: 'Filter by period (e.g., "1880 - 1909")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        municipality: { type: 'string', description: PARAMS.MUNICIPALITY },
+        architecturalStyle: { type: 'string', description: PARAMS.ARCH_STYLE },
+        period: { type: 'string', description: PARAMS.PERIOD },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: [],
     },

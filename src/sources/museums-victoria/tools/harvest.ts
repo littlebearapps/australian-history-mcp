@@ -6,56 +6,26 @@ import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { museumsVictoriaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { MV_RECORD_TYPES, MV_CATEGORIES, MV_LICENCES } from '../../../core/enums.js';
 import type { MuseumRecord, MuseumSearchParams } from '../types.js';
 
 export const museumsvicHarvestTool: SourceTool = {
   schema: {
     name: 'museumsvic_harvest',
-    description: 'Bulk download Museums Victoria records with pagination.',
+    description: 'Bulk download museum records.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search terms',
-        },
-        recordType: {
-          type: 'string',
-          enum: ['article', 'item', 'species', 'specimen'],
-          description: 'Type of record to harvest',
-        },
-        category: {
-          type: 'string',
-          enum: ['natural sciences', 'first peoples', 'history & technology'],
-          description: 'Collection category',
-        },
-        hasImages: {
-          type: 'boolean',
-          description: 'Only harvest records with images',
-        },
-        imageLicence: {
-          type: 'string',
-          enum: ['public domain', 'cc by', 'cc by-nc', 'cc by-sa', 'cc by-nc-sa'],
-          description: 'Filter by image licence',
-        },
-        locality: {
-          type: 'string',
-          description: 'Filter by collection locality',
-        },
-        taxon: {
-          type: 'string',
-          description: 'Filter by taxonomic classification',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        startPage: {
-          type: 'number',
-          description: 'Page to start from (for pagination)',
-          default: 1,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        recordType: { type: 'string', description: PARAMS.RECORD_TYPE, enum: MV_RECORD_TYPES },
+        category: { type: 'string', description: PARAMS.CATEGORY, enum: MV_CATEGORIES },
+        hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
+        imageLicence: { type: 'string', description: 'Image licence', enum: MV_LICENCES },
+        locality: { type: 'string', description: 'Collection locality' },
+        taxon: { type: 'string', description: PARAMS.TAXON },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startPage: { type: 'number', description: PARAMS.PAGE, default: 1 },
       },
       required: [],
     },

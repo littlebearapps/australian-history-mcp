@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaGetPartyTool: SourceTool = {
   schema: {
     name: 'nma_get_party',
-    description: 'Get detailed person or organisation record from National Museum of Australia by ID. Returns biographical details, birth/death info, and associated metadata.',
+    description: 'Get person or organisation by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'Party ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },

@@ -7,32 +7,19 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { acmiClient } from '../client.js';
 import type { ACMIWork } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const acmiHarvestTool: SourceTool = {
   schema: {
     name: 'acmi_harvest',
-    description: 'Bulk download ACMI collection works with pagination. Returns films, TV, videogames, and digital art.',
+    description: 'Bulk download collection works.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Optional search query to filter works',
-        },
-        type: {
-          type: 'string',
-          description: 'Optional work type filter (e.g., "Film", "Artwork")',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        startPage: {
-          type: 'number',
-          description: 'Page to start from (1-based)',
-          default: 1,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        type: { type: 'string', description: PARAMS.TYPE },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startPage: { type: 'number', description: PARAMS.START_PAGE, default: 1 },
       },
       required: [],
     },

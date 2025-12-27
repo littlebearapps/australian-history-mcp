@@ -9,7 +9,7 @@ import { ghapClient } from '../client.js';
 export const ghapListLayersTool: SourceTool = {
   schema: {
     name: 'ghap_list_layers',
-    description: 'List all available GHAP/TLCMap data layers. These are community-contributed datasets of historical placenames, journeys, and events.',
+    description: 'List community-contributed TLCMap data layers.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

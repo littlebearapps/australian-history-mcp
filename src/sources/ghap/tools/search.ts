@@ -5,42 +5,23 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { ghapClient } from '../client.js';
-import { GHAP_STATES, type GHAPSearchParams } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { AU_STATES_UPPER } from '../../../core/enums.js';
+import type { GHAPSearchParams } from '../types.js';
 
 export const ghapSearchTool: SourceTool = {
   schema: {
     name: 'ghap_search',
-    description: 'Search the Gazetteer of Historical Australian Placenames (GHAP) for placenames with coordinates. Includes ANPS gazetteer and community-contributed historical datasets.',
+    description: 'Search historical Australian placenames with coordinates.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Placename to search for (partial match)',
-        },
-        fuzzy: {
-          type: 'boolean',
-          description: 'Use fuzzy matching (handles typos)',
-          default: false,
-        },
-        state: {
-          type: 'string',
-          description: 'Filter by Australian state',
-          enum: GHAP_STATES,
-        },
-        lga: {
-          type: 'string',
-          description: 'Filter by Local Government Area (e.g., "BALLARAT CITY")',
-        },
-        bbox: {
-          type: 'string',
-          description: 'Bounding box: minLon,minLat,maxLon,maxLat (e.g., "143,-38,144,-37")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        fuzzy: { type: 'boolean', description: PARAMS.FUZZY, default: false },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_UPPER },
+        lga: { type: 'string', description: PARAMS.LGA },
+        bbox: { type: 'string', description: PARAMS.BBOX },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: ['query'],
     },

@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { vhdClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const vhdGetPlaceTool: SourceTool = {
   schema: {
     name: 'vhd_get_place',
-    description: 'Get detailed heritage place record from Victorian Heritage Database by ID. Returns full history, description, and heritage significance.',
+    description: 'Get heritage place by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'number',
-          description: 'Place ID (from search results)',
-        },
+        id: { type: 'number', description: PARAMS.ID },
       },
       required: ['id'],
     },

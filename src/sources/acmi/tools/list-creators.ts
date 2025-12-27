@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { acmiClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const acmiListCreatorsTool: SourceTool = {
   schema: {
     name: 'acmi_list_creators',
-    description: 'List creators from the ACMI collection. Returns directors, actors, studios, and other contributors associated with films, TV, and videogames.',
+    description: 'List creators (directors, actors, studios).',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        page: {
-          type: 'number',
-          description: 'Page number (1-based, default 1)',
-        },
+        page: { type: 'number', description: PARAMS.PAGE },
       },
       required: [],
     },
@@ -33,13 +31,24 @@ export const acmiListCreatorsTool: SourceTool = {
         totalResults: result.count,
         count: result.results.length,
         page: input.page ?? 1,
-        creators: result.results.map((c) => ({
-          id: c.id,
-          name: c.name,
-          slug: c.slug,
-          wikidataId: c.wikidata_id,
-          worksCount: c.works_count,
-        })),
+        creators: result.results.map((c) => {
+          // Extract Wikidata ID if present
+          const wikidataRef = c.external_references?.find(
+            (ref) => ref.source?.slug === 'wikidata'
+          );
+          const wikidataId = wikidataRef?.source_identifier ?? null;
+
+          return {
+            id: c.id,
+            name: c.name,
+            alsoKnownAs: c.also_known_as || undefined,
+            dateOfBirth: c.date_of_birth,
+            dateOfDeath: c.date_of_death,
+            biography: c.biography || undefined,
+            wikidataId,
+            worksCount: c.roles_in_work?.length ?? 0,
+          };
+        }),
         hasNext: !!result.next,
         hasPrevious: !!result.previous,
       });

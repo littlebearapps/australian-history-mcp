@@ -5,23 +5,17 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaSearchPlacesTool: SourceTool = {
   schema: {
     name: 'nma_search_places',
-    description: 'Search National Museum of Australia for places associated with collection objects. Returns historical locations, sites, and geographic references.',
+    description: 'Search places associated with collection objects.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Place name or location to search for',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: ['query'],
     },

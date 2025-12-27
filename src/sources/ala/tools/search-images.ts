@@ -5,26 +5,18 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const alaSearchImagesTool: SourceTool = {
   schema: {
     name: 'ala_search_images',
-    description: 'Search for images of Australian species from the Atlas of Living Australia. Returns photos and illustrations with licensing information.',
+    description: 'Search species images.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (e.g., "koala", "Eucalyptus", "platypus")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100, default 20)',
-        },
-        offset: {
-          type: 'number',
-          description: 'Number of results to skip for pagination',
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        limit: { type: 'number', description: PARAMS.LIMIT },
+        offset: { type: 'number', description: PARAMS.OFFSET },
       },
       required: ['query'],
     },

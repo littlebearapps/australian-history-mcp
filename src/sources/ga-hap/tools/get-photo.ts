@@ -5,31 +5,19 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { gaHapClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const gaHapGetPhotoTool: SourceTool = {
   schema: {
     name: 'ga_hap_get_photo',
-    description:
-      'Get detailed information about a specific historical aerial photograph by OBJECTID or film/run/frame. Returns full metadata and download URLs.',
+    description: 'Get aerial photo by ID or film/run/frame.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        objectId: {
-          type: 'number',
-          description: 'ArcGIS OBJECTID (from search results)',
-        },
-        filmNumber: {
-          type: 'string',
-          description: 'Film number (e.g., "MAP2080"). Use with run and frame.',
-        },
-        run: {
-          type: 'string',
-          description: 'Run identifier (e.g., "1", "COAST TIE 2"). Use with filmNumber and frame.',
-        },
-        frame: {
-          type: 'string',
-          description: 'Frame identifier (e.g., "80", "5014"). Use with filmNumber and run.',
-        },
+        objectId: { type: 'number', description: PARAMS.OBJECT_ID },
+        filmNumber: { type: 'string', description: PARAMS.FILM_NUMBER },
+        run: { type: 'string', description: PARAMS.RUN },
+        frame: { type: 'string', description: PARAMS.FRAME },
       },
       required: [],
     },

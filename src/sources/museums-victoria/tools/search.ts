@@ -5,60 +5,27 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { museumsVictoriaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { MV_RECORD_TYPES, MV_CATEGORIES, MV_LICENCES } from '../../../core/enums.js';
 import type { MuseumSearchParams, MuseumRecord } from '../types.js';
 
 export const museumsvicSearchTool: SourceTool = {
   schema: {
     name: 'museumsvic_search',
-    description: 'Search Museums Victoria for objects, specimens, species, and articles.',
+    description: 'Search museum objects, specimens, species, and articles.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search terms',
-        },
-        recordType: {
-          type: 'string',
-          enum: ['article', 'item', 'species', 'specimen'],
-          description: 'Type of record to search',
-        },
-        category: {
-          type: 'string',
-          enum: ['natural sciences', 'first peoples', 'history & technology'],
-          description: 'Collection category',
-        },
-        hasImages: {
-          type: 'boolean',
-          description: 'Only return records with images',
-        },
-        onDisplay: {
-          type: 'boolean',
-          description: 'Only return items currently on display',
-        },
-        imageLicence: {
-          type: 'string',
-          enum: ['public domain', 'cc by', 'cc by-nc', 'cc by-sa', 'cc by-nc-sa'],
-          description: 'Filter by image licence',
-        },
-        locality: {
-          type: 'string',
-          description: 'Filter by collection locality',
-        },
-        taxon: {
-          type: 'string',
-          description: 'Filter by taxonomic classification',
-        },
-        random: {
-          type: 'boolean',
-          description: 'Return results in random order (useful for discovering collection)',
-          default: false,
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        recordType: { type: 'string', description: PARAMS.RECORD_TYPE, enum: MV_RECORD_TYPES },
+        category: { type: 'string', description: PARAMS.CATEGORY, enum: MV_CATEGORIES },
+        hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
+        onDisplay: { type: 'boolean', description: PARAMS.ON_DISPLAY },
+        imageLicence: { type: 'string', description: 'Image licence', enum: MV_LICENCES },
+        locality: { type: 'string', description: 'Collection locality' },
+        taxon: { type: 'string', description: PARAMS.TAXON },
+        random: { type: 'boolean', description: PARAMS.RANDOM, default: false },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: [],
     },

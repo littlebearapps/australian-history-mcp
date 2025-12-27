@@ -5,37 +5,22 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { ghapClient } from '../client.js';
-import { GHAP_STATES, type GHAPSearchParams } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { AU_STATES_UPPER } from '../../../core/enums.js';
+import type { GHAPSearchParams } from '../types.js';
 
 export const ghapHarvestTool: SourceTool = {
   schema: {
     name: 'ghap_harvest',
-    description: 'Bulk download GHAP placename records. Use specific filters to target your search as GHAP contains 330,000+ records.',
+    description: 'Bulk download placename records (330,000+ available).',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Placename to search for (partial match)',
-        },
-        state: {
-          type: 'string',
-          description: 'Filter by Australian state',
-          enum: GHAP_STATES,
-        },
-        lga: {
-          type: 'string',
-          description: 'Filter by Local Government Area',
-        },
-        bbox: {
-          type: 'string',
-          description: 'Bounding box: minLon,minLat,maxLon,maxLat',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-500)',
-          default: 100,
-        },
+        query: { type: 'string', description: PARAMS.QUERY_OPTIONAL },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_UPPER },
+        lga: { type: 'string', description: PARAMS.LGA },
+        bbox: { type: 'string', description: PARAMS.BBOX },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
       },
       required: [],
     },

@@ -5,26 +5,18 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const alaListSpeciesListsTool: SourceTool = {
   schema: {
     name: 'ala_list_species_lists',
-    description: 'List species lists from the Atlas of Living Australia. These are curated lists of species for conservation, invasive species, threatened species, and other purposes.',
+    description: 'List curated species lists.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        listType: {
-          type: 'string',
-          description: 'Filter by list type (e.g., "CONSERVATION_LIST", "SENSITIVE_LIST", "INVASIVE")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100, default 20)',
-        },
-        offset: {
-          type: 'number',
-          description: 'Number of results to skip for pagination',
-        },
+        listType: { type: 'string', description: 'List type filter' },
+        limit: { type: 'number', description: PARAMS.LIMIT },
+        offset: { type: 'number', description: PARAMS.OFFSET },
       },
       required: [],
     },

@@ -9,7 +9,7 @@ import { vhdClient } from '../client.js';
 export const vhdListPeriodsTool: SourceTool = {
   schema: {
     name: 'vhd_list_periods',
-    description: 'List all time periods used to classify Victorian heritage places. Use period IDs when searching for places from specific eras.',
+    description: 'List heritage time periods.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

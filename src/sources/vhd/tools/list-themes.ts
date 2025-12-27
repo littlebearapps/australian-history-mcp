@@ -9,7 +9,7 @@ import { vhdClient } from '../client.js';
 export const vhdListThemesTool: SourceTool = {
   schema: {
     name: 'vhd_list_themes',
-    description: 'List all heritage themes used to categorise Victorian heritage places. Themes include topics like "Gold", "Pastoral", "Maritime", "Education", etc.',
+    description: 'List heritage themes.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

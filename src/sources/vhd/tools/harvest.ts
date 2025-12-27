@@ -7,40 +7,21 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { vhdClient } from '../client.js';
 import type { VHDPlace } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const vhdHarvestTool: SourceTool = {
   schema: {
     name: 'vhd_harvest',
-    description: 'Bulk download Victorian heritage place records with pagination.',
+    description: 'Bulk download heritage place records.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (place name, location, or keyword)',
-        },
-        municipality: {
-          type: 'string',
-          description: 'Filter by municipality',
-        },
-        architecturalStyle: {
-          type: 'string',
-          description: 'Filter by architectural style',
-        },
-        period: {
-          type: 'string',
-          description: 'Filter by period',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        startPage: {
-          type: 'number',
-          description: 'Page to start from (1-based)',
-          default: 1,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        municipality: { type: 'string', description: PARAMS.MUNICIPALITY },
+        architecturalStyle: { type: 'string', description: PARAMS.ARCH_STYLE },
+        period: { type: 'string', description: PARAMS.PERIOD },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startPage: { type: 'number', description: PARAMS.START_PAGE, default: 1 },
       },
       required: [],
     },

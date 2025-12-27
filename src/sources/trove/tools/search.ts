@@ -5,118 +5,39 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
-import { TROVE_CATEGORIES, TROVE_STATES, type TroveSearchParams } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { TROVE_CATEGORIES, AU_STATES_WITH_NATIONAL, SORT_ORDERS_DATE, TROVE_AVAILABILITY, ILLUSTRATION_TYPES } from '../../../core/enums.js';
+import type { TroveSearchParams } from '../types.js';
 
 export const troveSearchTool: SourceTool = {
   schema: {
     name: 'trove_search',
-    description: 'Search Trove for Australian newspapers, gazettes, images, books, and magazines. Supports sorting, advanced filters, search indexes, and holdings retrieval.',
+    description: 'Search Australian newspapers, gazettes, images, books.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search terms',
-        },
-        category: {
-          type: 'string',
-          description: 'Content category to search',
-          enum: TROVE_CATEGORIES,
-          default: 'all',
-        },
-        state: {
-          type: 'string',
-          description: 'Filter by Australian state (for newspapers)',
-          enum: TROVE_STATES,
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Start date (YYYY or YYYY-MM-DD)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'End date (YYYY or YYYY-MM-DD)',
-        },
-        format: {
-          type: 'string',
-          description: 'Format filter',
-        },
-        includeFullText: {
-          type: 'boolean',
-          description: 'Include full article text (newspapers only)',
-          default: false,
-        },
-        nuc: {
-          type: 'string',
-          description: 'NUC code to filter by contributor/partner. Common codes: VSL (State Library Victoria), SLNSW (State Library NSW), ANL (National Library), QSL (State Library Queensland)',
-        },
-        illustrationType: {
-          type: 'string',
-          description: 'Filter by illustration type (for newspapers/magazines). Options: Illustrated, Not Illustrated',
-          enum: ['Illustrated', 'Not Illustrated'],
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results (1-100)',
-          default: 20,
-        },
-        // NEW: Sorting
-        sortby: {
-          type: 'string',
-          enum: ['relevance', 'datedesc', 'dateasc'],
-          default: 'relevance',
-          description: 'Sort order: relevance (default), datedesc (newest first), dateasc (oldest first)',
-        },
-        // NEW: Advanced filters
-        decade: {
-          type: 'string',
-          description: 'Filter by decade (e.g., "199" for 1990s, "188" for 1880s)',
-        },
-        language: {
-          type: 'string',
-          description: 'Language filter (e.g., "english", "french")',
-        },
-        availability: {
-          type: 'string',
-          enum: ['online', 'free', 'restricted', 'subscription'],
-          description: 'Online availability: online (any), free, restricted, subscription',
-        },
-        australian: {
-          type: 'boolean',
-          description: 'Filter to Australian content only',
-        },
-        firstAustralians: {
-          type: 'boolean',
-          description: 'Filter to First Nations content',
-        },
-        // NEW: Search indexes
-        creator: {
-          type: 'string',
-          description: 'Search by author/creator name',
-        },
-        subject: {
-          type: 'string',
-          description: 'Search by subject term',
-        },
-        isbn: {
-          type: 'string',
-          description: 'Search by ISBN',
-        },
-        issn: {
-          type: 'string',
-          description: 'Search by ISSN',
-        },
-        // NEW: Include options
-        includeHoldings: {
-          type: 'boolean',
-          default: false,
-          description: 'Include library holdings (NUC codes, call numbers) in results',
-        },
-        includeLinks: {
-          type: 'boolean',
-          default: false,
-          description: 'Include external links in results',
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        category: { type: 'string', description: PARAMS.CATEGORY, enum: TROVE_CATEGORIES, default: 'all' },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_WITH_NATIONAL },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
+        format: { type: 'string', description: PARAMS.FORMAT },
+        includeFullText: { type: 'boolean', description: PARAMS.INCLUDE_FULL_TEXT, default: false },
+        nuc: { type: 'string', description: PARAMS.NUC },
+        illustrationType: { type: 'string', description: PARAMS.ILLUSTRATION_TYPE, enum: ILLUSTRATION_TYPES },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        sortby: { type: 'string', description: PARAMS.SORT_BY, enum: SORT_ORDERS_DATE, default: 'relevance' },
+        decade: { type: 'string', description: PARAMS.DECADE },
+        language: { type: 'string', description: PARAMS.LANGUAGE },
+        availability: { type: 'string', description: PARAMS.AVAILABILITY, enum: TROVE_AVAILABILITY },
+        australian: { type: 'boolean', description: PARAMS.AUSTRALIAN },
+        firstAustralians: { type: 'boolean', description: PARAMS.FIRST_NATIONS },
+        creator: { type: 'string', description: PARAMS.CREATOR },
+        subject: { type: 'string', description: PARAMS.SUBJECT },
+        isbn: { type: 'string', description: PARAMS.ISBN },
+        issn: { type: 'string', description: PARAMS.ISSN },
+        includeHoldings: { type: 'boolean', description: PARAMS.INCLUDE_HOLDINGS, default: false },
+        includeLinks: { type: 'boolean', description: PARAMS.INCLUDE_LINKS, default: false },
       },
       required: ['query'],
     },
@@ -151,6 +72,19 @@ export const troveSearchTool: SourceTool = {
 
     if (!troveClient.hasApiKey()) {
       return errorResponse('TROVE_API_KEY not configured. See CLAUDE.md for setup instructions.');
+    }
+
+    // Validate date formats (YYYY, YYYY-MM, or YYYY-MM-DD)
+    const dateRegex = /^\d{4}(-\d{2}(-\d{2})?)?$/;
+    if (input.dateFrom && !dateRegex.test(input.dateFrom)) {
+      return errorResponse(
+        `Invalid dateFrom format: "${input.dateFrom}". Use YYYY, YYYY-MM, or YYYY-MM-DD (e.g., 1920, 1920-03, 1920-03-15).`
+      );
+    }
+    if (input.dateTo && !dateRegex.test(input.dateTo)) {
+      return errorResponse(
+        `Invalid dateTo format: "${input.dateTo}". Use YYYY, YYYY-MM, or YYYY-MM-DD (e.g., 1920, 1920-03, 1920-03-15).`
+      );
     }
 
     try {

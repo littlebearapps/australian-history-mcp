@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { acmiClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const acmiGetConstellationTool: SourceTool = {
   schema: {
     name: 'acmi_get_constellation',
-    description: 'Get detailed constellation (curated collection) from ACMI by ID. Returns theme description and work count.',
+    description: 'Get constellation by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'number',
-          description: 'Constellation ID (from list results)',
-        },
+        id: { type: 'number', description: PARAMS.ID },
       },
       required: ['id'],
     },

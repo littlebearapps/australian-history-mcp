@@ -5,6 +5,7 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { museumsVictoriaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 /**
  * Get an article by ID
@@ -12,14 +13,11 @@ import { museumsVictoriaClient } from '../client.js';
 export const museumsvicGetArticleTool: SourceTool = {
   schema: {
     name: 'museumsvic_get_article',
-    description: 'Get an educational article by ID.',
+    description: 'Get educational article by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'The article ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },
@@ -66,14 +64,11 @@ export const museumsvicGetArticleTool: SourceTool = {
 export const museumsvicGetItemTool: SourceTool = {
   schema: {
     name: 'museumsvic_get_item',
-    description: 'Get a museum object (photograph, artefact, technology) by ID.',
+    description: 'Get museum object by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'The item ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },
@@ -128,14 +123,11 @@ export const museumsvicGetItemTool: SourceTool = {
 export const museumsvicGetSpeciesTool: SourceTool = {
   schema: {
     name: 'museumsvic_get_species',
-    description: 'Get species info (taxonomy, biology, habitat, distribution) by ID.',
+    description: 'Get species info by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'The species ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },
@@ -186,14 +178,11 @@ export const museumsvicGetSpeciesTool: SourceTool = {
 export const museumsvicGetSpecimenTool: SourceTool = {
   schema: {
     name: 'museumsvic_get_specimen',
-    description: 'Get a natural science specimen with taxonomy and collection info.',
+    description: 'Get natural science specimen by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'The specimen ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },

@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const alaMatchNameTool: SourceTool = {
   schema: {
     name: 'ala_match_name',
-    description: 'Match a scientific name to the ALA taxonomic backbone. Resolves synonyms, finds accepted names, and returns full taxonomic classification. Useful for standardising species names.',
+    description: 'Match scientific name to ALA taxonomy.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        scientificName: {
-          type: 'string',
-          description: 'Scientific name to match (e.g., "Phascolarctos cinereus", "Eucalyptus globulus")',
-        },
+        scientificName: { type: 'string', description: PARAMS.SCIENTIFIC_NAME },
       },
       required: ['scientificName'],
     },

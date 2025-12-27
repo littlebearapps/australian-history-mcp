@@ -1,0 +1,65 @@
+{
+  "mcpServers": {
+    "apify": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && export APIFY_TOKEN=$(kc_get apify-api-token) && exec npx -y @apify/actors-mcp-server@latest --tools actors,docs,storage,runs,apify/rag-web-browser --telemetry-enabled=false"
+      ]
+    },
+    "backlog": {
+      "command": "backlog",
+      "args": [
+        "mcp",
+        "start"
+      ]
+    },
+    "brave-search": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && export BRAVE_API_KEY=$(kc_get BRAVE_API_KEY) && npx -y @brave/brave-search-mcp-server --transport stdio"
+      ]
+    },
+    "jina": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && npx -y mcp-remote https://mcp.jina.ai/sse --header \"Authorization:Bearer $(kc_get jina-api-key)\""
+      ]
+    },
+    "pal": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && source ~/.config/kc/profiles.sh && load_mcp_secrets australian-history-mcp main && exec /Users/nathanschram/claude-code-tools/mcp/zen/instances/instQ/venv/bin/pal-mcp-server"
+      ],
+      "cwd": "/Users/nathanschram/claude-code-tools/mcp/zen/instances/instQ",
+      "env": {
+        "ZEN_INSTANCE_NAME": "zen-project-q",
+        "ZEN_PORT": "7527",
+        "DEFAULT_MODEL": "gpt-5.2",
+        "ZEN_DISABLED": "0",
+        "ZEN_MAX_OUTPUT_TOKENS": "1024",
+        "ZEN_MAX_INPUT_TOKENS": "12000",
+        "ZEN_MAX_RETRIES": "1",
+        "ZEN_ENABLE_SAFE_CONTINUATION": "1",
+        "ZEN_DAILY_SOFT_BUDGET_USD": "2.50",
+        "ZEN_MINUTES_RATE_LIMIT": "60",
+        "OPENAI_ALLOWED_MODELS": "gpt-5.2",
+        "GOOGLE_ALLOWED_MODELS": "gemini-3-pro-preview",
+        "LOG_LEVEL": "INFO",
+        "DISABLED_TOOLS": "analyze,testgen,secaudit,docgen,tracer",
+        "CONVERSATION_TIMEOUT_HOURS": "24",
+        "MAX_CONVERSATION_TURNS": "40"
+      }
+    },
+    "australian-history": {
+      "command": "bash",
+      "args": [
+        "-c",
+        "source ~/bin/kc.sh && export TROVE_API_KEY=$(kc_get trove-api-key 2>/dev/null || echo '') && exec node /Users/nathanschram/claude-code-tools/lba/apps/mcp-servers/australian-history-mcp/dist/index.js"
+      ]
+    }
+  }
+}

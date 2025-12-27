@@ -133,7 +133,8 @@ export class PROVClient extends BaseClient {
     pages?: number[];
     pageRange?: string;
   }): Promise<PROVImagesResult> {
-    const manifest = await this.fetchJSON<any>(manifestUrl);
+    // PROV IIIF manifests reject Accept: application/json header (HTTP 406)
+    const manifest = await this.fetchJSON<any>(manifestUrl, { skipAcceptHeader: true });
 
     const title = this.extractManifestTitle(manifest);
     const description = this.extractManifestDescription(manifest);

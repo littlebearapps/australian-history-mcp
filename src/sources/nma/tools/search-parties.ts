@@ -5,26 +5,18 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaSearchPartiesTool: SourceTool = {
   schema: {
     name: 'nma_search_parties',
-    description: 'Search National Museum of Australia for people and organisations (parties) associated with collection objects. Returns artists, makers, donors, historical figures, and organisations.',
+    description: 'Search people and organisations.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (e.g., "Harold Cazneaux", "Aboriginal", "photographer")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100, default 20)',
-        },
-        offset: {
-          type: 'number',
-          description: 'Number of results to skip for pagination',
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        limit: { type: 'number', description: PARAMS.LIMIT },
+        offset: { type: 'number', description: PARAMS.OFFSET },
       },
       required: ['query'],
     },

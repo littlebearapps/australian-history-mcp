@@ -5,66 +5,29 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { ALA_KINGDOMS, AU_STATES_FULL } from '../../../core/enums.js';
 import type { ALAOccurrenceSearchParams, ALAOccurrence } from '../types.js';
 
 export const alaSearchOccurrencesTool: SourceTool = {
   schema: {
     name: 'ala_search_occurrences',
-    description: 'Search Atlas of Living Australia for species occurrence records. Returns sightings, specimens, and observations across Australia.',
+    description: 'Search species occurrences (sightings, specimens, observations).',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (taxon name, location, or keyword)',
-        },
-        scientificName: {
-          type: 'string',
-          description: 'Filter by scientific name',
-        },
-        vernacularName: {
-          type: 'string',
-          description: 'Filter by common name',
-        },
-        kingdom: {
-          type: 'string',
-          enum: ['Animalia', 'Plantae', 'Fungi', 'Chromista', 'Protozoa', 'Bacteria', 'Archaea', 'Viruses'],
-          description: 'Filter by kingdom',
-        },
-        family: {
-          type: 'string',
-          description: 'Filter by taxonomic family',
-        },
-        genus: {
-          type: 'string',
-          description: 'Filter by genus',
-        },
-        stateProvince: {
-          type: 'string',
-          enum: ['New South Wales', 'Victoria', 'Queensland', 'Western Australia', 'South Australia', 'Tasmania', 'Northern Territory', 'Australian Capital Territory'],
-          description: 'Filter by state/territory',
-        },
-        startYear: {
-          type: 'number',
-          description: 'Filter by start year (e.g., 2020)',
-        },
-        endYear: {
-          type: 'number',
-          description: 'Filter by end year (e.g., 2024)',
-        },
-        hasImages: {
-          type: 'boolean',
-          description: 'Only return records with images',
-        },
-        spatiallyValid: {
-          type: 'boolean',
-          description: 'Only return records with valid coordinates',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        scientificName: { type: 'string', description: PARAMS.SCIENTIFIC_NAME },
+        vernacularName: { type: 'string', description: PARAMS.VERNACULAR_NAME },
+        kingdom: { type: 'string', description: PARAMS.KINGDOM, enum: ALA_KINGDOMS },
+        family: { type: 'string', description: PARAMS.FAMILY },
+        genus: { type: 'string', description: PARAMS.GENUS },
+        stateProvince: { type: 'string', description: PARAMS.STATE_FULL, enum: AU_STATES_FULL },
+        startYear: { type: 'number', description: PARAMS.YEAR_FROM },
+        endYear: { type: 'number', description: PARAMS.YEAR_TO },
+        hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
+        spatiallyValid: { type: 'boolean', description: PARAMS.SPATIALLY_VALID },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: [],
     },

@@ -5,25 +5,19 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { REC_LEVELS } from '../../../core/enums.js';
 import type { TroveRecLevel } from '../types.js';
 
 export const troveListContributorsTool: SourceTool = {
   schema: {
     name: 'trove_list_contributors',
-    description: 'List or search Trove contributors (1500+ libraries, archives, and institutions). Returns NUC codes, names, and contact details.',
+    description: 'List/search 1500+ contributing libraries.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Optional search query to filter contributors by name (e.g., "university", "state library")',
-        },
-        reclevel: {
-          type: 'string',
-          enum: ['brief', 'full'],
-          default: 'brief',
-          description: 'Record detail level: "brief" for basic info, "full" for extended details',
-        },
+        query: { type: 'string', description: PARAMS.QUERY_OPTIONAL },
+        reclevel: { type: 'string', description: PARAMS.RECLEVEL, enum: REC_LEVELS, default: 'brief' },
       },
       required: [],
     },

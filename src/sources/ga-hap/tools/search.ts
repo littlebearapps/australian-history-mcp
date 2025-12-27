@@ -5,52 +5,24 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { gaHapClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { AU_STATES } from '../../../core/enums.js';
 
 export const gaHapSearchTool: SourceTool = {
   schema: {
     name: 'ga_hap_search',
-    description:
-      'Search Geoscience Australia Historical Aerial Photography (1928-1996). Returns photo records with preview and download URLs. CC-BY 4.0 licensed.',
+    description: 'Search historical aerial photos (1928-1996).',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        state: {
-          type: 'string',
-          description: 'Australian state (NSW, VIC, QLD, SA, WA, TAS, NT, ACT)',
-          enum: ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'],
-        },
-        yearFrom: {
-          type: 'number',
-          description: 'Filter by start year (e.g., 1950)',
-        },
-        yearTo: {
-          type: 'number',
-          description: 'Filter by end year (e.g., 1970)',
-        },
-        scannedOnly: {
-          type: 'boolean',
-          description: 'Only return records with digitised images (default: false)',
-          default: false,
-        },
-        filmNumber: {
-          type: 'string',
-          description: 'Filter by film number (e.g., "MAP2080")',
-        },
-        bbox: {
-          type: 'string',
-          description:
-            'Bounding box filter: minLon,minLat,maxLon,maxLat in WGS84 (e.g., "144.9,-37.9,145.0,-37.8")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100, default 20)',
-          default: 20,
-        },
-        offset: {
-          type: 'number',
-          description: 'Number of results to skip for pagination (default 0)',
-          default: 0,
-        },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES },
+        yearFrom: { type: 'number', description: PARAMS.YEAR_FROM },
+        yearTo: { type: 'number', description: PARAMS.YEAR_TO },
+        scannedOnly: { type: 'boolean', description: PARAMS.SCANNED_ONLY, default: false },
+        filmNumber: { type: 'string', description: PARAMS.FILM_NUMBER },
+        bbox: { type: 'string', description: PARAMS.BBOX },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        offset: { type: 'number', description: PARAMS.OFFSET, default: 0 },
       },
       required: [],
     },

@@ -8,27 +8,19 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { provClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { IMAGE_SIZES } from '../../../core/enums.js';
 
 export const provGetImagesTool: SourceTool = {
   schema: {
     name: 'prov_get_images',
-    description: 'Extract image URLs from a PROV digitised record via IIIF manifest.',
+    description: 'Extract image URLs from PROV IIIF manifest.',
     inputSchema: {
       type: 'object',
       properties: {
-        manifestUrl: {
-          type: 'string',
-          description: 'IIIF manifest URL from search result',
-        },
-        pages: {
-          type: 'string',
-          description: 'Page filter (e.g., "1-5", "1,3,7")',
-        },
-        size: {
-          type: 'string',
-          enum: ['thumbnail', 'medium', 'full', 'all'],
-          description: 'Which size URLs to return. Default: "all"',
-        },
+        manifestUrl: { type: 'string', description: PARAMS.MANIFEST_URL },
+        pages: { type: 'string', description: PARAMS.PAGES },
+        size: { type: 'string', description: PARAMS.IMAGE_SIZE, enum: IMAGE_SIZES },
       },
       required: ['manifestUrl'],
     },

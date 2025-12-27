@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { ghapClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const ghapGetLayerTool: SourceTool = {
   schema: {
     name: 'ghap_get_layer',
-    description: 'Get all places from a specific GHAP/TLCMap data layer by ID. Use ghap_list_layers to find available layers.',
+    description: 'Get all places from a TLCMap data layer.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        layerId: {
-          type: 'number',
-          description: 'Layer ID (from ghap_list_layers results)',
-        },
+        layerId: { type: 'number', description: PARAMS.LAYER_ID },
       },
       required: ['layerId'],
     },
