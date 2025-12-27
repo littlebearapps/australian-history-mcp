@@ -24,13 +24,14 @@ That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](
 
 ## How It Works
 
-This server uses **dynamic tool loading** - instead of exposing all 69 data tools upfront, it presents just 5 meta-tools:
+This server uses **dynamic tool loading** - instead of exposing all 69 data tools upfront, it presents just 6 meta-tools:
 
 | Meta-Tool | Purpose |
 |-----------|---------|
 | `tools` | Discover available data tools by keyword, source, or category |
 | `schema` | Get full parameters for a specific tool |
 | `run` | Execute any data tool by name |
+| `search` | Search across multiple sources at once |
 | `open` | Open URLs in your browser |
 | `export` | Export results to CSV, JSON, or Markdown |
 
@@ -637,7 +638,7 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 <details>
 <summary><strong>7. What's the difference between dynamic and legacy mode?</strong></summary>
 
-**Dynamic mode** (default) exposes 5 meta-tools (`tools`, `schema`, `run`, `open`, `export`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
+**Dynamic mode** (default) exposes 6 meta-tools (`tools`, `schema`, `run`, `search`, `open`, `export`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
 
 **Legacy mode** exposes all 69 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
 
