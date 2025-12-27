@@ -39,6 +39,10 @@ This server uses **dynamic tool loading** - instead of exposing all 69 data tool
 
 > 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 69 tools directly.
 
+### Demo
+
+![Demo showing tool discovery, federated search, and browser view](demos/output/combined.gif)
+
 ## What You Can Ask
 
 Instead of navigating 11 different archive websites, just ask your AI:
