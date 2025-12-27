@@ -5,43 +5,22 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { gaHapClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { AU_STATES } from '../../../core/enums.js';
 
 export const gaHapHarvestTool: SourceTool = {
   schema: {
     name: 'ga_hap_harvest',
-    description:
-      'Bulk download Geoscience Australia historical aerial photography records with pagination. Returns photo metadata with download URLs.',
+    description: 'Bulk download aerial photo records.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        state: {
-          type: 'string',
-          description: 'Australian state (NSW, VIC, QLD, SA, WA, TAS, NT, ACT)',
-          enum: ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'],
-        },
-        yearFrom: {
-          type: 'number',
-          description: 'Filter by start year (e.g., 1950)',
-        },
-        yearTo: {
-          type: 'number',
-          description: 'Filter by end year (e.g., 1970)',
-        },
-        scannedOnly: {
-          type: 'boolean',
-          description: 'Only return records with digitised images (default: false)',
-          default: false,
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000, default 100)',
-          default: 100,
-        },
-        startFrom: {
-          type: 'number',
-          description: 'Offset for pagination (default 0)',
-          default: 0,
-        },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES },
+        yearFrom: { type: 'number', description: PARAMS.YEAR_FROM },
+        yearTo: { type: 'number', description: PARAMS.YEAR_TO },
+        scannedOnly: { type: 'boolean', description: PARAMS.SCANNED_ONLY, default: false },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startFrom: { type: 'number', description: PARAMS.START_FROM, default: 0 },
       },
       required: [],
     },

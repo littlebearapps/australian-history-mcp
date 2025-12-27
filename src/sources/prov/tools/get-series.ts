@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { provClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const provGetSeriesTool: SourceTool = {
   schema: {
     name: 'prov_get_series',
-    description: 'Get detailed information about a PROV series (VPRS) including description, agency, date range, and access status.',
+    description: 'Get PROV series details by VPRS number.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        seriesId: {
-          type: 'string',
-          description: 'Series ID (e.g., "VPRS 515" or "515")',
-        },
+        seriesId: { type: 'string', description: PARAMS.SERIES },
       },
       required: ['seriesId'],
     },

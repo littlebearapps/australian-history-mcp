@@ -130,16 +130,38 @@ export interface ACMIWork {
 // Creator Types
 // ============================================================================
 
+export interface ACMIRoleInWork {
+  id: number;
+  title: string;
+  work_id: number;
+  role: string;
+  role_id: number;
+  is_primary: boolean;
+}
+
 export interface ACMICreator {
   id: number;
   name: string;
-  slug: string;
-  wikidata_id: string | null;
-  biography: string | null;
-  works_count: number;
-  _meta?: {
-    modified?: string;
-  };
+  also_known_as: string;
+  date_of_birth: string | null;
+  date_of_death: string | null;
+  genders: string[];
+  languages: string[];
+  places_of_operation: string[];
+  biography: string;
+  biography_author: string | null;
+  date_of_biography: string | null;
+  external_links: string[];
+  uuid: string;
+  source: { name: string; slug: string };
+  source_identifier: string;
+  external_references: Array<{
+    id: number;
+    source: { name: string; slug: string };
+    source_identifier: string;
+  }>;
+  roles_in_work: ACMIRoleInWork[];
+  date_modified: string;
 }
 
 // ============================================================================

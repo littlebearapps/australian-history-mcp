@@ -5,30 +5,19 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+
 export const troveGetMagazineTitleTool: SourceTool = {
   schema: {
     name: 'trove_get_magazine_title',
-    description: 'Get detailed information about a Trove magazine title by ID, including available years and issues.',
+    description: 'Get magazine title details with years/issues.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        titleId: {
-          type: 'string',
-          description: 'The magazine title ID from trove_list_magazine_titles',
-        },
-        includeYears: {
-          type: 'boolean',
-          default: true,
-          description: 'Include list of available years with issue counts',
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Start date for issue list (YYYYMMDD format)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'End date for issue list (YYYYMMDD format)',
-        },
+        titleId: { type: 'string', description: PARAMS.ID },
+        includeYears: { type: 'boolean', description: PARAMS.INCLUDE_YEARS, default: true },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
       },
       required: ['titleId'],
     },

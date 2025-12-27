@@ -8,35 +8,18 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { iiifClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const iiifGetManifestTool: SourceTool = {
   schema: {
     name: 'iiif_get_manifest',
-    description: `Fetch and parse an IIIF manifest from any IIIF-compliant institution.
-
-Common manifest URL patterns:
-- SLV: https://rosetta.slv.vic.gov.au/delivery/iiif/presentation/2.1/{IE_ID}/manifest
-- NLA: https://nla.gov.au/nla.obj-{ID}/manifest
-- Bodleian: https://iiif.bodleian.ox.ac.uk/iiif/manifest/{ID}.json
-
-Returns structured data including label, description, attribution, and canvas/image details.`,
+    description: 'Fetch and parse IIIF manifest from any institution.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        manifestUrl: {
-          type: 'string',
-          description: 'Full URL to the IIIF manifest (e.g., https://rosetta.slv.vic.gov.au/delivery/iiif/presentation/2.1/IE145082/manifest)',
-        },
-        includeCanvases: {
-          type: 'boolean',
-          description: 'Include detailed canvas/image information (default: true)',
-          default: true,
-        },
-        maxCanvases: {
-          type: 'number',
-          description: 'Maximum number of canvases to include in response (default: 50)',
-          default: 50,
-        },
+        manifestUrl: { type: 'string', description: PARAMS.MANIFEST_URL },
+        includeCanvases: { type: 'boolean', description: PARAMS.INCLUDE_CANVASES, default: true },
+        maxCanvases: { type: 'number', description: PARAMS.MAX_CANVASES, default: 50 },
       },
       required: ['manifestUrl'],
     },

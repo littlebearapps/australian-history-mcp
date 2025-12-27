@@ -54,12 +54,10 @@ export class GHAPClient extends BaseClient {
       queryParams.bbox = params.bbox;
     }
 
-    // Also search community datasets if no specific gazetteer chosen
-    if (params.containsname || params.fuzzyname || params.name) {
-      queryParams.searchpublicdatasets = 'on';
-    }
+    // Note: searchpublicdatasets=on causes max paging redirect errors on TLCMap
+    // The Australian National Gazetteer (searchausgaz=on) is sufficient for most queries
 
-    const url = this.buildUrl('/', queryParams);
+    const url = this.buildUrl('/places', queryParams);
     const data = await this.fetchJSON<GeoJSONFeatureCollection>(url);
 
     return this.parseSearchResponse(data);

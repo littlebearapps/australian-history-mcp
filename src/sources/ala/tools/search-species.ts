@@ -5,24 +5,18 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 import type { ALASpeciesSearchParams } from '../types.js';
 
 export const alaSearchSpeciesTool: SourceTool = {
   schema: {
     name: 'ala_search_species',
-    description: 'Search Atlas of Living Australia for species by scientific or common name. Returns species taxonomy and occurrence counts.',
+    description: 'Search species by scientific or common name.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Species name to search for (scientific or common name)',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: ['query'],
     },

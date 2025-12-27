@@ -5,31 +5,19 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaSearchObjectsTool: SourceTool = {
   schema: {
     name: 'nma_search_objects',
-    description: 'Search National Museum of Australia collection for objects by keyword. Returns museum artefacts, photographs, technology, and historical items.',
+    description: 'Search museum collection objects.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (e.g., "boomerang", "gold rush", "convict")',
-        },
-        type: {
-          type: 'string',
-          description: 'Object type filter (e.g., "Photographs", "Boomerangs")',
-        },
-        collection: {
-          type: 'string',
-          description: 'Collection name filter',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        type: { type: 'string', description: PARAMS.TYPE },
+        collection: { type: 'string', description: PARAMS.COLLECTION },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: ['query'],
     },

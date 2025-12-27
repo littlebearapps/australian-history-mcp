@@ -9,49 +9,21 @@ import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { pmTranscriptsClient } from '../client.js';
 import type { PMTranscript } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const pmTranscriptsHarvestTool: SourceTool = {
   schema: {
     name: 'pm_transcripts_harvest',
-    description:
-      'Bulk download Prime Ministerial transcripts. Fetches sequentially by ID with optional filters. ' +
-      'When filtering by PM name, uses sitemap for faster lookups. ' +
-      'PM era approximate ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, ' +
-      'Keating ~8000-10000, Howard ~10000-18000, Rudd/Gillard ~18000-22000, Abbott+ ~22000+.',
+    description: 'Bulk download PM transcripts with filters.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        primeMinister: {
-          type: 'string',
-          description: 'Filter by PM name (partial match, e.g., "Hawke", "Keating")',
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Filter from date (YYYY-MM-DD)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'Filter to date (YYYY-MM-DD)',
-        },
-        startFrom: {
-          type: 'number',
-          description:
-            'Starting transcript ID (default: 1). For faster PM filtering, use approximate era: ' +
-            'Hawke ~5000, Keating ~8000, Howard ~10000, Rudd ~18000, Abbott ~22000',
-          default: 1,
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-500, default: 100)',
-          default: 100,
-        },
-        useSitemap: {
-          type: 'boolean',
-          description:
-            'Use sitemap for faster PM-filtered harvesting (default: true when primeMinister filter used). ' +
-            'Sitemap fetches all ~26,000 transcript IDs at once, then filters locally.',
-          default: true,
-        },
+        primeMinister: { type: 'string', description: PARAMS.PRIME_MINISTER },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
+        startFrom: { type: 'number', description: PARAMS.START_FROM, default: 1 },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        useSitemap: { type: 'boolean', description: PARAMS.USE_SITEMAP, default: true },
       },
       required: [],
     },

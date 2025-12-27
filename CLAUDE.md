@@ -1,8 +1,8 @@
 # CLAUDE.md - Australian History MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-25
-**Version:** 0.6.1
+**Last Updated:** 2025-12-27
+**Version:** 0.7.0
 
 ---
 
@@ -98,11 +98,111 @@ npm run build
 # Development (watch mode)
 npm run dev
 
-# Run directly
+# Run directly (dynamic mode - default)
 node dist/index.js
+
+# Run in legacy mode (all 69 tools exposed)
+MCP_MODE=legacy node dist/index.js
 
 # Type check
 npx tsc --noEmit
+```
+
+---
+
+## Dynamic Tool Loading (Default Mode)
+
+The server uses **dynamic tool loading** by default, exposing only 6 meta-tools instead of all 69 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
+
+### Meta-Tools Exposed
+
+| Tool | Purpose |
+|------|---------|
+| `tools` | Discover available data tools by keyword, source, or category |
+| `schema` | Get full input schema for a specific tool |
+| `run` | Execute any data tool by name with arguments |
+| `search` | **Federated search across multiple sources in parallel** |
+| `open` | Open a URL in the default browser |
+| `export` | Export records to CSV, JSON, Markdown, or download script |
+
+### Federated Search
+
+The `search` meta-tool executes parallel searches across multiple sources:
+
+```
+# Auto-select sources based on query keywords
+search(query="Melbourne photos 1920s", limit=5)
+→ Searches PROV, Trove, NMA, Museums Victoria in parallel
+
+# Explicit source selection
+search(query="railway", sources=["prov", "trove"], limit=3)
+→ Searches only specified sources
+
+# With content type filter
+search(query="gold rush", type="image", limit=5)
+→ Searches sources that handle images
+```
+
+**Response includes:**
+- `sourcesSearched` - which sources were queried
+- `totalResults` - combined result count
+- `results` - per-source records with source attribution
+- `errors` - any sources that failed (others continue)
+- `_timing` - execution time per source (for debugging)
+
+### Workflow: tools() → schema() → run()
+
+```
+1. Discover: tools(query="newspaper")
+   → Returns matching tools: trove_search, trove_newspaper_article, etc.
+
+2. Get Schema: schema(tool="trove_search")
+   → Returns full inputSchema with all parameters
+
+3. Execute: run(tool="trove_search", args={query:"Melbourne", limit:5})
+   → Returns search results
+```
+
+### Example Session
+
+```
+# Find tools for searching newspapers
+tools(query="newspaper")
+→ 5 matching tools: trove_search, trove_harvest, trove_newspaper_article...
+
+# Get parameters for trove_search
+schema(tool="trove_search")
+→ {query, category, dateFrom, dateTo, state, creator, sortby, limit...}
+
+# Search for articles
+run(tool="trove_search", args={query:"Melbourne flood", category:"newspaper", dateFrom:"1930"})
+→ {totalResults: 1234, records: [...]}
+
+# Export results to CSV
+export(records=<results.records>, format="csv", path="/tmp/floods.csv")
+→ {status: "saved", path: "/tmp/floods.csv"}
+```
+
+### Mode Switching
+
+Set `MCP_MODE` environment variable:
+
+| Mode | Tools Exposed | Use Case |
+|------|---------------|----------|
+| `dynamic` (default) | 6 meta-tools | Research workflows, token-efficient |
+| `legacy` | 69 data tools | Backwards compatibility, direct access |
+
+```json
+{
+  "australian-history": {
+    "command": "npx",
+    "args": ["-y", "@littlebearapps/australian-history-mcp"],
+    "env": {
+      "TROVE_API_KEY": "your-key",
+      "MCP_MODE": "dynamic"
+    }
+  }
+}
 ```
 
 ---
@@ -306,26 +406,34 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 ## Architecture
 
+### Dynamic Mode (Default)
+
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                             Claude Code Session                                  │
-└───────────────────────────────────┬─────────────────────────────────────────────┘
-                                    │ stdio
-┌───────────────────────────────────▼─────────────────────────────────────────────┐
-│               Australian History MCP Server (69 tools, 11 sources)               │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │                         Tool Registry (Map-based)                         │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐  │
-│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA │  │
-│  │(5) │ │(13) │ │(5) │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) │  │
-│  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘  │
-└─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼──────┘
-      │      │      │       │       │     │     │     │      │      │      │
-      ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼      ▼      ▼      ▼
-   PROV   Trove  TLCMap  MusVic  ALA   NMA   VHD   ACMI   PMC   Any    GA
-   Solr   API v3  WSAPI   API    API   API   API   API    XML  IIIF  ArcGIS
+┌─────────────────────────────────────────────────────────────────┐
+│                    Claude Code Session                           │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │ stdio
+┌───────────────────────────────▼─────────────────────────────────┐
+│    Australian History MCP Server (5 meta-tools exposed)          │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │    Meta-Tools: tools | schema | run | open | export        │ │
+│  └───────────────────────────┬────────────────────────────────┘ │
+│                              │ run(tool, args)                   │
+│  ┌───────────────────────────▼────────────────────────────────┐ │
+│  │              Tool Registry (69 data tools)                  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ...   │
+│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│        │
+│  │(5) │ │(13) │ │(5) │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │        │
+│  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘        │
+└─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼────────────┘
+      ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼
+    PROV  Trove  TLCMap  MusVic   ALA   NMA   VHD   ACMI (+ 3 more)
 ```
+
+### Legacy Mode (MCP_MODE=legacy)
+
+All 69 data tools exposed directly (backwards compatible).
 
 ---
 
@@ -642,4 +750,4 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 
 ---
 
-**Token Count:** ~800 tokens
+**Token Count:** ~900 tokens

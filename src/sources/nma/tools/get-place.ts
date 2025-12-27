@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaGetPlaceTool: SourceTool = {
   schema: {
     name: 'nma_get_place',
-    description: 'Get detailed place record from National Museum of Australia by ID. Returns location details, coordinates, and associated information.',
+    description: 'Get place by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'Place ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },

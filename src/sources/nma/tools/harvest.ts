@@ -7,36 +7,20 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { nmaClient } from '../client.js';
 import type { NMAObject } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaHarvestTool: SourceTool = {
   schema: {
     name: 'nma_harvest',
-    description: 'Bulk download museum collection objects from National Museum of Australia with pagination.',
+    description: 'Bulk download museum collection objects.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (e.g., "gold rush", "aboriginal")',
-        },
-        type: {
-          type: 'string',
-          description: 'Object type filter',
-        },
-        collection: {
-          type: 'string',
-          description: 'Collection name filter',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        startFrom: {
-          type: 'number',
-          description: 'Offset for pagination',
-          default: 0,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        type: { type: 'string', description: PARAMS.TYPE },
+        collection: { type: 'string', description: PARAMS.COLLECTION },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        startFrom: { type: 'number', description: PARAMS.START_FROM, default: 0 },
       },
       required: ['query'],
     },

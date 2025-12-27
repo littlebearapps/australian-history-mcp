@@ -17,6 +17,8 @@ export interface FetchOptions extends RequestInit {
   retries?: number;
   /** Custom error handler */
   onError?: (error: Error) => void;
+  /** Skip default Accept header (for APIs that reject application/json) */
+  skipAcceptHeader?: boolean;
 }
 
 /**
@@ -40,19 +42,26 @@ export abstract class BaseClient {
     url: string,
     options: FetchOptions = {}
   ): Promise<T> {
-    const { timeout = this.defaultTimeout, retries = 0, ...fetchOptions } = options;
+    const { timeout = this.defaultTimeout, retries = 0, skipAcceptHeader = false, ...fetchOptions } = options;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    // Build headers - skip Accept header if requested (e.g., for IIIF manifests)
+    const headers: Record<string, string> = {
+      'User-Agent': this.userAgent,
+    };
+    if (!skipAcceptHeader) {
+      headers['Accept'] = 'application/json';
+    }
 
     try {
       const response = await fetch(url, {
         ...fetchOptions,
         signal: controller.signal,
         headers: {
-          'Accept': 'application/json',
-          'User-Agent': this.userAgent,
-          ...fetchOptions.headers,
+          ...headers,
+          ...fetchOptions.headers as Record<string, string>,
         },
       });
 

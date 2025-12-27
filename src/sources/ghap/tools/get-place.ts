@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { ghapClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const ghapGetPlaceTool: SourceTool = {
   schema: {
     name: 'ghap_get_place',
-    description: 'Get detailed information about a specific place from GHAP by its TLCMap ID.',
+    description: 'Get place details by TLCMap ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'TLCMap place ID (e.g., "a1b4b8" from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },

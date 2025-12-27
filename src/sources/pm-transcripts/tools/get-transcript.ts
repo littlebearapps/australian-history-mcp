@@ -5,19 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { pmTranscriptsClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const pmTranscriptsGetTranscriptTool: SourceTool = {
   schema: {
     name: 'pm_transcripts_get_transcript',
-    description:
-      'Get a Prime Ministerial transcript by ID. Returns speeches, media releases, and interviews from Australian PMs.',
+    description: 'Get Prime Ministerial transcript by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'number',
-          description: 'Transcript ID (1 to ~26000)',
-        },
+        id: { type: 'number', description: PARAMS.ID },
       },
       required: ['id'],
     },

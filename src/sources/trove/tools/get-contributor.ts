@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const troveGetContributorTool: SourceTool = {
   schema: {
     name: 'trove_get_contributor',
-    description: 'Get details about a Trove contributor (library, archive, or institution) by NUC code. Common codes: ANL (National Library), VSL (State Library Victoria), SLNSW (State Library NSW), QSL (State Library Queensland).',
+    description: 'Get contributor details by NUC code.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        nuc: {
-          type: 'string',
-          description: 'NUC (National Union Catalogue) code for the contributor (e.g., "ANL", "VSL", "SLNSW")',
-        },
+        nuc: { type: 'string', description: PARAMS.NUC },
       },
       required: ['nuc'],
     },

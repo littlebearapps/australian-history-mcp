@@ -4,6 +4,17 @@
  * Types specific to the PROV data source.
  */
 
+import {
+  PROV_RECORD_FORMS,
+  PROV_DOCUMENT_CATEGORIES,
+  type PROVRecordForm,
+  type PROVDocumentCategory,
+} from '../../core/enums.js';
+
+// Re-export for backwards compatibility
+export { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES };
+export type { PROVRecordForm, PROVDocumentCategory };
+
 // ============================================================================
 // Search Parameters
 // ============================================================================
@@ -78,39 +89,6 @@ export interface PROVImagesResult {
   totalPages: number;
   images: PROVImage[];
 }
-
-// ============================================================================
-// Record Form Enum
-// ============================================================================
-
-export const PROV_RECORD_FORMS = [
-  'Photograph or Image',
-  'Map, Plan, or Drawing',
-  'File',
-  'Volume',
-  'Document',
-  'Card',
-  'Object',
-  'Moving Image',
-  'Sound Recording',
-] as const;
-
-export type PROVRecordForm = typeof PROV_RECORD_FORMS[number];
-
-// ============================================================================
-// Document Category Enum
-// ============================================================================
-
-export const PROV_DOCUMENT_CATEGORIES = [
-  'agency',
-  'function',
-  'series',
-  'consignment',
-  'item',
-  'image',
-] as const;
-
-export type PROVDocumentCategory = typeof PROV_DOCUMENT_CATEGORIES[number];
 
 // ============================================================================
 // Agency Types

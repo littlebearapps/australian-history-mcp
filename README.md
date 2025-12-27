@@ -22,6 +22,22 @@ That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](
 
 → **Next:** Add to your MCP client via [Configuration](#configuration)
 
+## How It Works
+
+This server uses **dynamic tool loading** - instead of exposing all 69 data tools upfront, it presents just 5 meta-tools:
+
+| Meta-Tool | Purpose |
+|-----------|---------|
+| `tools` | Discover available data tools by keyword, source, or category |
+| `schema` | Get full parameters for a specific tool |
+| `run` | Execute any data tool by name |
+| `open` | Open URLs in your browser |
+| `export` | Export results to CSV, JSON, or Markdown |
+
+**Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
+
+> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 69 tools directly.
+
 ## What You Can Ask
 
 Instead of navigating 11 different archive websites, just ask your AI:
@@ -39,6 +55,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 ## Table of Contents
 
 - [Quick Start](#quick-start)
+- [How It Works](#how-it-works)
 - [What You Can Ask](#what-you-can-ask)
 - [Data Sources - What You Can Find](#data-sources---what-you-can-find)
 - [Important Notice - Third-Party Data Sources](#important-notice---third-party-data-sources)
@@ -614,6 +631,17 @@ Yes. Use `ga_hap_search` with `bbox` for aerial photos by bounding box (format: 
 <summary><strong>6. How do I find species information?</strong></summary>
 
 Use `ala_search_species` for scientific or common names, or `museumsvic_search` with `recordType: "species"`. Get detailed profiles with `ala_get_species` using the GUID from search results. ALA covers all Australian species; Museums Victoria focuses on Victorian fauna and flora.
+
+</details>
+
+<details>
+<summary><strong>7. What's the difference between dynamic and legacy mode?</strong></summary>
+
+**Dynamic mode** (default) exposes 5 meta-tools (`tools`, `schema`, `run`, `open`, `export`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
+
+**Legacy mode** exposes all 69 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
+
+Switch modes by setting `MCP_MODE=legacy` in your configuration environment variables.
 
 </details>
 
