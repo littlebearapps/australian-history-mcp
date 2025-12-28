@@ -5,6 +5,64 @@
  */
 
 // ============================================================================
+// Facet Types
+// ============================================================================
+
+// Available facet fields for ALA occurrence search
+export type ALAFacetField =
+  | 'kingdom'
+  | 'phylum'
+  | 'class'
+  | 'order'
+  | 'family'
+  | 'genus'
+  | 'species'
+  | 'stateProvince'
+  | 'basisOfRecord'
+  | 'year'
+  | 'month'
+  | 'dataResourceName';
+
+export const ALA_FACET_FIELDS: ALAFacetField[] = [
+  'kingdom',
+  'phylum',
+  'class',
+  'order',
+  'family',
+  'genus',
+  'stateProvince',
+  'basisOfRecord',
+  'year',
+];
+
+// User-friendly facet field names
+export const ALA_FACET_DISPLAY_NAMES: Record<ALAFacetField, string> = {
+  'kingdom': 'Kingdom',
+  'phylum': 'Phylum',
+  'class': 'Class',
+  'order': 'Order',
+  'family': 'Family',
+  'genus': 'Genus',
+  'species': 'Species',
+  'stateProvince': 'State/Province',
+  'basisOfRecord': 'Basis of Record',
+  'year': 'Year',
+  'month': 'Month',
+  'dataResourceName': 'Data Resource',
+};
+
+export interface ALAFacetValue {
+  value: string;
+  count: number;
+}
+
+export interface ALAFacet {
+  name: ALAFacetField;
+  displayName: string;
+  values: ALAFacetValue[];
+}
+
+// ============================================================================
 // Search Parameter Types
 // ============================================================================
 
@@ -43,6 +101,12 @@ export interface ALAOccurrenceSearchParams {
   sort?: 'score' | 'taxon_name' | 'event_date';
   /** Sort direction */
   dir?: 'asc' | 'desc';
+  /** Include facet counts */
+  includeFacets?: boolean;
+  /** Facet fields to return */
+  facetFields?: ALAFacetField[];
+  /** Max values per facet */
+  facetLimit?: number;
 }
 
 export interface ALASpeciesSearchParams {
@@ -103,6 +167,7 @@ export interface ALAOccurrenceSearchResult {
   sort: string;
   dir: string;
   occurrences: ALAOccurrence[];
+  facets?: ALAFacet[];
 }
 
 // ============================================================================

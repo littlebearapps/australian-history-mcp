@@ -7,7 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { TROVE_CATEGORIES, AU_STATES_WITH_NATIONAL, SORT_ORDERS_DATE, TROVE_AVAILABILITY, ILLUSTRATION_TYPES } from '../../../core/enums.js';
-import type { TroveSearchParams } from '../types.js';
+import type { TroveSearchParams, TroveFacetField } from '../types.js';
+import { TROVE_FACET_FIELDS } from '../types.js';
 
 export const troveSearchTool: SourceTool = {
   schema: {
@@ -38,6 +39,9 @@ export const troveSearchTool: SourceTool = {
         issn: { type: 'string', description: PARAMS.ISSN },
         includeHoldings: { type: 'boolean', description: PARAMS.INCLUDE_HOLDINGS, default: false },
         includeLinks: { type: 'boolean', description: PARAMS.INCLUDE_LINKS, default: false },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: TROVE_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
       },
       required: ['query'],
     },
@@ -68,6 +72,9 @@ export const troveSearchTool: SourceTool = {
       issn?: string;
       includeHoldings?: boolean;
       includeLinks?: boolean;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: TroveFacetField[];
     };
 
     if (!troveClient.hasApiKey()) {
@@ -130,11 +137,15 @@ export const troveSearchTool: SourceTool = {
         // NEW: Include options
         includeHoldings: input.includeHoldings,
         includeLinks: input.includeLinks,
+        // Faceted search
+        includeFacets: input.includeFacets,
+        facetFields: input.facetFields,
       };
 
       const result = await troveClient.search(params);
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'trove',
         query: result.query,
         category: result.category,
@@ -171,7 +182,21 @@ export const troveSearchTool: SourceTool = {
             };
           }
         }),
-      });
+      };
+
+      // Add facets if requested and available
+      if (input.includeFacets && result.facets && result.facets.length > 0) {
+        response.facets = result.facets.map(f => ({
+          name: f.name,
+          displayName: f.displayname,
+          values: f.term.map(t => ({
+            value: t.display,
+            count: t.count,
+          })),
+        }));
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

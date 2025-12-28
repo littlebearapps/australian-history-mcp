@@ -8,6 +8,17 @@ import { ghapClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { AU_STATES_UPPER } from '../../../core/enums.js';
 import type { GHAPSearchParams } from '../types.js';
+import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
+
+// Facet configuration for GHAP
+const GHAP_FACET_CONFIGS = [
+  simpleFacetConfig('state', 'State', 'state'),
+  simpleFacetConfig('lga', 'Local Government Area', 'lga'),
+  simpleFacetConfig('featureType', 'Feature Type', 'featureType'),
+  simpleFacetConfig('source', 'Source', 'source'),
+];
+
+const GHAP_FACET_FIELDS = GHAP_FACET_CONFIGS.map(c => c.name);
 
 export const ghapSearchTool: SourceTool = {
   schema: {
@@ -22,6 +33,10 @@ export const ghapSearchTool: SourceTool = {
         lga: { type: 'string', description: PARAMS.LGA },
         bbox: { type: 'string', description: PARAMS.BBOX },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: GHAP_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: ['query'],
     },
@@ -35,6 +50,10 @@ export const ghapSearchTool: SourceTool = {
       lga?: string;
       bbox?: string;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: string[];
+      facetLimit?: number;
     };
 
     if (!input.query || input.query.trim() === '') {
@@ -58,7 +77,8 @@ export const ghapSearchTool: SourceTool = {
 
       const result = await ghapClient.search(params);
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'ghap',
         totalResults: result.totalResults,
         returned: result.places.length,
@@ -74,7 +94,22 @@ export const ghapSearchTool: SourceTool = {
           dateRange: p.dateRange,
           url: p.url,
         })),
-      });
+      };
+
+      // Add client-side facets if requested
+      if (input.includeFacets && result.places.length > 0) {
+        const facetResult = countFacets(
+          result.places as unknown as Record<string, unknown>[],
+          {
+            facetConfigs: GHAP_FACET_CONFIGS,
+            includeFacets: input.facetFields,
+            limit: input.facetLimit ?? 10,
+          }
+        );
+        response.facets = Object.values(facetResult.facets);
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

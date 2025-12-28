@@ -7,7 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { provClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES } from '../../../core/enums.js';
-import type { PROVSearchParams } from '../types.js';
+import type { PROVSearchParams, PROVFacetField } from '../types.js';
+import { PROV_FACET_FIELDS } from '../types.js';
 
 export const provSearchTool: SourceTool = {
   schema: {
@@ -25,6 +26,10 @@ export const provSearchTool: SourceTool = {
         dateTo: { type: 'string', description: PARAMS.DATE_TO },
         digitisedOnly: { type: 'boolean', description: PARAMS.DIGITISED_ONLY, default: false },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: PROV_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: [],
     },
@@ -41,6 +46,10 @@ export const provSearchTool: SourceTool = {
       dateTo?: string;
       digitisedOnly?: boolean;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: PROVFacetField[];
+      facetLimit?: number;
     };
 
     // Validate at least one search parameter
@@ -59,11 +68,16 @@ export const provSearchTool: SourceTool = {
         endDate: input.dateTo,
         digitisedOnly: input.digitisedOnly ?? false,
         rows: Math.min(input.limit ?? 20, 100),
+        // Faceted search
+        includeFacets: input.includeFacets,
+        facetFields: input.facetFields,
+        facetLimit: input.facetLimit,
       };
 
       const result = await provClient.search(params);
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'prov',
         totalResults: result.totalResults,
         returned: result.records.length,
@@ -82,7 +96,14 @@ export const provSearchTool: SourceTool = {
           url: r.url,
           iiifManifest: r.iiifManifest,
         })),
-      });
+      };
+
+      // Add facets if requested and available
+      if (input.includeFacets && result.facets && result.facets.length > 0) {
+        response.facets = result.facets;
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

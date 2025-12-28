@@ -19,6 +19,28 @@ export type { PROVRecordForm, PROVDocumentCategory };
 // Search Parameters
 // ============================================================================
 
+// Available facet fields for PROV search (Solr field names)
+export type PROVFacetField =
+  | 'record_form'
+  | 'category'
+  | 'series_id'
+  | 'agencies.ids';
+
+export const PROV_FACET_FIELDS: PROVFacetField[] = [
+  'record_form',
+  'category',
+  'series_id',
+  'agencies.ids',
+];
+
+// User-friendly facet field names
+export const PROV_FACET_DISPLAY_NAMES: Record<PROVFacetField, string> = {
+  'record_form': 'Record Form',
+  'category': 'Category',
+  'series_id': 'Series',
+  'agencies.ids': 'Agency',
+};
+
 export interface PROVSearchParams {
   query?: string;
   series?: string;      // VPRS number (e.g., "VPRS 515")
@@ -30,6 +52,10 @@ export interface PROVSearchParams {
   digitisedOnly?: boolean;
   rows?: number;        // max results (default 20)
   start?: number;       // pagination offset
+  // Faceted search
+  includeFacets?: boolean;
+  facetFields?: PROVFacetField[];
+  facetLimit?: number;  // max values per facet (default 10)
 }
 
 // ============================================================================
@@ -52,11 +78,24 @@ export interface PROVRecord {
   url: string;
 }
 
+// Facet types
+export interface PROVFacetValue {
+  value: string;
+  count: number;
+}
+
+export interface PROVFacet {
+  name: PROVFacetField;
+  displayName: string;
+  values: PROVFacetValue[];
+}
+
 export interface PROVSearchResult {
   totalResults: number;
   start: number;
   rows: number;
   records: PROVRecord[];
+  facets?: PROVFacet[];
 }
 
 export interface PROVSeries {

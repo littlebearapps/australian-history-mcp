@@ -71,6 +71,45 @@ curl -sL "https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_
 
 ---
 
+## Search Enhancements (SEARCH-xxx)
+
+Enhanced search capabilities across all data sources. Planned for v0.8.0+.
+
+### Phase 1: Core Search Enhancements
+| Task | Description | Priority | Effort | Status |
+|------|-------------|----------|--------|--------|
+| SEARCH-001 | PM Transcripts Search Tool (title/metadata) | P0 | N/A | ❌ Not Implementable (API limitation) |
+| SEARCH-002 | Faceted Search Infrastructure (shared types) | P0 | 1 day | ✅ Completed (2025-12-28) |
+| SEARCH-003 | Faceted Search - Trove (native API facets) | P0 | 0.5 days | ✅ Completed (2025-12-28) |
+| SEARCH-004 | Faceted Search - PROV (Solr facets) | P1 | 0.5 days | ✅ Completed (2025-12-28) |
+| SEARCH-005 | Faceted Search - ALA (native API facets) | P1 | 0.5 days | ✅ Completed (2025-12-28) |
+| SEARCH-006 | Faceted Search - Remaining Sources (client-side) | P1 | 1.5 days | ✅ Completed (2025-12-28) |
+| SEARCH-007 | Advanced Query Syntax - Parser Core | P1 | 2 days | Not Started |
+| SEARCH-008 | Advanced Query Syntax - Source Builders | P1 | 1.5 days | Not Started |
+| SEARCH-009 | Sorting Options - Multi-Source | P2 | 1 day | Not Started |
+
+### Phase 2: Federated & Filter Expansion
+| Task | Description | Priority | Effort | Status |
+|------|-------------|----------|--------|--------|
+| SEARCH-010 | Federated Search Intelligence | P1 | 3-4 days | Not Started |
+| SEARCH-011 | NMA Filter Expansion (4 → 8+ params) | P2 | 1 day | Not Started |
+| SEARCH-012 | ACMI Filter Expansion (4 → 8+ params) | P2 | 1 day | Not Started |
+| SEARCH-013 | GA HAP Technical Filters | P2 | 1 day | Not Started |
+| SEARCH-014 | VHD Filter Expansion | P2 | 0.5 days | Not Started |
+| SEARCH-015 | ALA Filter Expansion | P2 | 0.5 days | Not Started |
+
+### Phase 3: Future Enhancements
+| Task | Description | Priority | Effort | Status |
+|------|-------------|----------|--------|--------|
+| SEARCH-016 | Spatial Query Support (point+radius) | P3 | 2-3 days | Not Started |
+| SEARCH-017 | Related Records Discovery | P3 | 2 days | Not Started |
+| SEARCH-018 | PM Transcripts Full-Text Index (SQLite) | P3 | 3-4 days | Not Started |
+| SEARCH-019 | Search History & Saved Queries | P3 | 1 day | Not Started |
+
+**Total: 19 tasks across 3 phases**
+
+---
+
 ## Future API Integrations (API-xxx)
 
 ### Phase 3: Needs Investigation
@@ -115,6 +154,30 @@ backlog/tasks/
 ├── PREP-012-retro-issues-v040.md
 ├── PREP-013-retro-issues-v050.md
 └── PREP-014-github-settings.md
+```
+
+### Search Enhancements
+```
+backlog/tasks/
+├── SEARCH-001-pm-transcripts-search.md      (Phase 1 - PM Transcripts search tool)
+├── SEARCH-002-faceted-search-infrastructure.md (Phase 1 - Shared facet types)
+├── SEARCH-003-faceted-search-trove.md       (Phase 1 - Trove facets)
+├── SEARCH-004-faceted-search-prov.md        (Phase 1 - PROV facets)
+├── SEARCH-005-faceted-search-ala.md         (Phase 1 - ALA facets)
+├── SEARCH-006-faceted-search-remaining.md   (Phase 1 - Client-side facets)
+├── SEARCH-007-query-parser-core.md          (Phase 1 - Boolean query parser)
+├── SEARCH-008-query-builders.md             (Phase 1 - Source-specific builders)
+├── SEARCH-009-sorting-options.md            (Phase 1 - Multi-source sorting)
+├── SEARCH-010-federated-search-intelligence.md (Phase 2 - Smart routing)
+├── SEARCH-011-nma-filter-expansion.md       (Phase 2 - NMA filters)
+├── SEARCH-012-acmi-filter-expansion.md      (Phase 2 - ACMI filters)
+├── SEARCH-013-ga-hap-technical-filters.md   (Phase 2 - GA HAP filters)
+├── SEARCH-014-vhd-filter-expansion.md       (Phase 2 - VHD filters)
+├── SEARCH-015-ala-filter-expansion.md       (Phase 2 - ALA filters)
+├── SEARCH-016-spatial-query-support.md      (Phase 3 - Point+radius)
+├── SEARCH-017-related-records.md            (Phase 3 - Related records)
+├── SEARCH-018-pm-transcripts-fulltext.md    (Phase 3 - Full-text index)
+└── SEARCH-019-saved-queries.md              (Phase 3 - Saved queries)
 ```
 
 ### Future API Integrations

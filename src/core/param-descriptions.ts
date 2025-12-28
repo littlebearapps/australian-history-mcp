@@ -120,7 +120,6 @@ export const PARAMS = {
 
   // PM Transcripts
   PRIME_MINISTER: 'PM name (partial match)',
-  USE_SITEMAP: 'Use sitemap for faster lookup',
   TRANSCRIPT_ID: 'Transcript ID (1-26000)',
 
   // VHD
@@ -145,6 +144,11 @@ export const PARAMS = {
 
   // Image sizes (PROV)
   IMAGE_SIZE: 'Image size (thumbnail, medium, full)',
+
+  // Faceted Search
+  INCLUDE_FACETS: 'Include facet counts',
+  FACET_FIELDS: 'Facets to return',
+  FACET_LIMIT: 'Max values per facet',
 } as const;
 
 // Type for autocomplete

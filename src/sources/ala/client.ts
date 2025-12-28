@@ -24,7 +24,10 @@ import type {
   ALASpeciesListSearchResult,
   ALASpeciesList,
   ALASpeciesListDetail,
+  ALAFacet,
+  ALAFacetField,
 } from './types.js';
+import { ALA_FACET_DISPLAY_NAMES } from './types.js';
 
 // ALA uses multiple API endpoints
 const BIOCACHE_API_BASE = 'https://biocache-ws.ala.org.au/ws';
@@ -179,10 +182,18 @@ export class ALAClient extends BaseClient {
       queryParams.dir = params.dir;
     }
 
-    const url = this.buildUrl('/occurrences/search', queryParams);
-    const data = await this.fetchJSON<ALAOccurrenceSearchResult>(url);
+    // Faceting
+    if (params.includeFacets) {
+      queryParams.facet = 'true';
+      queryParams.flimit = (params.facetLimit ?? 10).toString();
+      const facetFields = params.facetFields ?? ['kingdom', 'stateProvince', 'basisOfRecord'];
+      queryParams.facets = facetFields.join(',');
+    }
 
-    return {
+    const url = this.buildUrl('/occurrences/search', queryParams);
+    const data = await this.fetchJSON<ALAOccurrenceSearchResult & { facetResults?: unknown[] }>(url);
+
+    const result: ALAOccurrenceSearchResult = {
       totalRecords: data.totalRecords ?? 0,
       pageSize: data.pageSize ?? 20,
       startIndex: data.startIndex ?? 0,
@@ -191,6 +202,49 @@ export class ALAClient extends BaseClient {
       dir: data.dir ?? 'asc',
       occurrences: (data.occurrences ?? []).map((occ) => this.parseOccurrence(occ)),
     };
+
+    // Parse facets if requested and available
+    if (params.includeFacets && data.facetResults) {
+      result.facets = this.parseBiocacheFacets(data.facetResults);
+    }
+
+    return result;
+  }
+
+  /**
+   * Parse ALA biocache facet results
+   */
+  private parseBiocacheFacets(facetResults: unknown[]): ALAFacet[] {
+    const facets: ALAFacet[] = [];
+
+    for (const result of facetResults) {
+      const r = result as Record<string, unknown>;
+      const fieldName = String(r.fieldName ?? '');
+      const fieldResult = r.fieldResult as unknown[] | undefined;
+
+      if (!fieldResult || fieldResult.length === 0) continue;
+
+      const values: { value: string; count: number }[] = [];
+      for (const item of fieldResult) {
+        const i = item as Record<string, unknown>;
+        const label = String(i.label ?? i.fq ?? '');
+        const count = typeof i.count === 'number' ? i.count : parseInt(String(i.count ?? '0'), 10);
+
+        if (count > 0 && label) {
+          values.push({ value: label, count });
+        }
+      }
+
+      if (values.length > 0) {
+        facets.push({
+          name: fieldName as ALAFacetField,
+          displayName: ALA_FACET_DISPLAY_NAMES[fieldName as ALAFacetField] ?? fieldName,
+          values,
+        });
+      }
+    }
+
+    return facets;
   }
 
   /**

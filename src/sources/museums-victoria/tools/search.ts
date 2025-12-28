@@ -8,6 +8,16 @@ import { museumsVictoriaClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { MV_RECORD_TYPES, MV_CATEGORIES, MV_LICENCES } from '../../../core/enums.js';
 import type { MuseumSearchParams, MuseumRecord } from '../types.js';
+import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
+
+// Facet configuration for Museums Victoria
+const MV_FACET_CONFIGS = [
+  simpleFacetConfig('recordType', 'Record Type', 'recordType'),
+  simpleFacetConfig('category', 'Category', 'category'),
+  simpleFacetConfig('imageLicence', 'Image Licence', 'licence'),
+];
+
+const MV_FACET_FIELDS = MV_FACET_CONFIGS.map(c => c.name);
 
 export const museumsvicSearchTool: SourceTool = {
   schema: {
@@ -26,6 +36,10 @@ export const museumsvicSearchTool: SourceTool = {
         taxon: { type: 'string', description: PARAMS.TAXON },
         random: { type: 'boolean', description: PARAMS.RANDOM, default: false },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: MV_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: [],
     },
@@ -43,6 +57,10 @@ export const museumsvicSearchTool: SourceTool = {
       taxon?: string;
       random?: boolean;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: string[];
+      facetLimit?: number;
     };
 
     // Validate at least one search criterion
@@ -66,14 +84,30 @@ export const museumsvicSearchTool: SourceTool = {
 
       const result = await museumsVictoriaClient.search(params);
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'museumsvic',
         totalResults: result.totalResults,
         returned: result.records.length,
         page: result.currentPage,
         totalPages: result.totalPages,
         records: result.records.map(r => formatRecordSummary(r)),
-      });
+      };
+
+      // Add client-side facets if requested
+      if (input.includeFacets && result.records.length > 0) {
+        const facetResult = countFacets(
+          result.records as unknown as Record<string, unknown>[],
+          {
+            facetConfigs: MV_FACET_CONFIGS,
+            includeFacets: input.facetFields,
+            limit: input.facetLimit ?? 10,
+          }
+        );
+        response.facets = Object.values(facetResult.facets);
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

@@ -738,7 +738,8 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 - **ACMI constellations:** API uses `name` field not `title` for constellation names
 - **PM Transcripts format:** XML responses requiring parsing
 - **PM Transcripts IDs:** Sequential integers, gaps exist for missing transcripts
-- **PM Transcripts harvest:** Slow for PM filtering due to sequential scanning. Use `pm_transcripts_get_transcript` for individual lookups. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000
+- **PM Transcripts no search API:** The API only supports lookup by transcript ID (`/query?transcript=ID`). There is no search endpoint and the sitemap is no longer accessible. Use `pm_transcripts_harvest` with PM/date filters to scan ID ranges.
+- **PM Transcripts harvest:** Sequential ID scanning only. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000
 - **IIIF Presentation API versions:** Supports v2.x and v3.x manifests; v3 uses different structure (`items` instead of `sequences`)
 - **IIIF Image API port:** SLV uses port 2083 for images, standard 443 for manifests
 - **Trove NUC filtering:** Use `nuc` parameter to filter by contributor (e.g., "VSL" for State Library Victoria)

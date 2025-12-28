@@ -7,6 +7,16 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { gaHapClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { AU_STATES } from '../../../core/enums.js';
+import { countFacets, simpleFacetConfig, countByDecade } from '../../../core/facets/index.js';
+import type { Facet } from '../../../core/facets/types.js';
+
+// Facet configuration for GA HAP
+const GA_HAP_FACET_CONFIGS = [
+  simpleFacetConfig('state', 'State', 'stateName'),
+  simpleFacetConfig('filmType', 'Film Type', 'filmType'),
+];
+
+const GA_HAP_FACET_FIELDS = ['state', 'filmType', 'decade'];
 
 export const gaHapSearchTool: SourceTool = {
   schema: {
@@ -23,6 +33,10 @@ export const gaHapSearchTool: SourceTool = {
         bbox: { type: 'string', description: PARAMS.BBOX },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         offset: { type: 'number', description: PARAMS.OFFSET, default: 0 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: GA_HAP_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: [],
     },
@@ -38,6 +52,10 @@ export const gaHapSearchTool: SourceTool = {
       bbox?: string;
       limit?: number;
       offset?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: string[];
+      facetLimit?: number;
     };
 
     try {
@@ -52,7 +70,8 @@ export const gaHapSearchTool: SourceTool = {
         offset: input.offset ?? 0,
       });
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'ga-hap',
         returned: result.photos.length,
         offset: result.offset,
@@ -78,7 +97,49 @@ export const gaHapSearchTool: SourceTool = {
               ? { lat: photo.latitude, lon: photo.longitude }
               : undefined,
         })),
-      });
+      };
+
+      // Add client-side facets if requested
+      if (input.includeFacets && result.photos.length > 0) {
+        const facets: Facet[] = [];
+        const facetFieldsToInclude = input.facetFields ?? GA_HAP_FACET_FIELDS;
+
+        // Standard facets
+        if (facetFieldsToInclude.includes('state') || facetFieldsToInclude.includes('filmType')) {
+          const facetResult = countFacets(
+            result.photos as unknown as Record<string, unknown>[],
+            {
+              facetConfigs: GA_HAP_FACET_CONFIGS,
+              includeFacets: facetFieldsToInclude.filter(f => f !== 'decade'),
+              limit: input.facetLimit ?? 10,
+            }
+          );
+          facets.push(...Object.values(facetResult.facets));
+        }
+
+        // Decade facet (special handling for year fields)
+        if (facetFieldsToInclude.includes('decade')) {
+          const decadeValues = countByDecade(
+            result.photos as unknown as Record<string, unknown>[],
+            'yearStart'
+          );
+          if (decadeValues.length > 0) {
+            const limitedValues = decadeValues.slice(0, input.facetLimit ?? 10);
+            facets.push({
+              name: 'decade',
+              displayName: 'Decade',
+              values: limitedValues,
+              total: limitedValues.reduce((sum, v) => sum + v.count, 0),
+            });
+          }
+        }
+
+        if (facets.length > 0) {
+          response.facets = facets;
+        }
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

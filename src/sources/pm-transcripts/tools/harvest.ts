@@ -1,8 +1,11 @@
 /**
  * PM Transcripts Harvest Tool - Bulk download transcripts
  *
- * When filtering by PM name, uses sitemap for faster lookups instead of
- * sequential scanning. This reduces harvest time from minutes to seconds.
+ * Note: The PM Transcripts API only supports lookup by transcript ID.
+ * There is no search endpoint. The sitemap at /transcripts.xml is now
+ * a batch process and no longer directly accessible.
+ *
+ * Harvesting uses sequential ID scanning with filters applied client-side.
  */
 
 import type { SourceTool } from '../../../core/base-source.js';
@@ -14,7 +17,7 @@ import { PARAMS } from '../../../core/param-descriptions.js';
 export const pmTranscriptsHarvestTool: SourceTool = {
   schema: {
     name: 'pm_transcripts_harvest',
-    description: 'Bulk download PM transcripts with filters.',
+    description: 'Bulk download PM transcripts with filters. Uses sequential ID scanning (no search API available).',
     inputSchema: {
       type: 'object' as const,
       properties: {
@@ -23,7 +26,6 @@ export const pmTranscriptsHarvestTool: SourceTool = {
         dateTo: { type: 'string', description: PARAMS.DATE_TO },
         startFrom: { type: 'number', description: PARAMS.START_FROM, default: 1 },
         maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
-        useSitemap: { type: 'boolean', description: PARAMS.USE_SITEMAP, default: true },
       },
       required: [],
     },
@@ -36,92 +38,15 @@ export const pmTranscriptsHarvestTool: SourceTool = {
       dateTo?: string;
       startFrom?: number;
       maxRecords?: number;
-      useSitemap?: boolean;
     };
 
     try {
       const startFrom = input.startFrom ?? 1;
       const maxRecords = Math.min(input.maxRecords ?? 100, 500);
-      const useSitemap = input.useSitemap !== false; // Default true
 
       const transcripts: PMTranscript[] = [];
 
-      // Use sitemap-based harvesting when PM filter is provided (much faster)
-      if (input.primeMinister && useSitemap) {
-        // Fetch sitemap once - contains all ~26,000 transcript IDs
-        const allRefs = await pmTranscriptsClient.getSitemapIds();
-
-        // Filter to IDs >= startFrom and sort
-        const candidateIds = allRefs
-          .map((ref) => ref.id)
-          .filter((id) => id >= startFrom)
-          .sort((a, b) => a - b);
-
-        let lastId = startFrom;
-
-        // Iterate through candidate IDs (much faster than sequential scan)
-        for (const id of candidateIds) {
-          if (transcripts.length >= maxRecords) break;
-
-          try {
-            const transcript = await pmTranscriptsClient.getTranscript(id);
-            lastId = id;
-
-            if (transcript) {
-              // Apply PM filter
-              const pmFilter = input.primeMinister.toLowerCase();
-              if (!transcript.primeMinister.toLowerCase().includes(pmFilter)) {
-                continue;
-              }
-
-              // Apply date filters
-              if (input.dateFrom || input.dateTo) {
-                const releaseDate = parseReleaseDate(transcript.releaseDate);
-                if (releaseDate) {
-                  if (input.dateFrom && releaseDate < input.dateFrom) continue;
-                  if (input.dateTo && releaseDate > input.dateTo) continue;
-                }
-              }
-
-              transcripts.push(transcript);
-            }
-
-            // Small delay to be respectful to the server
-            await new Promise((resolve) => setTimeout(resolve, 100));
-          } catch {
-            // Skip failed transcripts
-            continue;
-          }
-        }
-
-        return successResponse({
-          source: 'pm-transcripts',
-          mode: 'sitemap',
-          harvested: transcripts.length,
-          startedAt: startFrom,
-          endedAt: lastId,
-          totalIdsInSitemap: allRefs.length,
-          hasMore: transcripts.length >= maxRecords,
-          filters: {
-            primeMinister: input.primeMinister || null,
-            dateFrom: input.dateFrom || null,
-            dateTo: input.dateTo || null,
-          },
-          records: transcripts.map((t) => ({
-            id: t.transcriptId,
-            title: t.title,
-            primeMinister: t.primeMinister,
-            releaseDate: t.releaseDate,
-            releaseType: t.releaseType,
-            documentUrl: t.documentUrl,
-            subjects: t.subjects,
-            contentPreview: t.content.substring(0, 500),
-            webUrl: `https://pmtranscripts.pmc.gov.au/release/transcript-${t.transcriptId}`,
-          })),
-        });
-      }
-
-      // Sequential harvesting (original behavior for non-PM-filtered harvests)
+      // Sequential harvesting - the only method available since sitemap is broken
       let currentId = startFrom;
       let consecutiveNotFound = 0;
       const maxConsecutiveNotFound = 50; // Stop if 50 in a row not found (gap detection)

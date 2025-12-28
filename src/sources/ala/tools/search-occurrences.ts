@@ -7,7 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { ALA_KINGDOMS, AU_STATES_FULL } from '../../../core/enums.js';
-import type { ALAOccurrenceSearchParams, ALAOccurrence } from '../types.js';
+import type { ALAOccurrenceSearchParams, ALAOccurrence, ALAFacetField } from '../types.js';
+import { ALA_FACET_FIELDS } from '../types.js';
 
 export const alaSearchOccurrencesTool: SourceTool = {
   schema: {
@@ -28,6 +29,10 @@ export const alaSearchOccurrencesTool: SourceTool = {
         hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
         spatiallyValid: { type: 'boolean', description: PARAMS.SPATIALLY_VALID },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: ALA_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: [],
     },
@@ -47,6 +52,10 @@ export const alaSearchOccurrencesTool: SourceTool = {
       hasImages?: boolean;
       spatiallyValid?: boolean;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: ALAFacetField[];
+      facetLimit?: number;
     };
 
     // Validate at least one search criterion
@@ -71,18 +80,30 @@ export const alaSearchOccurrencesTool: SourceTool = {
         hasImages: input.hasImages,
         spatiallyValid: input.spatiallyValid,
         pageSize: Math.min(input.limit ?? 20, 100),
+        // Faceted search
+        includeFacets: input.includeFacets,
+        facetFields: input.facetFields,
+        facetLimit: input.facetLimit,
       };
 
       const result = await alaClient.searchOccurrences(params);
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'ala',
         totalRecords: result.totalRecords,
         returned: result.occurrences.length,
         startIndex: result.startIndex,
         pageSize: result.pageSize,
         records: result.occurrences.map((occ) => formatOccurrenceSummary(occ)),
-      });
+      };
+
+      // Add facets if requested and available
+      if (input.includeFacets && result.facets && result.facets.length > 0) {
+        response.facets = result.facets;
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }
