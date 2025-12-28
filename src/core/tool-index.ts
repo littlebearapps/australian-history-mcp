@@ -1,7 +1,7 @@
 /**
  * Tool Index for Dynamic Discovery
  *
- * Contains metadata for all 69 tools across 11 sources.
+ * Contains metadata for all 76 tools across 11 sources.
  * Used by the `tools` meta-tool for keyword-based discovery.
  */
 
@@ -54,7 +54,7 @@ export type SourceName = keyof typeof SOURCES;
 
 export const TOOL_INDEX: ToolEntry[] = [
   // ---------------------------------------------------------------------------
-  // PROV - Public Record Office Victoria (5 tools)
+  // PROV - Public Record Office Victoria (6 tools)
   // ---------------------------------------------------------------------------
   {
     name: 'prov_search',
@@ -101,9 +101,18 @@ export const TOOL_INDEX: ToolEntry[] = [
     description: 'Get PROV agency details by VA number.',
     authRequired: false,
   },
+  {
+    name: 'prov_get_items',
+    source: 'prov',
+    sourceDisplay: 'PROV',
+    category: 'get',
+    keywords: ['prov', 'items', 'series', 'vprs', 'records', 'victoria'],
+    description: 'Get items within a PROV series by VPRS number.',
+    authRequired: false,
+  },
 
   // ---------------------------------------------------------------------------
-  // Trove - National Library of Australia (13 tools)
+  // Trove - National Library of Australia (14 tools)
   // ---------------------------------------------------------------------------
   {
     name: 'trove_search',
@@ -220,6 +229,15 @@ export const TOOL_INDEX: ToolEntry[] = [
     category: 'search',
     keywords: ['people', 'persons', 'organisations', 'biography', 'search'],
     description: 'Search people and organisations.',
+    authRequired: true,
+  },
+  {
+    name: 'trove_get_versions',
+    source: 'trove',
+    sourceDisplay: 'Trove',
+    category: 'get',
+    keywords: ['trove', 'versions', 'holdings', 'work', 'editions', 'formats'],
+    description: 'Get all versions of a work with holdings information.',
     authRequired: true,
   },
 
@@ -358,7 +376,7 @@ export const TOOL_INDEX: ToolEntry[] = [
   },
 
   // ---------------------------------------------------------------------------
-  // NMA - National Museum of Australia (9 tools)
+  // NMA - National Museum of Australia (10 tools)
   // ---------------------------------------------------------------------------
   {
     name: 'nma_search_objects',
@@ -439,6 +457,15 @@ export const TOOL_INDEX: ToolEntry[] = [
     category: 'harvest',
     keywords: ['museum', 'objects', 'bulk', 'download', 'export', 'batch'],
     description: 'Bulk download museum collection objects.',
+    authRequired: false,
+  },
+  {
+    name: 'nma_get_related',
+    source: 'nma',
+    sourceDisplay: 'NMA',
+    category: 'get',
+    keywords: ['nma', 'related', 'links', 'objects', 'places', 'parties'],
+    description: 'Get related objects, places, and parties from _links.',
     authRequired: false,
   },
 
@@ -528,7 +555,7 @@ export const TOOL_INDEX: ToolEntry[] = [
   },
 
   // ---------------------------------------------------------------------------
-  // ACMI - Australian Centre for the Moving Image (7 tools)
+  // ACMI - Australian Centre for the Moving Image (8 tools)
   // ---------------------------------------------------------------------------
   {
     name: 'acmi_search_works',
@@ -591,6 +618,15 @@ export const TOOL_INDEX: ToolEntry[] = [
     category: 'harvest',
     keywords: ['films', 'collection', 'bulk', 'download', 'export', 'batch'],
     description: 'Bulk download collection works.',
+    authRequired: false,
+  },
+  {
+    name: 'acmi_get_related',
+    source: 'acmi',
+    sourceDisplay: 'ACMI',
+    category: 'get',
+    keywords: ['acmi', 'related', 'parts', 'groups', 'series', 'episodes'],
+    description: 'Get related works including parts, groups, and recommendations.',
     authRequired: false,
   },
 
@@ -675,7 +711,7 @@ export const TOOL_INDEX: ToolEntry[] = [
   },
 
   // ---------------------------------------------------------------------------
-  // PM Transcripts - Prime Ministerial Transcripts (2 tools)
+  // PM Transcripts - Prime Ministerial Transcripts (5 tools)
   // ---------------------------------------------------------------------------
   {
     name: 'pm_transcripts_get_transcript',
@@ -693,6 +729,33 @@ export const TOOL_INDEX: ToolEntry[] = [
     category: 'harvest',
     keywords: ['transcripts', 'speeches', 'bulk', 'download', 'export', 'batch'],
     description: 'Bulk download PM transcripts with filters.',
+    authRequired: false,
+  },
+  {
+    name: 'pm_transcripts_search',
+    source: 'pm-transcripts',
+    sourceDisplay: 'PM Transcripts',
+    category: 'search',
+    keywords: ['pm', 'transcripts', 'search', 'fts5', 'fulltext', 'speeches'],
+    description: 'Full-text search PM transcripts using FTS5 index.',
+    authRequired: false,
+  },
+  {
+    name: 'pm_transcripts_build_index',
+    source: 'pm-transcripts',
+    sourceDisplay: 'PM Transcripts',
+    category: 'search',
+    keywords: ['pm', 'transcripts', 'index', 'build', 'fts5'],
+    description: 'Build or update the FTS5 full-text search index.',
+    authRequired: false,
+  },
+  {
+    name: 'pm_transcripts_index_stats',
+    source: 'pm-transcripts',
+    sourceDisplay: 'PM Transcripts',
+    category: 'search',
+    keywords: ['pm', 'transcripts', 'index', 'stats', 'coverage'],
+    description: 'Get FTS5 index statistics and PM coverage.',
     authRequired: false,
   },
 

@@ -106,6 +106,25 @@ Use these parameters to find historical museum specimens:
 - Use `basisOfRecord: "PRESERVED_SPECIMEN"` for historical research (museum specimens)
 - Collector names searched across both `recordedBy` and `collectors` fields
 
+### Collector Name Format
+
+The `collector` filter may require specific name formats for reliable matching. The data contains various formats depending on the contributing institution:
+
+| Format | Example | Notes |
+|--------|---------|-------|
+| Surname only | `Spencer` | May return many false positives |
+| First Last | `Baldwin Spencer` | Common format |
+| Last, First | `Spencer, Baldwin` | Institution format |
+| Abbreviated | `Spencer, B.` | Short form |
+| With title | `von Mueller, F.` | Includes particles |
+| Full formal | `Baron Ferdinand von Mueller` | Complete name |
+
+**Recommendations:**
+- Start with surname, refine if needed
+- Try different formats if initial search returns 0 results
+- Use `dataResourceName` to narrow to specific museum/herbarium
+- Check returned `collector` field values to see actual format used
+
 ## Example GUIDs
 
 - Koala: `https://biodiversity.org.au/afd/taxa/e9e7db31-04df-41fb-bd8d-e0b0f3c332d6`
