@@ -55,9 +55,11 @@ Instead of navigating 11 different archive websites, just ask your AI:
 - *"Show me historical aerial photos of Melbourne from the 1950s"*
 - *"What heritage buildings are in Carlton?"*
 - *"Get species sightings of platypus in Tasmania since 2020"*
-- *"Find Prime Ministerial speeches from the Hawke era"*
+- *"Find Prime Ministerial speeches mentioning 'economic reform'"* (uses FTS5 full-text search)
 - *"Search for gold rush artefacts in the National Museum"*
-- *"Find historical placenames near Ballarat"*
+- *"Find historical placenames within 50km of Ballarat"* (uses point+radius)
+- *"What films are related to Mad Max?"* (uses related records)
+- *"Save this search so I can run it again later"* (uses saved queries)
 
 Your AI handles the API calls, pagination, and formatting - you just ask questions in plain English.
 
@@ -279,6 +281,7 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 | `prov_harvest` | Bulk download PROV records with pagination |
 | `prov_get_agency` | Get agency details by VA number |
 | `prov_get_series` | Get series details by VPRS number |
+| `prov_get_items` | Get items within a series by VPRS number |
 
 **Examples:**
 ```
@@ -313,6 +316,7 @@ prov_get_images with manifestUrl: "<manifest-url-from-search>", size: "full"
 | `trove_list_magazine_titles` | List available magazine titles |
 | `trove_get_magazine_title` | Get magazine title details with years/issues |
 | `trove_get_work` | Get book/image/map/music details by ID (with holdings, links, versions) |
+| `trove_get_versions` | Get all versions of a work with holdings information |
 | `trove_get_person` | Get person/organisation biographical data |
 | `trove_get_list` | Get user-curated research list by ID |
 | `trove_search_people` | Search people and organisations |
@@ -340,7 +344,7 @@ trove_search with query: "bushrangers", sortby: "dateasc",
 
 | Tool | Description |
 |------|-------------|
-| `ghap_search` | Search historical placenames by name, state, LGA, or bounding box |
+| `ghap_search` | Search historical placenames by name, state, LGA, bounding box, or point+radius |
 | `ghap_get_place` | Get place details by TLCMap ID |
 | `ghap_list_layers` | List all available community data layers |
 | `ghap_get_layer` | Get all places from a specific data layer |
@@ -395,7 +399,7 @@ museumsvic_search with recordType: "specimen", hasImages: true, random: true
 
 | Tool | Description |
 |------|-------------|
-| `ala_search_occurrences` | Search species occurrence records by taxon, location, date |
+| `ala_search_occurrences` | Search species occurrence records by taxon, location, date, or point+radius |
 | `ala_search_species` | Search species by common or scientific name |
 | `ala_get_species` | Get species profile with taxonomy, images, distribution |
 | `ala_harvest` | Bulk download occurrence records with pagination |
@@ -435,6 +439,7 @@ ala_search_images with query: "Eucalyptus", limit: 50
 | `nma_get_party` | Get party (person/org) details by ID |
 | `nma_search_media` | Search images, video, and sound |
 | `nma_get_media` | Get media details by ID |
+| `nma_get_related` | Get related objects, parties, and places for a record |
 
 **Examples:**
 ```
@@ -496,6 +501,7 @@ vhd_get_place with id: 12345
 | `acmi_get_creator` | Get creator details and filmography |
 | `acmi_list_constellations` | List curated thematic collections |
 | `acmi_get_constellation` | Get constellation details with works |
+| `acmi_get_related` | Get related works (parts, recommendations, group members) |
 
 **Examples:**
 ```
@@ -520,6 +526,11 @@ acmi_get_creator with id: 12345
 |------|-------------|
 | `pm_transcripts_get_transcript` | Get Prime Ministerial transcript by ID |
 | `pm_transcripts_harvest` | Bulk download transcripts with PM name filter |
+| `pm_transcripts_search` | **Full-text search** across all indexed transcripts (requires local index) |
+| `pm_transcripts_build_index` | Build/rebuild the local SQLite FTS5 search index |
+| `pm_transcripts_index_stats` | Get index statistics (record count, size, last updated) |
+
+> **💡 Full-Text Search**: The `pm_transcripts_search` tool uses a local SQLite FTS5 index for fast, powerful searches. Run `pm_transcripts_build_index` once to create the index (~43 minutes for all 26,000 transcripts). Supports Boolean operators, phrase matching, and BM25 ranking.
 
 > **⚠️ Harvest Limitation**: The PM Transcripts API has no search endpoint, so harvesting scans IDs sequentially. Filtering by PM name can be slow. For targeted PM research, use `startFrom` near the PM's era:
 > - Curtin/Chifley (1940s): ~1-2000
@@ -536,6 +547,15 @@ pm_transcripts_get_transcript with id: 12345
 
 # Harvest Hawke era transcripts
 pm_transcripts_harvest with primeMinister: "Hawke", maxRecords: 100
+
+# Build the full-text search index (one-time setup)
+pm_transcripts_build_index with mode: "full"
+
+# Full-text search for "economic reform" across all transcripts
+pm_transcripts_search with query: "economic reform", limit: 20
+
+# Search with phrase matching and PM filter
+pm_transcripts_search with query: '"unemployment rate"', primeMinister: "Keating"
 ```
 
 </details>
@@ -574,7 +594,7 @@ iiif_get_image_url with imageServiceUrl: "<url-from-manifest>",
 
 | Tool | Description |
 |------|-------------|
-| `ga_hap_search` | Search historical aerial photos by state, year, location, bbox |
+| `ga_hap_search` | Search historical aerial photos by state, year, location, bbox, or point+radius |
 | `ga_hap_get_photo` | Get photo details by OBJECTID or film/run/frame |
 | `ga_hap_harvest` | Bulk download photo records with pagination |
 
@@ -632,7 +652,14 @@ Each source has a `_harvest` tool for bulk downloads with pagination:
 <details>
 <summary><strong>5. Can I search by location or coordinates?</strong></summary>
 
-Yes. Use `ga_hap_search` with `bbox` for aerial photos by bounding box (format: "minLon,minLat,maxLon,maxLat"). ALA tools support `stateProvince` filtering (e.g., "Victoria", "New South Wales"). VHD supports `municipality` filtering for Victorian local government areas.
+Yes. Three sources support **point+radius** spatial queries using `lat`, `lon`, and `radiusKm` parameters:
+- `ala_search_occurrences` - Species sightings within radius of a point
+- `ga_hap_search` - Aerial photos within radius of a point
+- `ghap_search` - Historical placenames within radius of a point
+
+For **bounding box** queries, use `bbox` parameter (format: "minLon,minLat,maxLon,maxLat") with `ga_hap_search` or `ghap_search`.
+
+For **state/region** filtering: ALA supports `stateProvince` (e.g., "Victoria"), VHD supports `municipality` for Victorian LGAs, and GA HAP supports `state` codes (VIC, NSW, etc.).
 
 </details>
 

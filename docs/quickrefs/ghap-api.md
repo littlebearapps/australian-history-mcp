@@ -35,6 +35,9 @@ https://tlcmap.org/
 | `state` | Filter by state (VIC, NSW, QLD, SA, WA, TAS, NT, ACT) |
 | `lga` | Filter by Local Government Area |
 | `bbox` | Bounding box: minLon,minLat,maxLon,maxLat |
+| `lat` | Centre latitude for point+radius search ⭐ NEW |
+| `lon` | Centre longitude for point+radius search ⭐ NEW |
+| `radiusKm` | Search radius in kilometres (requires lat/lon) ⭐ NEW |
 | `paging` | Results per page (default 20) |
 | `format` | Response format (`json`) |
 | `searchausgaz` | Enable Australian Gazetteer (`on`) |

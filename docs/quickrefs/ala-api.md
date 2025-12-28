@@ -25,6 +25,9 @@ Search species occurrence records.
 | `family` | string | Taxonomic family |
 | `genus` | string | Taxonomic genus |
 | `stateProvince` | string | Australian state (e.g., "Victoria") |
+| `lat` | number | Centre latitude for point+radius search ⭐ NEW |
+| `lon` | number | Centre longitude for point+radius search ⭐ NEW |
+| `radiusKm` | number | Search radius in kilometres (requires lat/lon) ⭐ NEW |
 | `startYear` | number | Filter by year range start |
 | `endYear` | number | Filter by year range end |
 | `hasImages` | boolean | Only records with images |
@@ -34,6 +37,16 @@ Search species occurrence records.
 | `dataResourceName` | string | Contributing dataset name |
 | `collector` | string | Collector name (matches recordedBy or collectors) |
 | `limit` | number | Max results (default 20, max 100) |
+
+**Spatial Query Example:**
+```
+# Find koala sightings within 50km of Melbourne CBD
+ala_search_occurrences with:
+  scientificName: "Phascolarctos cinereus"
+  lat: -37.8136
+  lon: 144.9631
+  radiusKm: 50
+```
 
 ### ala_search_species
 Search species by name.

@@ -103,6 +103,9 @@ Search historical aerial photos with filters.
 | `scannedOnly` | boolean | Only return digitised images (default false) |
 | `filmNumber` | string | Film number (e.g., "MAP2080") |
 | `bbox` | string | Bounding box: minLon,minLat,maxLon,maxLat (WGS84) |
+| `lat` | number | Centre latitude for point+radius search ⭐ NEW |
+| `lon` | number | Centre longitude for point+radius search ⭐ NEW |
+| `radiusKm` | number | Search radius in kilometres (requires lat/lon) ⭐ NEW |
 | `filmType` | string | Film type: bw, colour, bw-infrared, colour-infrared, infrared |
 | `camera` | string | Camera model filter (partial match, e.g., "Williamson") |
 | `scaleMin` | number | Min scale denominator (e.g., 10000 for 1:10000 or more detailed) |
@@ -110,6 +113,16 @@ Search historical aerial photos with filters.
 | `sortby` | string | Sort order: relevance, year_asc, year_desc |
 | `limit` | number | Max results (default 20, max 100) |
 | `offset` | number | Pagination offset |
+
+**Spatial Query Example:**
+```
+# Find aerial photos within 25km of Geelong
+ga_hap_search with:
+  lat: -38.1499
+  lon: 144.3617
+  radiusKm: 25
+  scannedOnly: true
+```
 
 ### Filter Examples
 

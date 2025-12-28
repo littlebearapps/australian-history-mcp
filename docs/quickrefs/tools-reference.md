@@ -1,6 +1,6 @@
 # Tools Reference
 
-Complete parameter documentation for all 75 Australian History MCP tools.
+Complete parameter documentation for all 76 Australian History MCP tools.
 
 ---
 
@@ -71,6 +71,25 @@ Bulk download PROV records with pagination.
 - `hasMore` - Whether more records available
 - `nextOffset` - Use for next harvest call
 - `records` - Array of full record objects
+
+---
+
+### prov_get_items
+
+Get items within a PROV series.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `series` | string | **Yes** | - | VPRS series number (e.g., "VPRS 515" or "515") |
+| `query` | string | No | - | Optional text search within series |
+| `dateFrom` | string | No | - | Start date (YYYY-MM-DD or YYYY) |
+| `dateTo` | string | No | - | End date (YYYY-MM-DD or YYYY) |
+| `digitisedOnly` | boolean | No | false | Only return digitised items |
+| `limit` | number | No | 20 | Maximum results (1-100) |
+
+**Response includes:**
+- `totalItems` - Total items in series
+- `items` - Array of item records with `id`, `title`, `dateRange`, `digitised`
 
 ---
 
@@ -176,6 +195,21 @@ Bulk download Trove search results.
 
 ---
 
+### trove_get_versions
+
+Get all versions of a Trove work with holdings information.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `workId` | string | **Yes** | - | Trove work ID |
+
+**Response includes:**
+- `work` - Parent work details
+- `versions` - Array of versions with format, publisher, holdings
+- `totalVersions` - Count of versions
+
+---
+
 ## GHAP Tools (No API Key Required)
 
 ### ghap_search
@@ -188,6 +222,9 @@ Search historical placenames from ANPS gazetteer and community datasets.
 | `state` | string | No | - | Filter by state (VIC, NSW, QLD, SA, WA, TAS, NT, ACT) |
 | `lga` | string | No | - | Filter by Local Government Area |
 | `bbox` | string | No | - | Bounding box: minLon,minLat,maxLon,maxLat |
+| `lat` | number | No | - | Centre latitude for point+radius search |
+| `lon` | number | No | - | Centre longitude for point+radius search |
+| `radiusKm` | number | No | - | Search radius in kilometres (requires lat/lon) |
 | `fuzzy` | boolean | No | false | Use fuzzy matching (handles typos) |
 | `limit` | number | No | 20 | Maximum results (1-100) |
 
@@ -310,6 +347,67 @@ Bulk download museum records.
 | `taxon` | string | No | - | Taxonomic classification |
 | `maxRecords` | number | No | 100 | Maximum records (1-1000) |
 | `startPage` | number | No | 1 | Starting page for pagination |
+
+---
+
+## PM Transcripts Tools (No API Key Required)
+
+### pm_transcripts_search
+
+Full-text search across PM Transcripts using local SQLite FTS5 index.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | **Yes** | - | Search query (supports FTS5 operators: AND, OR, NOT, "phrases") |
+| `primeMinister` | string | No | - | Filter by PM name (partial match) |
+| `releaseType` | string | No | - | Filter by type: Speech, Media Release, Interview, etc. |
+| `dateFrom` | string | No | - | Start date (YYYY-MM-DD) |
+| `dateTo` | string | No | - | End date (YYYY-MM-DD) |
+| `limit` | number | No | 20 | Maximum results (1-100) |
+| `snippetLength` | number | No | 200 | Length of content snippets |
+
+**Response includes:**
+- `totalResults` - Count of matching records
+- `results` - Array with `id`, `title`, `primeMinister`, `date`, `snippet`, `rank`
+- `queryTime` - Search execution time
+
+**Note:** Requires local index. Run `pm_transcripts_build_index` first.
+
+---
+
+### pm_transcripts_build_index
+
+Build or rebuild the local SQLite FTS5 search index.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `mode` | string | No | `full` | `full` (rebuild all), `update` (add new only) |
+| `startFrom` | number | No | 1 | Starting transcript ID |
+| `maxRecords` | number | No | - | Limit records to index (for testing) |
+
+**Response includes:**
+- `status` - Success/error status
+- `indexed` - Number of transcripts indexed
+- `duration` - Build time in seconds
+- `dbPath` - Path to SQLite database
+
+**Note:** Full build takes ~43 minutes for all 26,000 transcripts.
+
+---
+
+### pm_transcripts_index_stats
+
+Get statistics about the local FTS5 search index.
+
+No parameters required.
+
+**Response includes:**
+- `exists` - Whether index exists
+- `recordCount` - Number of indexed transcripts
+- `dbSizeBytes` - Database file size
+- `lastUpdated` - Last index update timestamp
+- `oldestRecord` - Earliest transcript date
+- `newestRecord` - Latest transcript date
 
 ---
 
