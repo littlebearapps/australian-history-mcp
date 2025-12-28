@@ -588,6 +588,24 @@ Size options: "max" (full), "!w,h" (best fit), "pct:50" (percentage), "w," or ",
 Use ga_hap_search with state "VIC", yearFrom 1950, yearTo 1960, scannedOnly true
 ```
 
+### Search Colour Aerial Photos (GA HAP)
+```
+Use ga_hap_search with filmType "colour" and state "VIC"
+Film types: bw (Black/White), colour, bw-infrared, colour-infrared, infrared
+```
+
+### Search Detailed Large-Scale Photos (GA HAP)
+```
+Use ga_hap_search with scaleMin 5000, scaleMax 15000 for detailed urban/site surveys
+Scale: lower denominator = more detail (1:5000 is very detailed, 1:100000 is wide area)
+```
+
+### Search by Camera Type (GA HAP)
+```
+Use ga_hap_search with camera "Wild" or "Williamson" for partial match on camera model
+Common cameras: Wild RC9, Williamson F24, Zeiss RMK, Fairchild
+```
+
 ### Get Aerial Photo Details (GA HAP)
 ```
 Use ga_hap_get_photo with objectId from search results, or filmNumber + run + frame

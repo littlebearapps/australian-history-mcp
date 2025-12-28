@@ -28,6 +28,11 @@ Search species occurrence records.
 | `startYear` | number | Filter by year range start |
 | `endYear` | number | Filter by year range end |
 | `hasImages` | boolean | Only records with images |
+| `basisOfRecord` | string | How recorded: PRESERVED_SPECIMEN, HUMAN_OBSERVATION, MACHINE_OBSERVATION, FOSSIL_SPECIMEN, LIVING_SPECIMEN |
+| `coordinateUncertaintyMax` | number | Max coordinate uncertainty in metres |
+| `occurrenceStatus` | string | "present" or "absent" |
+| `dataResourceName` | string | Contributing dataset name |
+| `collector` | string | Collector name (matches recordedBy or collectors) |
 | `limit` | number | Max results (default 20, max 100) |
 
 ### ala_search_species
@@ -58,12 +63,35 @@ Bulk download occurrence records.
 | `maxRecords` | number | Max records (1-1000, default 100) |
 | `startIndex` | number | Pagination offset |
 
+## Historical Research Filters
+
+Use these parameters to find historical museum specimens:
+
+| Use Case | Parameters |
+|----------|------------|
+| 19th century specimens | `basisOfRecord: "PRESERVED_SPECIMEN"`, `endYear: 1899` |
+| Specimens by collector | `collector: "Baldwin Spencer"` |
+| Precise location data | `coordinateUncertaintyMax: 1000` (within 1km) |
+| Specific museum | `dataResourceName: "Museums Victoria provider"` |
+
+### Basis of Record Values
+
+| Value | Description |
+|-------|-------------|
+| `PRESERVED_SPECIMEN` | Museum specimens (skins, bones, pressed plants) |
+| `HUMAN_OBSERVATION` | Direct sightings, citizen science |
+| `MACHINE_OBSERVATION` | Camera traps, acoustic sensors |
+| `FOSSIL_SPECIMEN` | Fossils and palaeontological specimens |
+| `LIVING_SPECIMEN` | Zoo, botanical garden records |
+
 ## Key Quirks
 
 - Uses two separate APIs: biocache-ws (occurrences) and bie-ws (species)
 - Species identified by LSID GUIDs (e.g., `https://biodiversity.org.au/afd/taxa/...`)
 - BIE API uses `nameString` for scientific name, taxonomy in `classification` object
 - Occurrence records include citizen science observations
+- Use `basisOfRecord: "PRESERVED_SPECIMEN"` for historical research (museum specimens)
+- Collector names searched across both `recordedBy` and `collectors` fields
 
 ## Example GUIDs
 

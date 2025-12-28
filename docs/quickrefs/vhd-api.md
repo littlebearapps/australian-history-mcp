@@ -22,7 +22,12 @@ Search Victorian heritage places.
 | `municipality` | string | Municipality/suburb filter |
 | `architecturalStyle` | string | Architectural style filter |
 | `period` | string | Time period filter |
+| `theme` | string | Heritage theme filter (from vhd_list_themes) |
+| `hasImages` | boolean | Only return places with photographs |
 | `limit` | number | Max results (default 20, max 100) |
+| `includeFacets` | boolean | Include facet counts |
+| `facetFields` | array | Facets to return |
+| `facetLimit` | number | Max values per facet (default 10) |
 
 ### vhd_get_place
 Get detailed heritage place record.
@@ -91,6 +96,9 @@ The VHD API uses different parameter names than typical REST APIs:
 | `municipality` | `sub` | Suburb/municipality |
 | `architecturalStyle` | `arcs` | Architectural style ID |
 | `period` | `per` | Time period ID |
+| `theme` | `thm` | Heritage theme ID |
+| `heritageAuthority` | `aut` | Heritage authority |
+| `hasImages` | (client-side) | Filters by primary_image_id |
 
 ## Response Format
 

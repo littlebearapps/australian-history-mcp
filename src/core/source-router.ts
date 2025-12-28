@@ -252,17 +252,27 @@ export function mapArgsToSource(
       if (state) mapped.stateProvince = mapStateToFull(state);
       mapped.limit = limit;
       mapped.hasImages = true;
+      // Pass through ALA-specific filters (SEARCH-015)
+      if (args.basisOfRecord) mapped.basisOfRecord = args.basisOfRecord;
+      if (args.collector) mapped.collector = args.collector;
       break;
 
     case 'nma':
       mapped.query = query;
       mapped.limit = limit;
+      // SEARCH-011: Map date to year, state to spatial
+      if (dateFrom) mapped.year = parseInt(dateFrom, 10);
+      if (state) mapped.spatial = mapStateToFull(state);
+      if (args.medium) mapped.medium = args.medium;
+      if (args.creator) mapped.creator = args.creator;
       break;
 
     case 'vhd':
       mapped.query = query;
       mapped.limit = limit;
       // VHD is Victoria-only, no state param needed
+      // Map hasImages if provided in common args
+      if (args.hasImages) mapped.hasImages = true;
       break;
 
     case 'acmi':

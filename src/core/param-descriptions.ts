@@ -86,6 +86,11 @@ export const PARAMS = {
   FAMILY: 'Taxonomic family',
   GENUS: 'Genus name',
   TAXON: 'Taxonomic classification',
+  BASIS_OF_RECORD: 'How recorded (specimen, observation)',
+  COORDINATE_UNCERTAINTY: 'Max coord uncertainty in metres',
+  OCCURRENCE_STATUS: 'present or absent',
+  DATA_RESOURCE_NAME: 'Contributing dataset name',
+  COLLECTOR: 'Collector name',
 
   // Search Indexes
   CREATOR: 'Author/creator name',
@@ -126,6 +131,7 @@ export const PARAMS = {
   ARCHITECTURAL_STYLE: 'Architectural style',
   ARCH_STYLE: 'Architectural style', // Alias
   PERIOD: 'Historical period',
+  THEME: 'Heritage theme (from vhd_list_themes)',
   COLLECTION: 'Collection name',
   START_PAGE: 'Starting page number',
 

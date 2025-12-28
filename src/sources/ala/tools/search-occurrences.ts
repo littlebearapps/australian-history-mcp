@@ -7,8 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { ALA_KINGDOMS, AU_STATES_FULL } from '../../../core/enums.js';
-import type { ALAOccurrenceSearchParams, ALAOccurrence, ALAFacetField, ALASortOption } from '../types.js';
-import { ALA_FACET_FIELDS, ALA_SORT_OPTIONS, ALA_SORT_MAPPINGS } from '../types.js';
+import type { ALAOccurrenceSearchParams, ALAOccurrence, ALAFacetField, ALASortOption, ALABasisOfRecord } from '../types.js';
+import { ALA_FACET_FIELDS, ALA_SORT_OPTIONS, ALA_SORT_MAPPINGS, ALA_BASIS_OF_RECORD } from '../types.js';
 
 export const alaSearchOccurrencesTool: SourceTool = {
   schema: {
@@ -28,6 +28,12 @@ export const alaSearchOccurrencesTool: SourceTool = {
         endYear: { type: 'number', description: PARAMS.YEAR_TO },
         hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
         spatiallyValid: { type: 'boolean', description: PARAMS.SPATIALLY_VALID },
+        // New filters (SEARCH-015)
+        basisOfRecord: { type: 'string', description: PARAMS.BASIS_OF_RECORD, enum: ALA_BASIS_OF_RECORD },
+        coordinateUncertaintyMax: { type: 'number', description: PARAMS.COORDINATE_UNCERTAINTY },
+        occurrenceStatus: { type: 'string', description: PARAMS.OCCURRENCE_STATUS, enum: ['present', 'absent'] },
+        dataResourceName: { type: 'string', description: PARAMS.DATA_RESOURCE_NAME },
+        collector: { type: 'string', description: PARAMS.COLLECTOR },
         sortby: { type: 'string', description: PARAMS.SORT_BY, enum: ALA_SORT_OPTIONS, default: 'relevance' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
@@ -52,6 +58,12 @@ export const alaSearchOccurrencesTool: SourceTool = {
       endYear?: number;
       hasImages?: boolean;
       spatiallyValid?: boolean;
+      // New filters (SEARCH-015)
+      basisOfRecord?: ALABasisOfRecord;
+      coordinateUncertaintyMax?: number;
+      occurrenceStatus?: 'present' | 'absent';
+      dataResourceName?: string;
+      collector?: string;
       sortby?: ALASortOption;
       limit?: number;
       // Faceted search
@@ -84,6 +96,12 @@ export const alaSearchOccurrencesTool: SourceTool = {
         endYear: input.endYear,
         hasImages: input.hasImages,
         spatiallyValid: input.spatiallyValid,
+        // New filters (SEARCH-015)
+        basisOfRecord: input.basisOfRecord,
+        coordinateUncertaintyMax: input.coordinateUncertaintyMax,
+        occurrenceStatus: input.occurrenceStatus,
+        dataResourceName: input.dataResourceName,
+        collector: input.collector,
         sort: sortMapping?.sort as ALAOccurrenceSearchParams['sort'],
         dir: sortMapping?.dir as ALAOccurrenceSearchParams['dir'],
         pageSize: Math.min(input.limit ?? 20, 100),

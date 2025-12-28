@@ -32,6 +32,37 @@ export const STATE_NAMES: Record<string, string> = {
 };
 
 // ============================================================================
+// Film Type Code Mapping (SEARCH-013)
+// ============================================================================
+
+/**
+ * Film type coded values from ArcGIS domain
+ */
+export const FILM_TYPE_CODES: Record<string, string> = {
+  unknown: '0',
+  bw: '1',
+  colour: '2',
+  'bw-infrared': '3',
+  'colour-infrared': '4',
+  infrared: '5',
+  other: '6',
+};
+
+export const FILM_TYPE_NAMES: Record<string, string> = {
+  '0': 'Unknown',
+  '1': 'Black/White',
+  '2': 'Colour',
+  '3': 'Black/White Infrared',
+  '4': 'Colour Infrared',
+  '5': 'Infrared',
+  '6': 'Other',
+};
+
+export type GAHAPFilmType = 'bw' | 'colour' | 'bw-infrared' | 'colour-infrared' | 'infrared' | 'unknown' | 'other';
+
+export const GAHAP_FILM_TYPES: GAHAPFilmType[] = ['bw', 'colour', 'bw-infrared', 'colour-infrared', 'infrared', 'unknown', 'other'];
+
+// ============================================================================
 // Sort Options
 // ============================================================================
 
@@ -69,6 +100,15 @@ export interface GAHAPSearchParams {
   filmNumber?: string;
   /** Sort order for results */
   sortby?: GAHAPSortOption;
+  // SEARCH-013: Technical filters
+  /** Film type (bw, colour, bw-infrared, colour-infrared, infrared, unknown, other) */
+  filmType?: GAHAPFilmType;
+  /** Camera model filter (partial match, e.g., "Williamson") */
+  camera?: string;
+  /** Minimum scale denominator (e.g., 10000 for 1:10000 or larger) */
+  scaleMin?: number;
+  /** Maximum scale denominator (e.g., 50000 for 1:50000 or smaller) */
+  scaleMax?: number;
 }
 
 export interface GAHAPGetPhotoParams {

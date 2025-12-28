@@ -2,8 +2,9 @@
 
 **Priority:** P2
 **Phase:** 2 - Federated & Filter Expansion
-**Status:** Not Started
+**Status:** ✅ Done
 **Estimated Effort:** 1 day
+**Completed:** 2025-12-28
 **Dependencies:** None
 
 ---
@@ -19,159 +20,117 @@ Add technical/specialized filters to GA HAP (Geoscience Australia Historical Aer
 - `bbox` - Bounding box
 - `filmNumber` - Film identifier
 
-**Target Parameters (10+):**
+**Implemented Parameters (10):**
 - All current parameters, plus:
-- `filmType` - Black & White, Colour, Infrared
-- `cameraType` - Camera equipment
-- `scaleRange` - Photo scale filtering (min/max)
-- `flightHeight` - Altitude range
-- `resolution` - Scan resolution
-- `hasPreview` - Has preview image
+- `filmType` - Film type (bw, colour, bw-infrared, colour-infrared, infrared)
+- `camera` - Camera model (partial match)
+- `scaleMin` - Minimum scale denominator
+- `scaleMax` - Maximum scale denominator
 
 ---
 
-## Files to Modify
+## Completion Notes
+
+### API Research Findings
+- Queried ArcGIS feature layer for field metadata
+- **FILM_TYPE** is a coded value domain:
+  - "0" = Unknown
+  - "1" = Black/White (~967,000 records)
+  - "2" = Colour (~127,000 records)
+  - "3" = Black/White Infrared (~26,000 records)
+  - "4" = Colour Infrared (rare)
+  - "5" = Infrared (rare)
+  - "6" = Other
+- **AVE_SCALE** is an integer (scale denominator)
+- **CAMERA** is free-text string (e.g., "Wild RC9", "Williamson F24")
+- **AVE_HEIGHT** and **FOCAL_LENG** are strings with units ("12000 ft", "5 in") - not ideal for filtering
+
+### Implementation Details
+- Updated `src/sources/ga-hap/types.ts` with film type codes mapping and new params
+- Updated `src/sources/ga-hap/client.ts` buildWhereClause() for new filters
+- Updated `src/sources/ga-hap/tools/search.ts` with schema and facets
+- Updated `docs/quickrefs/ga-hap-api.md` with filter reference tables
+
+### Key Decisions
+- Film type uses user-friendly values (bw, colour) mapped to API codes
+- Response shows human-readable film type names ("Black/White" not "1")
+- Camera filter uses LIKE for partial matching
+- Height/focal length filters not implemented (strings with units)
+- Added camera facet for faceted search
+
+---
+
+## Files Modified
 
 | File | Change |
 |------|--------|
-| `src/sources/ga-hap/tools/search.ts` | Add new parameters |
-| `src/sources/ga-hap/client.ts` | Support ArcGIS filter syntax |
-| `src/sources/ga-hap/types.ts` | Update input types |
-| `docs/quickrefs/ga-hap-api.md` | Document new filters |
+| `src/sources/ga-hap/types.ts` | Added FILM_TYPE_CODES, FILM_TYPE_NAMES, GAHAPFilmType |
+| `src/sources/ga-hap/client.ts` | Extended buildWhereClause(), film type translation in parsePhoto() |
+| `src/sources/ga-hap/tools/search.ts` | Added filmType, camera, scaleMin, scaleMax to schema |
+| `docs/quickrefs/ga-hap-api.md` | Added film type mapping, scale reference, camera examples |
+| `CLAUDE.md` | Added new GA HAP use cases |
 
 ---
 
 ## Subtasks
 
 ### 1. Research ArcGIS Fields
-- [ ] Query ArcGIS feature layer for available fields
-- [ ] Document field names and types:
-  ```
-  Expected fields:
-  - FILM_TYPE (string) - "Black & White", "Colour", etc.
-  - CAMERA (string) - Camera model
-  - AVE_SCALE (number) - Average scale denominator
-  - AVE_HEIGHT (number) - Flight height in feet/meters
-  - FOCAL_LENG (number) - Focal length in mm
-  - SCAN_RES (number) - Scan resolution DPI
-  ```
-- [ ] Test which fields are filterable via WHERE clause
-- [ ] Note valid values for enum fields
+- [x] Query ArcGIS feature layer for available fields
+- [x] Document field names and types:
+  - FILM_TYPE (string) - Coded values 0-6
+  - CAMERA (string) - Free text camera model
+  - AVE_SCALE (number) - Scale denominator
+  - AVE_HEIGHT (string) - Height with units
+  - FOCAL_LENG (string) - Focal length with units
+- [x] Test which fields are filterable via WHERE clause
+- [x] Note valid values for enum fields
 
 ### 2. Update Types
-- [ ] Expand `GAHAPSearchInput`:
-  ```typescript
-  interface GAHAPSearchInput {
-    // Existing params
-    state?: 'NSW' | 'VIC' | 'QLD' | 'SA' | 'WA' | 'TAS' | 'NT' | 'ACT';
-    yearFrom?: number;
-    yearTo?: number;
-    scannedOnly?: boolean;
-    bbox?: string;
-    filmNumber?: string;
-
-    // New technical filters
-    filmType?: 'bw' | 'colour' | 'infrared';
-    cameraType?: string;
-    scaleMin?: number;      // Minimum scale denominator (e.g., 10000)
-    scaleMax?: number;      // Maximum scale denominator (e.g., 50000)
-    flightHeightMin?: number;  // Minimum altitude
-    flightHeightMax?: number;  // Maximum altitude
-    focalLength?: number;   // Focal length in mm
-    scanResolution?: number; // Minimum scan DPI
-    hasPreview?: boolean;   // Has preview image URL
-
-    maxRecords?: number;
-    startOffset?: number;
-  }
-  ```
+- [x] Created FILM_TYPE_CODES and FILM_TYPE_NAMES mappings
+- [x] Created GAHAPFilmType type with user-friendly values
+- [x] Expanded GAHAPSearchParams with filmType, camera, scaleMin, scaleMax
 
 ### 3. Update Client WHERE Clause Builder
-- [ ] Modify `buildWhereClause()` in `client.ts`:
-  ```typescript
-  function buildWhereClause(input: GAHAPSearchInput): string {
-    const conditions: string[] = [];
-
-    // Existing conditions
-    if (input.state) conditions.push(`STATE='${stateCode}'`);
-    if (input.yearFrom) conditions.push(`YEAR_END>=${input.yearFrom}`);
-    if (input.yearTo) conditions.push(`YEAR_START<=${input.yearTo}`);
-
-    // New technical conditions
-    if (input.filmType) {
-      const filmTypeMap = {
-        'bw': 'Black & White',
-        'colour': 'Colour',
-        'infrared': 'Infrared',
-      };
-      conditions.push(`FILM_TYPE='${filmTypeMap[input.filmType]}'`);
-    }
-
-    if (input.cameraType) {
-      conditions.push(`CAMERA LIKE '%${input.cameraType}%'`);
-    }
-
-    if (input.scaleMin) {
-      conditions.push(`AVE_SCALE>=${input.scaleMin}`);
-    }
-    if (input.scaleMax) {
-      conditions.push(`AVE_SCALE<=${input.scaleMax}`);
-    }
-
-    if (input.flightHeightMin) {
-      conditions.push(`AVE_HEIGHT>=${input.flightHeightMin}`);
-    }
-    if (input.flightHeightMax) {
-      conditions.push(`AVE_HEIGHT<=${input.flightHeightMax}`);
-    }
-
-    if (input.hasPreview) {
-      conditions.push(`PREVIEW_URL IS NOT NULL`);
-    }
-
-    return conditions.join(' AND ') || '1=1';
-  }
-  ```
+- [x] Added filmType filter with code mapping
+- [x] Added camera filter with LIKE partial matching
+- [x] Added scaleMin/scaleMax filters
+- [x] Updated parsePhoto to translate film type codes to names
 
 ### 4. Update Search Tool
-- [ ] Add new parameters to tool schema
-- [ ] Add parameter descriptions with valid values
-- [ ] Add examples for technical users
+- [x] Added new parameters to tool schema
+- [x] Added camera facet for faceted search
+- [x] Added camera and height to response
 
-### 5. Add Film Type Reference Data
-- [ ] Create helper to list valid film types
-- [ ] Consider adding `ga_hap_list_film_types` tool
-- [ ] Document common camera types
+### 5. Testing
+- [x] Tested film type filtering (FILM_TYPE='2' for colour)
+- [x] Tested scale range filtering (AVE_SCALE>=10000 AND AVE_SCALE<=25000)
+- [x] Tested camera partial matching (CAMERA LIKE '%Wild%')
+- [x] All API queries returned expected results
 
-### 6. Testing
-- [ ] Test film type filtering
-- [ ] Test scale range filtering
-- [ ] Test flight height filtering
-- [ ] Test camera type partial matching
-- [ ] Test combinations of technical filters
-- [ ] Verify WHERE clause syntax is correct
-
-### 7. Documentation
-- [ ] Update `docs/quickrefs/ga-hap-api.md` with new filters
-- [ ] Add technical filter examples to CLAUDE.md
-- [ ] Document use cases for each filter
+### 6. Documentation
+- [x] Updated `docs/quickrefs/ga-hap-api.md` with:
+  - Film type code mapping table
+  - Scale reference table
+  - Common camera types
+  - Filter examples
+- [x] Added new use cases to CLAUDE.md
 
 ---
 
 ## Example Queries
 
 ```
-# Find colour aerial photos
-ga_hap_search: state="VIC", yearFrom=1960, filmType="colour"
+# Find colour aerial photos in Victoria
+ga_hap_search: state="VIC", filmType="colour"
 
-# Find large-scale (detailed) photos
-ga_hap_search: state="NSW", scaleMin=5000, scaleMax=15000
+# Find detailed (large-scale) photos
+ga_hap_search: scaleMin=5000, scaleMax=15000
 
-# Find high-altitude photos
-ga_hap_search: state="QLD", flightHeightMin=20000
+# Find Wild camera photos from 1960s
+ga_hap_search: camera="Wild", yearFrom=1960, yearTo=1969
 
-# Find high-resolution scans
-ga_hap_search: state="VIC", scannedOnly=true, scanResolution=600
+# Find B&W infrared in NSW
+ga_hap_search: state="NSW", filmType="bw-infrared"
 
 # Combined technical query
 ga_hap_search: state="VIC", yearFrom=1950, yearTo=1960, filmType="bw", scaleMax=25000
@@ -181,33 +140,60 @@ ga_hap_search: state="VIC", yearFrom=1950, yearTo=1960, filmType="bw", scaleMax=
 
 ## Scale Reference
 
-Common aerial photography scales:
-- **1:5,000** - Very detailed, individual buildings visible
-- **1:10,000** - Detailed, street-level features
-- **1:25,000** - Medium, suburb/rural area
-- **1:50,000** - Overview, regional coverage
-- **1:100,000** - Wide area, state-level coverage
+| Scale | Denominator | Use Case |
+|-------|-------------|----------|
+| 1:5,000 | 5000 | Very detailed urban/site surveys |
+| 1:10,000 | 10000 | Detailed urban mapping |
+| 1:25,000 | 25000 | Topographic mapping |
+| 1:50,000 | 50000 | Regional mapping |
+| 1:80,000 | 80000 | Wide-area coverage |
+| 1:100,000 | 100000 | Broad regional surveys |
 
-Lower denominator = larger scale = more detail
+**Note:** Lower denominator = more detail (larger scale). Higher denominator = less detail (smaller scale).
+
+---
+
+## Film Type Reference
+
+| Code | Type | Tool Value | Record Count |
+|------|------|------------|--------------|
+| 0 | Unknown | `unknown` | varies |
+| 1 | Black/White | `bw` | ~967,000 |
+| 2 | Colour | `colour` | ~127,000 |
+| 3 | Black/White Infrared | `bw-infrared` | ~26,000 |
+| 4 | Colour Infrared | `colour-infrared` | rare |
+| 5 | Infrared | `infrared` | rare |
+| 6 | Other | `other` | varies |
+
+---
+
+## Common Camera Types
+
+| Camera | Description |
+|--------|-------------|
+| Wild RC9 | Swiss precision mapping camera |
+| Williamson F24 | British reconnaissance camera |
+| Zeiss RMK | German aerial survey camera |
+| Fairchild | American aerial camera |
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] Film type filtering works (B&W, Colour, Infrared)
-- [ ] Scale range filtering works
-- [ ] At least 2 additional technical filters added
-- [ ] WHERE clause syntax is valid ArcGIS SQL
-- [ ] Documentation includes technical filter examples
-- [ ] No breaking changes to existing search
+- [x] Film type filtering works (bw, colour, infrared variants)
+- [x] Scale range filtering works
+- [x] Camera partial matching works
+- [x] WHERE clause syntax is valid ArcGIS SQL
+- [x] Documentation includes technical filter examples
+- [x] No breaking changes to existing search
 
 ---
 
 ## Notes
 
 - ArcGIS REST API uses SQL-like WHERE clause
-- Some fields may have NULL values - handle gracefully
-- Scale filtering may need validation (min < max)
-- Camera types may vary - use partial matching
-- Consider adding outFields parameter to control returned fields
-- Technical filters mainly for professional/research users
+- Film type uses coded values (0-6) - mapped to user-friendly names
+- Scale filtering works on integer AVE_SCALE field
+- Height and focal length are strings with units - not implemented as filters
+- Camera types vary - partial LIKE matching works well
+- Response now shows human-readable film type names

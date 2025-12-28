@@ -27,6 +27,9 @@ export const acmiSearchWorksTool: SourceTool = {
         query: { type: 'string', description: PARAMS.QUERY },
         type: { type: 'string', description: PARAMS.TYPE },
         year: { type: 'number', description: PARAMS.YEAR },
+        // SEARCH-012: New filter parameters
+        field: { type: 'string', description: 'Limit search to field (e.g., title)', enum: ['title', 'description'] },
+        size: { type: 'number', description: 'Results per page (default 20, max 50)' },
         page: { type: 'number', description: PARAMS.PAGE, default: 1 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -42,6 +45,9 @@ export const acmiSearchWorksTool: SourceTool = {
       query?: string;
       type?: string;
       year?: number;
+      // SEARCH-012: New filter parameters
+      field?: string;
+      size?: number;
       page?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -58,6 +64,9 @@ export const acmiSearchWorksTool: SourceTool = {
         query: input.query,
         type: input.type,
         year: input.year,
+        // SEARCH-012: New filter parameters
+        field: input.field,
+        size: input.size,
         page: input.page ?? 1,
       });
 

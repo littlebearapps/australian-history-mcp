@@ -49,6 +49,23 @@ export class NMAClient extends BaseClient {
       queryParams.collection = params.collection;
     }
 
+    // SEARCH-011: New filter parameters
+    if (params.medium) {
+      queryParams.medium = params.medium;
+    }
+
+    if (params.spatial) {
+      queryParams.spatial = params.spatial;
+    }
+
+    if (params.temporal !== undefined) {
+      queryParams.temporal = params.temporal.toString();
+    }
+
+    if (params.creator) {
+      queryParams.creator = params.creator;
+    }
+
     queryParams.limit = (params.limit ?? 20).toString();
 
     if (params.offset) {

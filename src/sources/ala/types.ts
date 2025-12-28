@@ -82,6 +82,22 @@ export const ALA_SORT_MAPPINGS: Record<ALASortOption, { sort: string; dir: strin
 // Search Parameter Types
 // ============================================================================
 
+/** Basis of record types - how the occurrence was recorded */
+export type ALABasisOfRecord =
+  | 'PRESERVED_SPECIMEN'
+  | 'HUMAN_OBSERVATION'
+  | 'MACHINE_OBSERVATION'
+  | 'FOSSIL_SPECIMEN'
+  | 'LIVING_SPECIMEN';
+
+export const ALA_BASIS_OF_RECORD: ALABasisOfRecord[] = [
+  'PRESERVED_SPECIMEN',
+  'HUMAN_OBSERVATION',
+  'MACHINE_OBSERVATION',
+  'FOSSIL_SPECIMEN',
+  'LIVING_SPECIMEN',
+];
+
 export interface ALAOccurrenceSearchParams {
   /** Search query (taxon name, location, etc.) */
   q?: string;
@@ -99,8 +115,10 @@ export interface ALAOccurrenceSearchParams {
   species?: string;
   /** Filter by state/territory */
   stateProvince?: string;
-  /** Filter by data resource */
+  /** Filter by data resource UID */
   dataResourceUid?: string;
+  /** Filter by data resource name */
+  dataResourceName?: string;
   /** Start year */
   startYear?: number;
   /** End year */
@@ -109,6 +127,14 @@ export interface ALAOccurrenceSearchParams {
   hasImages?: boolean;
   /** Only spatially valid records */
   spatiallyValid?: boolean;
+  /** Basis of record filter */
+  basisOfRecord?: ALABasisOfRecord;
+  /** Maximum coordinate uncertainty in metres */
+  coordinateUncertaintyMax?: number;
+  /** Occurrence status (present/absent) */
+  occurrenceStatus?: 'present' | 'absent';
+  /** Collector/recorded by name */
+  collector?: string;
   /** Page size (max 100) */
   pageSize?: number;
   /** Start index for pagination */

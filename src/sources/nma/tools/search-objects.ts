@@ -12,6 +12,8 @@ import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
 const NMA_FACET_CONFIGS = [
   simpleFacetConfig('type', 'Type', 'additionalType'),
   simpleFacetConfig('collection', 'Collection', 'collection.title'),
+  simpleFacetConfig('medium', 'Material', 'medium.title'),
+  simpleFacetConfig('spatial', 'Place', 'spatial.title'),
 ];
 
 const NMA_FACET_FIELDS = NMA_FACET_CONFIGS.map(c => c.name);
@@ -26,6 +28,11 @@ export const nmaSearchObjectsTool: SourceTool = {
         query: { type: 'string', description: PARAMS.QUERY },
         type: { type: 'string', description: PARAMS.TYPE },
         collection: { type: 'string', description: PARAMS.COLLECTION },
+        // SEARCH-011: New filter parameters
+        medium: { type: 'string', description: 'Material (e.g., Wood, Paper, Metal)' },
+        spatial: { type: 'string', description: 'Place/location (e.g., Victoria, Queensland)' },
+        year: { type: 'number', description: PARAMS.YEAR },
+        creator: { type: 'string', description: PARAMS.CREATOR },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -41,6 +48,11 @@ export const nmaSearchObjectsTool: SourceTool = {
       query?: string;
       type?: string;
       collection?: string;
+      // SEARCH-011: New filter parameters
+      medium?: string;
+      spatial?: string;
+      year?: number;
+      creator?: string;
       limit?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -57,6 +69,11 @@ export const nmaSearchObjectsTool: SourceTool = {
         text: input.query,
         type: input.type,
         collection: input.collection,
+        // SEARCH-011: New filter parameters
+        medium: input.medium,
+        spatial: input.spatial,
+        temporal: input.year,
+        creator: input.creator,
         limit: Math.min(input.limit ?? 20, 100),
       });
 

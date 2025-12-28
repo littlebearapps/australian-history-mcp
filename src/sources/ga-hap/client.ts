@@ -18,7 +18,7 @@ import type {
   GAHAPAttributes,
   GAHAPSearchResult,
 } from './types.js';
-import { STATE_CODES as CODES, STATE_NAMES as NAMES, GAHAP_SORT_MAPPINGS } from './types.js';
+import { STATE_CODES as CODES, STATE_NAMES as NAMES, GAHAP_SORT_MAPPINGS, FILM_TYPE_CODES, FILM_TYPE_NAMES } from './types.js';
 
 const API_BASE =
   'https://services1.arcgis.com/wfNKYeHsOyaFyPw3/arcgis/rest/services/HistoricalAerialPhotography_AGOL_DIST_gdb/FeatureServer';
@@ -205,6 +205,31 @@ export class GAHAPClient extends BaseClient {
       conditions.push(`FILM_NUMBER = '${params.filmNumber}'`);
     }
 
+    // SEARCH-013: Film type filter
+    if (params.filmType) {
+      const filmTypeCode = FILM_TYPE_CODES[params.filmType];
+      if (filmTypeCode) {
+        conditions.push(`FILM_TYPE = '${filmTypeCode}'`);
+      }
+    }
+
+    // SEARCH-013: Camera filter (partial match)
+    if (params.camera) {
+      // Escape single quotes in camera name
+      const escapedCamera = params.camera.replace(/'/g, "''");
+      conditions.push(`CAMERA LIKE '%${escapedCamera}%'`);
+    }
+
+    // SEARCH-013: Scale range filter (lower denominator = more detail)
+    // scaleMin: minimum denominator (e.g., 10000 means 1:10000 or more detailed)
+    // scaleMax: maximum denominator (e.g., 50000 means 1:50000 or less detailed)
+    if (params.scaleMin !== undefined) {
+      conditions.push(`AVE_SCALE >= ${params.scaleMin}`);
+    }
+    if (params.scaleMax !== undefined) {
+      conditions.push(`AVE_SCALE <= ${params.scaleMax}`);
+    }
+
     // Return all records if no conditions
     return conditions.length > 0 ? conditions.join(' AND ') : '1=1';
   }
@@ -261,7 +286,7 @@ export class GAHAPClient extends BaseClient {
       focalLength: attrs.FOCAL_LENG,
       averageHeight: attrs.AVE_HEIGHT,
       averageScale: attrs.AVE_SCALE,
-      filmType: attrs.FILM_TYPE,
+      filmType: attrs.FILM_TYPE ? FILM_TYPE_NAMES[attrs.FILM_TYPE] ?? attrs.FILM_TYPE : undefined,
       scanned: attrs.SCANNED === '1',
       previewUrl: this.extractUrl(attrs.PREVIEW_URL),
       tifUrl: this.extractUrl(attrs.TIF_URL),

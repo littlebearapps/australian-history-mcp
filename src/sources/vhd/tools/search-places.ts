@@ -14,6 +14,7 @@ const VHD_FACET_CONFIGS = [
   simpleFacetConfig('architecturalStyle', 'Architectural Style', 'architectural_style'),
   simpleFacetConfig('period', 'Period', 'period'),
   simpleFacetConfig('heritageAuthority', 'Heritage Authority', 'heritage_authority_name'),
+  simpleFacetConfig('hasImage', 'Has Image', 'primary_image_id'),
 ];
 
 const VHD_FACET_FIELDS = VHD_FACET_CONFIGS.map(c => c.name);
@@ -29,6 +30,8 @@ export const vhdSearchPlacesTool: SourceTool = {
         municipality: { type: 'string', description: PARAMS.MUNICIPALITY },
         architecturalStyle: { type: 'string', description: PARAMS.ARCH_STYLE },
         period: { type: 'string', description: PARAMS.PERIOD },
+        theme: { type: 'string', description: PARAMS.THEME },
+        hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -45,6 +48,8 @@ export const vhdSearchPlacesTool: SourceTool = {
       municipality?: string;
       architecturalStyle?: string;
       period?: string;
+      theme?: string;
+      hasImages?: boolean;
       limit?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -58,10 +63,15 @@ export const vhdSearchPlacesTool: SourceTool = {
         municipality: input.municipality,
         architecturalStyle: input.architecturalStyle,
         period: input.period,
+        theme: input.theme,
         limit: Math.min(input.limit ?? 20, 100),
       });
 
-      const places = result._embedded?.places ?? [];
+      // Get places and optionally filter by image presence
+      let places = result._embedded?.places ?? [];
+      if (input.hasImages) {
+        places = places.filter((place) => place.primary_image_id != null);
+      }
 
       // Build response with optional facets
       const response: Record<string, unknown> = {

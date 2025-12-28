@@ -9,16 +9,17 @@ import { PARAMS } from '../../../core/param-descriptions.js';
 import { AU_STATES } from '../../../core/enums.js';
 import { countFacets, simpleFacetConfig, countByDecade } from '../../../core/facets/index.js';
 import type { Facet } from '../../../core/facets/types.js';
-import type { GAHAPSortOption } from '../types.js';
-import { GAHAP_SORT_OPTIONS } from '../types.js';
+import type { GAHAPSortOption, GAHAPFilmType } from '../types.js';
+import { GAHAP_SORT_OPTIONS, GAHAP_FILM_TYPES } from '../types.js';
 
 // Facet configuration for GA HAP
 const GA_HAP_FACET_CONFIGS = [
   simpleFacetConfig('state', 'State', 'stateName'),
   simpleFacetConfig('filmType', 'Film Type', 'filmType'),
+  simpleFacetConfig('camera', 'Camera', 'camera'),
 ];
 
-const GA_HAP_FACET_FIELDS = ['state', 'filmType', 'decade'];
+const GA_HAP_FACET_FIELDS = ['state', 'filmType', 'camera', 'decade'];
 
 export const gaHapSearchTool: SourceTool = {
   schema: {
@@ -34,11 +35,16 @@ export const gaHapSearchTool: SourceTool = {
         filmNumber: { type: 'string', description: PARAMS.FILM_NUMBER },
         bbox: { type: 'string', description: PARAMS.BBOX },
         sortby: { type: 'string', description: PARAMS.SORT_BY, enum: GAHAP_SORT_OPTIONS, default: 'relevance' },
+        // SEARCH-013: Technical filters
+        filmType: { type: 'string', description: 'Film type (bw=Black/White, colour, bw-infrared, colour-infrared, infrared)', enum: GAHAP_FILM_TYPES },
+        camera: { type: 'string', description: 'Camera model filter (partial match, e.g., "Williamson")' },
+        scaleMin: { type: 'number', description: 'Min scale denominator (e.g., 10000 for 1:10000 or more detailed)' },
+        scaleMax: { type: 'number', description: 'Max scale denominator (e.g., 50000 for 1:50000 or less detailed)' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         offset: { type: 'number', description: PARAMS.OFFSET, default: 0 },
-        // Faceted search
+        // Faceted search (SEARCH-013: added camera facet)
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
-        facetFields: { type: 'array', items: { type: 'string', enum: GA_HAP_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetFields: { type: 'array', items: { type: 'string', enum: GA_HAP_FACET_FIELDS as unknown as string[] }, description: PARAMS.FACET_FIELDS },
         facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: [],
@@ -54,6 +60,11 @@ export const gaHapSearchTool: SourceTool = {
       filmNumber?: string;
       bbox?: string;
       sortby?: GAHAPSortOption;
+      // SEARCH-013: Technical filters
+      filmType?: GAHAPFilmType;
+      camera?: string;
+      scaleMin?: number;
+      scaleMax?: number;
       limit?: number;
       offset?: number;
       // Faceted search
@@ -71,6 +82,11 @@ export const gaHapSearchTool: SourceTool = {
         filmNumber: input.filmNumber,
         bbox: input.bbox,
         sortby: input.sortby,
+        // SEARCH-013: Technical filters
+        filmType: input.filmType,
+        camera: input.camera,
+        scaleMin: input.scaleMin,
+        scaleMax: input.scaleMax,
         limit: Math.min(input.limit ?? 20, 100),
         offset: input.offset ?? 0,
       });
@@ -93,7 +109,9 @@ export const gaHapSearchTool: SourceTool = {
               : photo.yearStart?.toString() ?? photo.yearEnd?.toString(),
           state: photo.stateName ?? photo.stateCode,
           filmType: photo.filmType,
+          camera: photo.camera,
           scale: photo.averageScale ? `1:${photo.averageScale}` : undefined,
+          height: photo.averageHeight,
           scanned: photo.scanned,
           previewUrl: photo.previewUrl,
           downloadUrl: photo.tifUrl,
@@ -110,7 +128,7 @@ export const gaHapSearchTool: SourceTool = {
         const facetFieldsToInclude = input.facetFields ?? GA_HAP_FACET_FIELDS;
 
         // Standard facets
-        if (facetFieldsToInclude.includes('state') || facetFieldsToInclude.includes('filmType')) {
+        if (facetFieldsToInclude.includes('state') || facetFieldsToInclude.includes('filmType') || facetFieldsToInclude.includes('camera')) {
           const facetResult = countFacets(
             result.photos as unknown as Record<string, unknown>[],
             {

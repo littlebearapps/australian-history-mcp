@@ -21,6 +21,10 @@ Search museum collection objects.
 | `query` | string | Search term (e.g., "boomerang", "gold rush") |
 | `type` | string | Object type filter |
 | `collection` | string | Collection name filter |
+| `medium` | string | Material filter (e.g., "Wood", "Paper", "Metal") |
+| `spatial` | string | Place/location filter (e.g., "Victoria", "Queensland") |
+| `year` | number | Year filter (e.g., 1850) |
+| `creator` | string | Creator/maker name filter |
 | `limit` | number | Max results (default 20, max 100) |
 | `offset` | number | Pagination offset |
 
@@ -72,12 +76,25 @@ Bulk download collection records.
 }
 ```
 
+## Filter Examples
+
+| Use Case | Parameters |
+|----------|------------|
+| Wooden artefacts from Victoria | `medium: "Wood"`, `spatial: "Victoria"` |
+| Gold rush era objects | `query: "gold"`, `year: 1851` |
+| Paper items from Queensland | `medium: "Paper"`, `spatial: "Queensland"` |
+
+### Common Material Values
+
+Wood, Paper, Metal, Glass, Ceramic, Textile, Stone, Leather, Bone, Ivory
+
 ## Key Quirks
 
 - Uses offset-based pagination
 - Objects have type-prefixed IDs
 - Licence is CC-BY-NC (non-commercial use)
 - Places returned as array with title and role
+- Use `medium` for material, `spatial` for place (not `material` or `place`)
 
 ## Resources
 

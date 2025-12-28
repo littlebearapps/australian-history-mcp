@@ -13,6 +13,10 @@ export interface ACMISearchParams {
   type?: string;
   /** Production year filter */
   year?: number;
+  /** Limit search to specific field (e.g., "title") */
+  field?: string;
+  /** Page size (default 20, max 50) */
+  size?: number;
   /** Page number (1-based) */
   page?: number;
 }

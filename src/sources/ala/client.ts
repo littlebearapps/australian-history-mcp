@@ -153,6 +153,27 @@ export class ALAClient extends BaseClient {
       queryParts.push(`data_resource_uid:${params.dataResourceUid}`);
     }
 
+    if (params.dataResourceName) {
+      queryParts.push(`dataResourceName:"${params.dataResourceName}"`);
+    }
+
+    if (params.basisOfRecord) {
+      queryParts.push(`basisOfRecord:${params.basisOfRecord}`);
+    }
+
+    if (params.coordinateUncertaintyMax !== undefined) {
+      queryParts.push(`coordinateUncertaintyInMeters:[0 TO ${params.coordinateUncertaintyMax}]`);
+    }
+
+    if (params.occurrenceStatus) {
+      queryParts.push(`occurrenceStatus:${params.occurrenceStatus}`);
+    }
+
+    if (params.collector) {
+      // Search both recordedBy and collectors fields
+      queryParts.push(`(recordedBy:"${params.collector}" OR collectors:"${params.collector}")`);
+    }
+
     if (params.startYear || params.endYear) {
       const startYear = params.startYear ?? '*';
       const endYear = params.endYear ?? '*';
