@@ -32,6 +32,10 @@ export interface CommonSearchArgs {
   dateTo?: string;
   state?: string;
   limit?: number;
+  // SEARCH-016: Spatial query support
+  lat?: number;
+  lon?: number;
+  radiusKm?: number;
   [key: string]: unknown;
 }
 
@@ -255,6 +259,10 @@ export function mapArgsToSource(
       // Pass through ALA-specific filters (SEARCH-015)
       if (args.basisOfRecord) mapped.basisOfRecord = args.basisOfRecord;
       if (args.collector) mapped.collector = args.collector;
+      // SEARCH-016: Spatial query support
+      if (args.lat !== undefined) mapped.lat = args.lat;
+      if (args.lon !== undefined) mapped.lon = args.lon;
+      if (args.radiusKm !== undefined) mapped.radiusKm = args.radiusKm;
       break;
 
     case 'nma':
@@ -286,6 +294,10 @@ export function mapArgsToSource(
       mapped.query = query;
       if (state) mapped.state = state.toUpperCase();
       mapped.limit = limit;
+      // SEARCH-016: Spatial query support
+      if (args.lat !== undefined) mapped.lat = args.lat;
+      if (args.lon !== undefined) mapped.lon = args.lon;
+      if (args.radiusKm !== undefined) mapped.radiusKm = args.radiusKm;
       break;
 
     case 'ga-hap':
@@ -295,6 +307,10 @@ export function mapArgsToSource(
       if (state) mapped.state = state.toUpperCase();
       mapped.limit = limit;
       mapped.scannedOnly = true; // Only return scanned photos
+      // SEARCH-016: Spatial query support
+      if (args.lat !== undefined) mapped.lat = args.lat;
+      if (args.lon !== undefined) mapped.lon = args.lon;
+      if (args.radiusKm !== undefined) mapped.radiusKm = args.radiusKm;
       break;
 
     default:

@@ -24,7 +24,7 @@ That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](
 
 ## How It Works
 
-This server uses **dynamic tool loading** - instead of exposing all 69 data tools upfront, it presents just 6 meta-tools:
+This server uses **dynamic tool loading** - instead of exposing all 76 data tools upfront, it presents just 10 meta-tools:
 
 | Meta-Tool | Purpose |
 |-----------|---------|
@@ -34,10 +34,14 @@ This server uses **dynamic tool loading** - instead of exposing all 69 data tool
 | `search` | Search across multiple sources at once |
 | `open` | Open URLs in your browser |
 | `export` | Export results to CSV, JSON, or Markdown |
+| `save_query` | Save a named query for later reuse |
+| `list_queries` | List saved queries with filtering options |
+| `run_query` | Execute a saved query with optional overrides |
+| `delete_query` | Remove a saved query by name |
 
 **Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
 
-> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 69 tools directly.
+> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 76 tools directly.
 
 ### Demo
 
@@ -642,9 +646,9 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 <details>
 <summary><strong>7. What's the difference between dynamic and legacy mode?</strong></summary>
 
-**Dynamic mode** (default) exposes 6 meta-tools (`tools`, `schema`, `run`, `search`, `open`, `export`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
+**Dynamic mode** (default) exposes 10 meta-tools (`tools`, `schema`, `run`, `search`, `open`, `export`, `save_query`, `list_queries`, `run_query`, `delete_query`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
 
-**Legacy mode** exposes all 69 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
+**Legacy mode** exposes all 76 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
 
 Switch modes by setting `MCP_MODE=legacy` in your configuration environment variables.
 

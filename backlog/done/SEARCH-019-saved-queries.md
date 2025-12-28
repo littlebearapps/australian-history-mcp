@@ -2,9 +2,52 @@
 
 **Priority:** P3
 **Phase:** 3 - Future Enhancements
-**Status:** Not Started
+**Status:** ✅ Done
 **Estimated Effort:** 1 day
 **Dependencies:** None
+**Completed:** 2025-12-28
+**Branch:** claude/optimize-mcp-architecture-uW4hZ
+
+---
+
+## Completion Summary
+
+### What Was Implemented
+
+1. **Created `src/core/saved-queries/` module:**
+   - `types.ts` - SavedQuery, ListQueryOptions, RunQueryOptions, SavedQueriesFile interfaces
+   - `store.ts` - JSON file storage with CRUD operations, filtering, sorting
+   - `index.ts` - Barrel export
+
+2. **Created 4 new meta-tools:**
+   - `save_query` - Save a named query for later reuse
+   - `list_queries` - List saved queries with filtering (source, tool, tag, search)
+   - `run_query` - Execute a saved query with optional parameter overrides
+   - `delete_query` - Remove a saved query by name
+
+### Implementation Notes
+
+- **Storage location:** `~/.local/share/australian-history-mcp/saved-queries.json`
+- **Name validation:** Alphanumeric, hyphens, underscores only; max 64 characters
+- **Query tracking:** Tracks createdAt, lastUsed, useCount for analytics
+- **Tag support:** Optional tags for query categorization
+- **Parameter overrides:** Can modify saved params at execution time
+- **Sorting options:** By name, createdAt, lastUsed, or useCount
+
+### Meta-Tools Count Updated
+- Dynamic mode: 6 → 10 meta-tools
+
+### Files Created
+- `src/core/saved-queries/types.ts`
+- `src/core/saved-queries/store.ts`
+- `src/core/saved-queries/index.ts`
+- `src/core/meta-tools/save-query.ts`
+- `src/core/meta-tools/list-queries.ts`
+- `src/core/meta-tools/run-query.ts`
+- `src/core/meta-tools/delete-query.ts`
+
+### Files Modified
+- `src/core/meta-tools/index.ts` (registered 4 new meta-tools)
 
 ---
 

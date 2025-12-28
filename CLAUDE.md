@@ -1,8 +1,8 @@
 # CLAUDE.md - Australian History MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-27
-**Version:** 0.7.0
+**Last Updated:** 2025-12-28
+**Version:** 0.8.0
 
 ---
 
@@ -101,7 +101,7 @@ npm run dev
 # Run directly (dynamic mode - default)
 node dist/index.js
 
-# Run in legacy mode (all 69 tools exposed)
+# Run in legacy mode (all 76 tools exposed)
 MCP_MODE=legacy node dist/index.js
 
 # Type check
@@ -112,7 +112,7 @@ npx tsc --noEmit
 
 ## Dynamic Tool Loading (Default Mode)
 
-The server uses **dynamic tool loading** by default, exposing only 6 meta-tools instead of all 69 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
+The server uses **dynamic tool loading** by default, exposing only 10 meta-tools instead of all 76 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
 
 ### Meta-Tools Exposed
 
@@ -124,6 +124,10 @@ The server uses **dynamic tool loading** by default, exposing only 6 meta-tools 
 | `search` | **Federated search across multiple sources in parallel** |
 | `open` | Open a URL in the default browser |
 | `export` | Export records to CSV, JSON, Markdown, or download script |
+| `save_query` | Save a named query for later reuse |
+| `list_queries` | List saved queries with filtering options |
+| `run_query` | Execute a saved query with optional parameter overrides |
+| `delete_query` | Remove a saved query by name |
 
 ### Federated Search
 
@@ -189,8 +193,8 @@ Set `MCP_MODE` environment variable:
 
 | Mode | Tools Exposed | Use Case |
 |------|---------------|----------|
-| `dynamic` (default) | 6 meta-tools | Research workflows, token-efficient |
-| `legacy` | 69 data tools | Backwards compatibility, direct access |
+| `dynamic` (default) | 10 meta-tools | Research workflows, token-efficient |
+| `legacy` | 76 data tools | Backwards compatibility, direct access |
 
 ```json
 {
@@ -209,7 +213,7 @@ Set `MCP_MODE` environment variable:
 
 ## MCP Tools Available
 
-### PROV Tools (5)
+### PROV Tools (6)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `prov_search` | None | Search Victorian state archives (with category filter) |
@@ -217,8 +221,9 @@ Set `MCP_MODE` environment variable:
 | `prov_harvest` | None | Bulk download PROV records |
 | `prov_get_agency` | None | Get agency details by VA number |
 | `prov_get_series` | None | Get series details by VPRS number |
+| `prov_get_items` | None | Get items within a series by VPRS number |
 
-### Trove Tools (13)
+### Trove Tools (14)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `trove_search` | Required | Search newspapers, images, books (with sortby, filters, holdings) |
@@ -234,6 +239,7 @@ Set `MCP_MODE` environment variable:
 | `trove_get_person` | Required | Get person/organisation biographical data |
 | `trove_get_list` | Required | Get user-curated research list by ID |
 | `trove_search_people` | Required | Search people and organisations |
+| `trove_get_versions` | Required | Get all versions of a work with holdings info |
 
 ### GHAP Tools (5)
 | Tool | API Key | Purpose |
@@ -266,7 +272,7 @@ Set `MCP_MODE` environment variable:
 | `ala_list_species_lists` | None | List user-curated species lists |
 | `ala_get_species_list` | None | Get species list details by druid |
 
-### NMA Tools (9)
+### NMA Tools (10)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `nma_search_objects` | None | Search museum collection objects |
@@ -278,6 +284,7 @@ Set `MCP_MODE` environment variable:
 | `nma_get_party` | None | Get party (person/org) details by ID |
 | `nma_search_media` | None | Search images, video, and sound |
 | `nma_get_media` | None | Get media details by ID |
+| `nma_get_related` | None | Get related objects, places, parties from _links |
 
 ### VHD Tools (9)
 | Tool | API Key | Purpose |
@@ -292,7 +299,7 @@ Set `MCP_MODE` environment variable:
 | `vhd_list_themes` | None | List heritage themes (history, economics, etc.) |
 | `vhd_list_periods` | None | List historical periods |
 
-### ACMI Tools (7)
+### ACMI Tools (8)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `acmi_search_works` | None | Search ACMI collection (with field and size options) |
@@ -302,12 +309,16 @@ Set `MCP_MODE` environment variable:
 | `acmi_get_creator` | None | Get creator details and filmography |
 | `acmi_list_constellations` | None | List curated thematic collections |
 | `acmi_get_constellation` | None | Get constellation details with works |
+| `acmi_get_related` | None | Get related works (parts, groups, recommendations) |
 
-### PM Transcripts Tools (2)
+### PM Transcripts Tools (5)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `pm_transcripts_get_transcript` | None | Get Prime Ministerial transcript by ID |
 | `pm_transcripts_harvest` | None | Bulk download transcripts with filters |
+| `pm_transcripts_search` | None | Full-text search with FTS5 (requires local index) |
+| `pm_transcripts_build_index` | None | Build/rebuild/update local FTS5 search index |
+| `pm_transcripts_index_stats` | None | Get FTS5 index statistics and PM coverage |
 
 ### IIIF Tools (2)
 | Tool | API Key | Purpose |
@@ -380,22 +391,22 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (69 tools via registry) |
+| `src/index.ts` | MCP server entry point (76 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
 | `src/core/base-client.ts` | Shared fetch helpers with retry |
 | `src/core/base-source.ts` | Source interface definition |
 | `src/core/harvest-runner.ts` | Shared pagination logic |
-| `src/sources/prov/` | PROV source (5 tools) |
-| `src/sources/trove/` | Trove source (13 tools) |
+| `src/sources/prov/` | PROV source (6 tools) |
+| `src/sources/trove/` | Trove source (14 tools) |
 | `src/sources/ghap/` | GHAP source (5 tools) |
 | `src/sources/museums-victoria/` | Museums Victoria source (6 tools) |
 | `src/sources/ala/` | ALA source (8 tools) |
-| `src/sources/nma/` | NMA source (9 tools) |
+| `src/sources/nma/` | NMA source (10 tools) |
 | `src/sources/vhd/` | VHD source (9 tools) |
-| `src/sources/acmi/` | ACMI source (7 tools) |
-| `src/sources/pm-transcripts/` | PM Transcripts source (2 tools) |
+| `src/sources/acmi/` | ACMI source (8 tools) |
+| `src/sources/pm-transcripts/` | PM Transcripts source (5 tools) |
 | `src/sources/iiif/` | IIIF source (2 tools) |
 | `src/sources/ga-hap/` | GA HAP source (3 tools) |
 | `docs/quickrefs/` | Quick reference documentation |
@@ -414,17 +425,18 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 └───────────────────────────────┬─────────────────────────────────┘
                                 │ stdio
 ┌───────────────────────────────▼─────────────────────────────────┐
-│    Australian History MCP Server (5 meta-tools exposed)          │
+│    Australian History MCP Server (10 meta-tools exposed)         │
 │  ┌────────────────────────────────────────────────────────────┐ │
-│  │    Meta-Tools: tools | schema | run | open | export        │ │
+│  │  Meta-Tools: tools | schema | run | search | open | export │ │
+│  │              save_query | list_queries | run_query | ...   │ │
 │  └───────────────────────────┬────────────────────────────────┘ │
 │                              │ run(tool, args)                   │
 │  ┌───────────────────────────▼────────────────────────────────┐ │
-│  │              Tool Registry (69 data tools)                  │ │
+│  │              Tool Registry (76 data tools)                  │ │
 │  └─────────────────────────────────────────────────────────────┘ │
-│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ...   │
-│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│        │
-│  │(5) │ │(13) │ │(5) │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │        │
+│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌────┐ ┌───┐ ┌────┐ ...  │
+│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA │ │VHD│ │ACMI│       │
+│  │(6) │ │(14) │ │(5) │ │(6)   │ │(8)│ │(10)│ │(9)│ │(8) │       │
 │  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘        │
 └─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼────────────┘
       ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼
@@ -433,7 +445,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 ### Legacy Mode (MCP_MODE=legacy)
 
-All 69 data tools exposed directly (backwards compatible).
+All 76 data tools exposed directly (backwards compatible).
 
 ---
 
@@ -624,6 +636,76 @@ ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, pm_transcripts_harvest,
 or ga_hap_harvest
 ```
 
+### Search by Location (Spatial - ALA, GA HAP, GHAP)
+```
+Use ala_search_occurrences with lat=-37.81, lon=144.96, radiusKm=50 for Melbourne area
+Use ga_hap_search with lat=-37.81, lon=144.96, radiusKm=25 for aerial photos near Melbourne
+Use ghap_search with lat=-37.81, lon=144.96, radiusKm=10 for historical placenames
+```
+
+### Get Items within a PROV Series
+```
+Use prov_get_items with seriesId "VPRS 515" to list items in the series
+Add query "Melbourne" to filter items within the series
+```
+
+### Get Related Museum Objects (NMA)
+```
+Use nma_get_related with objectId from nma_get_object results
+Returns related objects, places, parties, and media via _links
+```
+
+### Get Related Works (ACMI)
+```
+Use acmi_get_related with workId from acmi_get_work results
+Returns parts (episodes), groups (series), and recommendations
+```
+
+### Get Work Versions (Trove)
+```
+Use trove_get_versions with workId to see all versions
+Returns holdings, formats, and library locations for each version
+```
+
+### Full-Text Search PM Transcripts (FTS5)
+```
+1. Build index first: pm_transcripts_build_index with mode "build"
+   (Takes ~43 minutes for all 26,000+ transcripts)
+2. Search: pm_transcripts_search with query "climate change" or "economic reform"
+   Supports FTS5 operators: "phrase match", term1 OR term2, term1 NOT term2
+3. Check index: pm_transcripts_index_stats for coverage and size
+```
+
+### Update PM Transcripts Index (Incremental)
+```
+Use pm_transcripts_build_index with mode "update"
+Only fetches new transcripts since last build (seconds vs minutes)
+```
+
+### Save a Query for Later Reuse
+```
+Use save_query with:
+  name: "melbourne-floods-1930s"
+  source: "trove"
+  tool: "trove_search"
+  parameters: {query: "Melbourne flood", category: "newspaper", dateFrom: "1930", dateTo: "1939"}
+  tags: ["research", "floods"]
+```
+
+### Run a Saved Query
+```
+Use run_query with name "melbourne-floods-1930s"
+Add overrides {limit: 50} to modify parameters for this run
+```
+
+### List and Manage Saved Queries
+```
+Use list_queries to see all saved queries
+Filter with source "trove" or tag "research"
+Sort by lastUsed or useCount to find frequently used queries
+Use delete_query to remove old queries
+```
+
 ---
 
 ## Documentation Hierarchy
@@ -766,7 +848,14 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 - **GA HAP pagination:** Max 2000 records per query; use harvest tool for larger downloads
 - **GA HAP state codes:** NSW=1, VIC=2, QLD=3, SA=4, WA=5, TAS=6, NT=7, ACT=8
 - **GA HAP RUN/FRAME fields:** These are strings not integers (e.g., "COAST TIE 2", "C-KEY"); prefer objectId for lookups
+- **Spatial queries:** Point+radius converted to bounding box internally; results may include records slightly outside radius
+- **Spatial coordinate format:** All spatial params use WGS84 (lat, lon in decimal degrees); GA HAP internally converts to Web Mercator
+- **PM Transcripts FTS5 index:** Stored at `~/.local/share/australian-history-mcp/pm-transcripts.db` (~50-100MB)
+- **PM Transcripts FTS5 build time:** Initial build ~43 minutes (26k transcripts); incremental update much faster
+- **PM Transcripts FTS5 operators:** Supports "phrase match", term1 OR term2, term1 NOT term2, NEAR(a b, 5)
+- **Saved queries storage:** JSON file at `~/.local/share/australian-history-mcp/saved-queries.json`
+- **Saved query names:** Alphanumeric, hyphens, underscores only; max 64 characters
 
 ---
 
-**Token Count:** ~900 tokens
+**Token Count:** ~1100 tokens

@@ -2,9 +2,52 @@
 
 **Priority:** P3
 **Phase:** 3 - Future Enhancements
-**Status:** Not Started
+**Status:** ✅ Done
 **Estimated Effort:** 2-3 days
 **Dependencies:** None
+**Completed:** 2025-12-28
+**Branch:** claude/optimize-mcp-architecture-uW4hZ
+
+---
+
+## Completion Summary
+
+### What Was Implemented
+
+1. **Created `src/core/spatial/` module:**
+   - `types.ts` - Point, BBox, RadiusQuery, SpatialInput interfaces
+   - `geometry.ts` - radiusToBBox(), haversineDistance() utilities
+   - `index.ts` - Barrel export
+
+2. **Added spatial parameters to 3 source tools:**
+   - `ala_search_occurrences` - lat, lon, radiusKm params
+   - `ga_hap_search` - lat, lon, radiusKm params (converts to bbox→Web Mercator)
+   - `ghap_search` - lat, lon, radiusKm params (converts to bbox string)
+
+3. **Updated source-router.ts:**
+   - Maps spatial params to source-specific formats
+   - Federated search passes location to spatial-capable sources
+
+### Implementation Notes
+
+- Used simple flat params (lat, lon, radiusKm) instead of nested object for Claude Code compatibility
+- Point+radius is converted to bounding box internally (may include records slightly outside radius)
+- GA HAP requires Web Mercator conversion (EPSG:3857)
+- All spatial params use WGS84 (lat/lon in decimal degrees)
+
+### Files Created
+- `src/core/spatial/types.ts`
+- `src/core/spatial/geometry.ts`
+- `src/core/spatial/index.ts`
+
+### Files Modified
+- `src/sources/ala/tools/search-occurrences.ts`
+- `src/sources/ala/client.ts`
+- `src/sources/ga-hap/tools/search.ts`
+- `src/sources/ga-hap/client.ts`
+- `src/sources/ghap/tools/search.ts`
+- `src/core/source-router.ts`
+- `src/core/meta-tools/search.ts`
 
 ---
 

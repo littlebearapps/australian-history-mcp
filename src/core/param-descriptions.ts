@@ -38,6 +38,9 @@ export const PARAMS = {
   LGA: 'Local Government Area',
   BBOX: 'Bounding box: minLon,minLat,maxLon,maxLat',
   MUNICIPALITY: 'Municipality name',
+  LAT: 'Centre latitude (-90 to 90)',
+  LON: 'Centre longitude (-180 to 180)',
+  RADIUS_KM: 'Search radius in kilometres',
 
   // Identifiers
   ID: 'Record ID',

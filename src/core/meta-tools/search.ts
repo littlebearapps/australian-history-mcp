@@ -37,6 +37,10 @@ interface SearchInput {
   dateTo?: string;
   state?: string;
   limit?: number;
+  // SEARCH-016: Spatial query support
+  lat?: number;
+  lon?: number;
+  radiusKm?: number;
   parseAdvancedSyntax?: boolean;
   smart?: boolean;
   explain?: boolean;
@@ -119,6 +123,19 @@ export const searchMetaTool: SourceTool = {
           type: 'number',
           description: 'Max results per source (default: 10)',
         },
+        // SEARCH-016: Spatial query support
+        lat: {
+          type: 'number',
+          description: 'Centre latitude for point+radius search (-90 to 90)',
+        },
+        lon: {
+          type: 'number',
+          description: 'Centre longitude for point+radius search (-180 to 180)',
+        },
+        radiusKm: {
+          type: 'number',
+          description: 'Search radius in kilometres (default: 10)',
+        },
         parseAdvancedSyntax: {
           type: 'boolean',
           description: 'Parse advanced query syntax (date ranges like 1920-1930, field:value, "phrases", -exclusions). Default: false',
@@ -157,6 +174,10 @@ export const searchMetaTool: SourceTool = {
       dateTo: typeof args.dateTo === 'string' ? args.dateTo : undefined,
       state: typeof args.state === 'string' ? args.state : undefined,
       limit: typeof args.limit === 'number' ? args.limit : undefined,
+      // SEARCH-016: Spatial query support
+      lat: typeof args.lat === 'number' ? args.lat : undefined,
+      lon: typeof args.lon === 'number' ? args.lon : undefined,
+      radiusKm: typeof args.radiusKm === 'number' ? args.radiusKm : undefined,
       parseAdvancedSyntax: typeof args.parseAdvancedSyntax === 'boolean' ? args.parseAdvancedSyntax : false,
       smart: typeof args.smart === 'boolean' ? args.smart : false,
       explain: typeof args.explain === 'boolean' ? args.explain : false,
@@ -333,6 +354,10 @@ async function executeSourceSearch(
       dateTo: input.dateTo,
       state: input.state,
       limit: input.limit ?? 10,
+      // SEARCH-016: Spatial query support
+      lat: input.lat,
+      lon: input.lon,
+      radiusKm: input.radiusKm,
     }, parsed);
 
     // Execute via registry

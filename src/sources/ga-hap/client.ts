@@ -10,6 +10,7 @@
  */
 
 import { BaseClient } from '../../core/base-client.js';
+import { radiusToBBox, bboxToString } from '../../core/spatial/index.js';
 import type {
   GAHAPSearchParams,
   GAHAPGetPhotoParams,
@@ -63,9 +64,16 @@ export class GAHAPClient extends BaseClient {
       }
     }
 
-    // Add spatial filter if bbox provided
-    if (params.bbox) {
-      const [minX, minY, maxX, maxY] = params.bbox.split(',').map(Number);
+    // SEARCH-016: Convert point+radius to bbox if provided
+    let bboxString = params.bbox;
+    if (params.lat !== undefined && params.lon !== undefined && params.radiusKm !== undefined) {
+      const bbox = radiusToBBox({ lat: params.lat, lon: params.lon, radiusKm: params.radiusKm });
+      bboxString = bboxToString(bbox);
+    }
+
+    // Add spatial filter if bbox available (either directly or from point+radius)
+    if (bboxString) {
+      const [minX, minY, maxX, maxY] = bboxString.split(',').map(Number);
       // Convert WGS84 to Web Mercator for the query
       const webMercatorGeometry = {
         xmin: this.lonToWebMercator(minX),

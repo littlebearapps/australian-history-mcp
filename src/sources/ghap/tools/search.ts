@@ -32,6 +32,10 @@ export const ghapSearchTool: SourceTool = {
         state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_UPPER },
         lga: { type: 'string', description: PARAMS.LGA },
         bbox: { type: 'string', description: PARAMS.BBOX },
+        // SEARCH-016: Spatial query support
+        lat: { type: 'number', description: PARAMS.LAT },
+        lon: { type: 'number', description: PARAMS.LON },
+        radiusKm: { type: 'number', description: PARAMS.RADIUS_KM },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -49,6 +53,10 @@ export const ghapSearchTool: SourceTool = {
       state?: string;
       lga?: string;
       bbox?: string;
+      // SEARCH-016: Spatial query support
+      lat?: number;
+      lon?: number;
+      radiusKm?: number;
       limit?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -66,6 +74,10 @@ export const ghapSearchTool: SourceTool = {
         state: input.state as GHAPSearchParams['state'],
         lga: input.lga,
         bbox: input.bbox,
+        // SEARCH-016: Spatial query support
+        lat: input.lat,
+        lon: input.lon,
+        radiusKm: input.radiusKm,
       };
 
       // Use fuzzy or contains search

@@ -109,6 +109,13 @@ export interface GAHAPSearchParams {
   scaleMin?: number;
   /** Maximum scale denominator (e.g., 50000 for 1:50000 or smaller) */
   scaleMax?: number;
+  // SEARCH-016: Spatial query support
+  /** Centre latitude for point+radius search */
+  lat?: number;
+  /** Centre longitude for point+radius search */
+  lon?: number;
+  /** Search radius in kilometres */
+  radiusKm?: number;
 }
 
 export interface GAHAPGetPhotoParams {

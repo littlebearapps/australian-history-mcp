@@ -203,6 +203,14 @@ export class ALAClient extends BaseClient {
       queryParams.dir = params.dir;
     }
 
+    // Spatial search (SEARCH-016)
+    // ALA biocache API natively supports lat/lon/radius params
+    if (params.lat !== undefined && params.lon !== undefined && params.radius !== undefined) {
+      queryParams.lat = params.lat.toString();
+      queryParams.lon = params.lon.toString();
+      queryParams.radius = params.radius.toString();
+    }
+
     // Faceting
     if (params.includeFacets) {
       queryParams.facet = 'true';

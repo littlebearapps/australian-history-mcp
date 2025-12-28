@@ -2,9 +2,55 @@
 
 **Priority:** P3
 **Phase:** 3 - Future Enhancements
-**Status:** Not Started
+**Status:** ✅ Done
 **Estimated Effort:** 2 days
 **Dependencies:** None
+**Completed:** 2025-12-28
+**Branch:** claude/optimize-mcp-architecture-uW4hZ
+
+---
+
+## Completion Summary
+
+### What Was Implemented
+
+1. **`acmi_get_related` tool** (`src/sources/acmi/tools/get-related.ts`)
+   - Gets related works for a given ACMI work ID
+   - Returns parts (episodes), groups (series), and recommendations
+   - Fetches parent work via getWork API
+
+2. **`nma_get_related` tool** (`src/sources/nma/tools/get-related.ts`)
+   - Gets related objects, parties, places, and media via `_links`
+   - Follows HAL+JSON link structure from object response
+   - Supports filtering by relation type
+
+3. **`trove_get_versions` tool** (`src/sources/trove/tools/get-versions.ts`)
+   - Gets all versions of a work with holdings info
+   - Uses `include=workversions` parameter
+   - Returns formats, editions, and library locations
+
+4. **`prov_get_items` tool** (`src/sources/prov/tools/get-items.ts`)
+   - Gets items within a PROV series by VPRS number
+   - Supports query, date filtering, and sorting
+   - Uses existing search endpoint with series_id filter
+
+### Tool Counts Updated
+- PROV: 5 → 6 tools
+- Trove: 13 → 14 tools
+- NMA: 9 → 10 tools
+- ACMI: 7 → 8 tools
+
+### Files Created
+- `src/sources/acmi/tools/get-related.ts`
+- `src/sources/nma/tools/get-related.ts`
+- `src/sources/trove/tools/get-versions.ts`
+- `src/sources/prov/tools/get-items.ts`
+
+### Files Modified
+- `src/sources/acmi/index.ts` (registered new tool)
+- `src/sources/nma/index.ts` (registered new tool)
+- `src/sources/trove/index.ts` (registered new tool)
+- `src/sources/prov/index.ts` (registered new tool)
 
 ---
 

@@ -34,6 +34,10 @@ export const gaHapSearchTool: SourceTool = {
         scannedOnly: { type: 'boolean', description: PARAMS.SCANNED_ONLY, default: false },
         filmNumber: { type: 'string', description: PARAMS.FILM_NUMBER },
         bbox: { type: 'string', description: PARAMS.BBOX },
+        // SEARCH-016: Spatial query support
+        lat: { type: 'number', description: PARAMS.LAT },
+        lon: { type: 'number', description: PARAMS.LON },
+        radiusKm: { type: 'number', description: PARAMS.RADIUS_KM },
         sortby: { type: 'string', description: PARAMS.SORT_BY, enum: GAHAP_SORT_OPTIONS, default: 'relevance' },
         // SEARCH-013: Technical filters
         filmType: { type: 'string', description: 'Film type (bw=Black/White, colour, bw-infrared, colour-infrared, infrared)', enum: GAHAP_FILM_TYPES },
@@ -59,6 +63,10 @@ export const gaHapSearchTool: SourceTool = {
       scannedOnly?: boolean;
       filmNumber?: string;
       bbox?: string;
+      // SEARCH-016: Spatial query support
+      lat?: number;
+      lon?: number;
+      radiusKm?: number;
       sortby?: GAHAPSortOption;
       // SEARCH-013: Technical filters
       filmType?: GAHAPFilmType;
@@ -81,6 +89,10 @@ export const gaHapSearchTool: SourceTool = {
         scannedOnly: input.scannedOnly ?? false,
         filmNumber: input.filmNumber,
         bbox: input.bbox,
+        // SEARCH-016: Spatial query support
+        lat: input.lat,
+        lon: input.lon,
+        radiusKm: input.radiusKm,
         sortby: input.sortby,
         // SEARCH-013: Technical filters
         filmType: input.filmType,

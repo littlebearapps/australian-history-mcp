@@ -36,6 +36,10 @@ export const alaSearchOccurrencesTool: SourceTool = {
         collector: { type: 'string', description: PARAMS.COLLECTOR },
         sortby: { type: 'string', description: PARAMS.SORT_BY, enum: ALA_SORT_OPTIONS, default: 'relevance' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Spatial search (SEARCH-016)
+        lat: { type: 'number', description: PARAMS.LAT },
+        lon: { type: 'number', description: PARAMS.LON },
+        radiusKm: { type: 'number', description: PARAMS.RADIUS_KM },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
         facetFields: { type: 'array', items: { type: 'string', enum: ALA_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
@@ -66,6 +70,10 @@ export const alaSearchOccurrencesTool: SourceTool = {
       collector?: string;
       sortby?: ALASortOption;
       limit?: number;
+      // Spatial search (SEARCH-016)
+      lat?: number;
+      lon?: number;
+      radiusKm?: number;
       // Faceted search
       includeFacets?: boolean;
       facetFields?: ALAFacetField[];
@@ -73,11 +81,17 @@ export const alaSearchOccurrencesTool: SourceTool = {
     };
 
     // Validate at least one search criterion
+    const hasSpatial = input.lat !== undefined && input.lon !== undefined && input.radiusKm !== undefined;
     const hasFilter = input.query || input.scientificName || input.vernacularName ||
-      input.kingdom || input.family || input.genus || input.stateProvince;
+      input.kingdom || input.family || input.genus || input.stateProvince || hasSpatial;
 
     if (!hasFilter) {
-      return errorResponse('At least one search parameter is required (query, scientificName, vernacularName, kingdom, family, genus, or stateProvince)');
+      return errorResponse('At least one search parameter is required (query, scientificName, vernacularName, kingdom, family, genus, stateProvince, or lat+lon+radiusKm)');
+    }
+
+    // Validate spatial params if provided
+    if ((input.lat !== undefined || input.lon !== undefined || input.radiusKm !== undefined) && !hasSpatial) {
+      return errorResponse('Spatial search requires all three: lat, lon, and radiusKm');
     }
 
     try {
@@ -102,6 +116,10 @@ export const alaSearchOccurrencesTool: SourceTool = {
         occurrenceStatus: input.occurrenceStatus,
         dataResourceName: input.dataResourceName,
         collector: input.collector,
+        // Spatial search (SEARCH-016)
+        lat: input.lat,
+        lon: input.lon,
+        radius: input.radiusKm,
         sort: sortMapping?.sort as ALAOccurrenceSearchParams['sort'],
         dir: sortMapping?.dir as ALAOccurrenceSearchParams['dir'],
         pageSize: Math.min(input.limit ?? 20, 100),

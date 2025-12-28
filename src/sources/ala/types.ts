@@ -135,6 +135,12 @@ export interface ALAOccurrenceSearchParams {
   occurrenceStatus?: 'present' | 'absent';
   /** Collector/recorded by name */
   collector?: string;
+  /** Centre latitude for spatial search (SEARCH-016) */
+  lat?: number;
+  /** Centre longitude for spatial search (SEARCH-016) */
+  lon?: number;
+  /** Search radius in kilometres (SEARCH-016) */
+  radius?: number;
   /** Page size (max 100) */
   pageSize?: number;
   /** Start index for pagination */

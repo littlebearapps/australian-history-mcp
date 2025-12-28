@@ -9,6 +9,7 @@
  */
 
 import { BaseClient } from '../../core/base-client.js';
+import { radiusToBBox, bboxToString } from '../../core/spatial/index.js';
 import type {
   GHAPSearchParams,
   GHAPSearchResult,
@@ -50,8 +51,15 @@ export class GHAPClient extends BaseClient {
     if (params.lga) {
       queryParams.lga = params.lga;
     }
-    if (params.bbox) {
-      queryParams.bbox = params.bbox;
+
+    // SEARCH-016: Convert point+radius to bbox if provided
+    let bboxValue = params.bbox;
+    if (params.lat !== undefined && params.lon !== undefined && params.radiusKm !== undefined) {
+      const bbox = radiusToBBox({ lat: params.lat, lon: params.lon, radiusKm: params.radiusKm });
+      bboxValue = bboxToString(bbox);
+    }
+    if (bboxValue) {
+      queryParams.bbox = bboxValue;
     }
 
     // Note: searchpublicdatasets=on causes max paging redirect errors on TLCMap
