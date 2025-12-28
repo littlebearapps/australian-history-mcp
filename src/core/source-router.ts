@@ -209,7 +209,8 @@ export function mapArgsToSource(
   args: CommonSearchArgs,
   parsed?: ParsedQuery
 ): Record<string, unknown> {
-  let { query, dateFrom, dateTo, state, limit = 10 } = args;
+  let { query, dateFrom, dateTo } = args;
+  const { state, limit = 10 } = args;
 
   // Apply query builders for sources that support them
   if (parsed && hasBuilder(source)) {

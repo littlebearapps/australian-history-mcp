@@ -4,7 +4,7 @@
  */
 
 import { PATTERNS, ERA_MAPPINGS, getAllValidFields } from './patterns.js';
-import type { ParsedQuery, DateRange } from './types.js';
+import type { ParsedQuery } from './types.js';
 
 /**
  * Parse a query string for advanced syntax patterns

@@ -11,7 +11,7 @@ export const PATTERNS = {
    * Date range: 1920-1930, 1920–1930, 1920..1930
    * Captures: [full match, from year, to year]
    */
-  dateRange: /(\d{4})\s*[-–\.\.]+\s*(\d{4})/,
+  dateRange: /(\d{4})\s*[-–.]+\s*(\d{4})/,
 
   /**
    * Decade: 1920s, 1890s

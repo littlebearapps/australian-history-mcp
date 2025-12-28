@@ -77,7 +77,7 @@ export const openMetaTool: SourceTool = {
         url: input.url,
         message: 'URL opened in default browser',
       });
-    } catch (error) {
+    } catch (_error) {
       // Don't expose internal error details
       return errorResponse(
         `Failed to open URL: ${input.url}. Browser may not be available.`,

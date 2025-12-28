@@ -34,7 +34,6 @@ import {
   type TroveRecLevel,
   type TroveIncludeOption,
   type TroveFacet,
-  type TroveFacetValue,
 } from './types.js';
 
 const TROVE_API_BASE = 'https://api.trove.nla.gov.au/v3';

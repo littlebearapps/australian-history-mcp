@@ -86,7 +86,7 @@ export const pmTranscriptsBuildIndexTool: SourceTool = {
 
     // Provide estimate
     const rangeSize = idRange ? idRange.end - idRange.start + 1 : 40000;
-    const estimatedMinutes = Math.ceil((rangeSize * 0.1) / 60);
+    const _estimatedMinutes = Math.ceil((rangeSize * 0.1) / 60);
 
     try {
       // Build the index

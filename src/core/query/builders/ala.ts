@@ -9,7 +9,7 @@ import { KNOWN_FIELDS } from '../patterns.js';
 /**
  * Solr special characters that need escaping
  */
-const SOLR_SPECIAL_CHARS = /[+\-&|!(){}[\]^"~*?:\\\/]/g;
+const SOLR_SPECIAL_CHARS = /[+\-&|!(){}[\]^"~*?:\\/]/g;
 
 /**
  * ALA field mappings (user-friendly -> biocache field)

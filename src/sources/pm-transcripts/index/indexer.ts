@@ -83,7 +83,7 @@ export async function buildIndex(options: BuildOptions): Promise<BuildProgress> 
 
     // Determine ID range
     let startId = idRange?.start ?? 1;
-    let endId = idRange?.end ?? MAX_KNOWN_ID;
+    const endId = idRange?.end ?? MAX_KNOWN_ID;
 
     // For update mode, start from the highest indexed ID
     if (mode === 'update') {
