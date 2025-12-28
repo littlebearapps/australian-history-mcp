@@ -8,7 +8,7 @@ This guide explains the dynamic tool loading architecture introduced in v0.7.0.
 
 ## Overview
 
-The Australian History MCP Server uses **dynamic tool loading** by default. Instead of exposing all 69 data tools upfront (which consumes ~11,909 tokens), it exposes only 6 meta-tools (~900 tokens).
+The Australian History MCP Server uses **dynamic tool loading** by default. Instead of exposing all 76 data tools upfront (which consumes ~12,500 tokens), it exposes only 10 meta-tools (~1,100 tokens).
 
 **Token reduction: 93%**
 
@@ -24,6 +24,10 @@ The Australian History MCP Server uses **dynamic tool loading** by default. Inst
 | `search` | Federated search across sources | `search(query="Melbourne 1920s")` |
 | `open` | Open URL in browser | `open(url="https://...")` |
 | `export` | Export records to file | `export(records=[...], format="csv")` |
+| `save_query` | Save a named query | `save_query(name="vic-floods", ...)` |
+| `list_queries` | List saved queries | `list_queries()` |
+| `run_query` | Execute a saved query | `run_query(name="vic-floods")` |
+| `delete_query` | Remove a saved query | `delete_query(name="vic-floods")` |
 
 ---
 
@@ -217,11 +221,11 @@ Meta-tools include caching hints in responses:
 
 ### Dynamic Mode (Default)
 
-6 meta-tools exposed. Use `tools() → schema() → run()` or `search()` workflow.
+10 meta-tools exposed. Use `tools() → schema() → run()` or `search()` workflow.
 
 ### Legacy Mode
 
-All 69 data tools exposed directly. Set `MCP_MODE=legacy`:
+All 76 data tools exposed directly. Set `MCP_MODE=legacy`:
 
 ```json
 {
@@ -253,18 +257,18 @@ All 69 data tools exposed directly. Set `MCP_MODE=legacy`:
 
 | Source | Tools | API Key |
 |--------|-------|---------|
-| PROV | 5 | None |
-| Trove | 13 | Required |
+| PROV | 6 | None |
+| Trove | 14 | Required |
 | GHAP | 5 | None |
 | Museums Victoria | 6 | None |
 | ALA | 8 | None |
-| NMA | 9 | None |
+| NMA | 10 | None |
 | VHD | 9 | None |
-| ACMI | 7 | None |
-| PM Transcripts | 2 | None |
+| ACMI | 8 | None |
+| PM Transcripts | 5 | None |
 | IIIF | 2 | None |
 | GA HAP | 3 | None |
-| **Total** | **69** | |
+| **Total** | **76** | |
 
 ---
 
