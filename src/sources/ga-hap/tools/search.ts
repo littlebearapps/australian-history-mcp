@@ -9,6 +9,8 @@ import { PARAMS } from '../../../core/param-descriptions.js';
 import { AU_STATES } from '../../../core/enums.js';
 import { countFacets, simpleFacetConfig, countByDecade } from '../../../core/facets/index.js';
 import type { Facet } from '../../../core/facets/types.js';
+import type { GAHAPSortOption } from '../types.js';
+import { GAHAP_SORT_OPTIONS } from '../types.js';
 
 // Facet configuration for GA HAP
 const GA_HAP_FACET_CONFIGS = [
@@ -31,6 +33,7 @@ export const gaHapSearchTool: SourceTool = {
         scannedOnly: { type: 'boolean', description: PARAMS.SCANNED_ONLY, default: false },
         filmNumber: { type: 'string', description: PARAMS.FILM_NUMBER },
         bbox: { type: 'string', description: PARAMS.BBOX },
+        sortby: { type: 'string', description: PARAMS.SORT_BY, enum: GAHAP_SORT_OPTIONS, default: 'relevance' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         offset: { type: 'number', description: PARAMS.OFFSET, default: 0 },
         // Faceted search
@@ -50,6 +53,7 @@ export const gaHapSearchTool: SourceTool = {
       scannedOnly?: boolean;
       filmNumber?: string;
       bbox?: string;
+      sortby?: GAHAPSortOption;
       limit?: number;
       offset?: number;
       // Faceted search
@@ -66,6 +70,7 @@ export const gaHapSearchTool: SourceTool = {
         scannedOnly: input.scannedOnly ?? false,
         filmNumber: input.filmNumber,
         bbox: input.bbox,
+        sortby: input.sortby,
         limit: Math.min(input.limit ?? 20, 100),
         offset: input.offset ?? 0,
       });

@@ -7,8 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { provClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES } from '../../../core/enums.js';
-import type { PROVSearchParams, PROVFacetField } from '../types.js';
-import { PROV_FACET_FIELDS } from '../types.js';
+import type { PROVSearchParams, PROVFacetField, PROVSortOption } from '../types.js';
+import { PROV_FACET_FIELDS, PROV_SORT_OPTIONS } from '../types.js';
 
 export const provSearchTool: SourceTool = {
   schema: {
@@ -25,6 +25,7 @@ export const provSearchTool: SourceTool = {
         dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
         dateTo: { type: 'string', description: PARAMS.DATE_TO },
         digitisedOnly: { type: 'boolean', description: PARAMS.DIGITISED_ONLY, default: false },
+        sortby: { type: 'string', description: PARAMS.SORT_BY, enum: PROV_SORT_OPTIONS, default: 'relevance' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -45,6 +46,7 @@ export const provSearchTool: SourceTool = {
       dateFrom?: string;
       dateTo?: string;
       digitisedOnly?: boolean;
+      sortby?: PROVSortOption;
       limit?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -67,6 +69,7 @@ export const provSearchTool: SourceTool = {
         startDate: input.dateFrom,
         endDate: input.dateTo,
         digitisedOnly: input.digitisedOnly ?? false,
+        sortby: input.sortby,
         rows: Math.min(input.limit ?? 20, 100),
         // Faceted search
         includeFacets: input.includeFacets,

@@ -3,7 +3,11 @@
  *
  * Maps queries and content types to relevant sources.
  * Handles parameter translation between common search args and source-specific APIs.
+ * Integrates query builders for sources that support advanced syntax (Trove, PROV, ALA).
  */
+
+import { getBuilder, hasBuilder } from './query/index.js';
+import type { ParsedQuery } from './query/types.js';
 
 // ============================================================================
 // Types
@@ -28,6 +32,7 @@ export interface CommonSearchArgs {
   dateTo?: string;
   state?: string;
   limit?: number;
+  [key: string]: unknown;
 }
 
 // ============================================================================
@@ -192,12 +197,29 @@ export function selectSources(
  * - dateFrom/dateTo: PROV, Trove use as-is; GA HAP uses yearFrom/yearTo; ALA uses startYear/endYear
  * - state: Trove, GA HAP, GHAP support; VHD is Victoria-only
  * - limit: Most use limit; ACMI uses page (1-based)
+ *
+ * When `parsed` is provided, uses query builders for sources that support them.
  */
 export function mapArgsToSource(
   source: string,
-  args: CommonSearchArgs
+  args: CommonSearchArgs,
+  parsed?: ParsedQuery
 ): Record<string, unknown> {
-  const { query, dateFrom, dateTo, state, limit = 10 } = args;
+  let { query, dateFrom, dateTo, state, limit = 10 } = args;
+
+  // Apply query builders for sources that support them
+  if (parsed && hasBuilder(source)) {
+    const builder = getBuilder(source)!;
+    const transformed = builder.build(parsed, args);
+    query = transformed.transformed;
+    // Use applied date range from builder if not explicitly set
+    if (!dateFrom && transformed.appliedDateRange?.from && transformed.appliedDateRange.from !== '*') {
+      dateFrom = transformed.appliedDateRange.from;
+    }
+    if (!dateTo && transformed.appliedDateRange?.to && transformed.appliedDateRange.to !== '*') {
+      dateTo = transformed.appliedDateRange.to;
+    }
+  }
   const mapped: Record<string, unknown> = {};
 
   switch (source) {

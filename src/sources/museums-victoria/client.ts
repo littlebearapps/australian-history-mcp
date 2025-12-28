@@ -19,6 +19,7 @@ import type {
   MuseumMedia,
   MuseumRecordType,
 } from './types.js';
+import { MV_SORT_MAPPINGS } from './types.js';
 
 const MUSEUMS_VIC_API_BASE = 'https://collections.museumsvictoria.com.au/api';
 
@@ -75,7 +76,14 @@ export class MuseumsVictoriaClient extends BaseClient {
       queryParams.collectingarea = params.collectingArea;
     }
 
-    if (params.random) {
+    // Handle sortby parameter (includes backwards-compat for deprecated random param)
+    if (params.sortby) {
+      const sortValue = MV_SORT_MAPPINGS[params.sortby];
+      if (sortValue) {
+        queryParams.sort = sortValue;
+      }
+    } else if (params.random) {
+      // Backwards compatibility for deprecated random parameter
       queryParams.sort = 'random';
     }
 

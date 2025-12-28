@@ -20,7 +20,7 @@ import type {
   PROVFacetField,
   PROVFacet,
 } from './types.js';
-import { PROV_FACET_DISPLAY_NAMES } from './types.js';
+import { PROV_FACET_DISPLAY_NAMES, PROV_SORT_MAPPINGS } from './types.js';
 
 const PROV_API_BASE = 'https://api.prov.vic.gov.au/search';
 
@@ -80,6 +80,14 @@ export class PROVClient extends BaseClient {
     urlParams.append('wt', 'json');
     urlParams.append('rows', String(rows));
     urlParams.append('start', String(start));
+
+    // Add sort parameter if specified
+    if (params.sortby && params.sortby !== 'relevance') {
+      const sortValue = PROV_SORT_MAPPINGS[params.sortby];
+      if (sortValue) {
+        urlParams.append('sort', sortValue);
+      }
+    }
 
     // Add Solr facet parameters if requested
     if (params.includeFacets) {

@@ -32,6 +32,21 @@ export const STATE_NAMES: Record<string, string> = {
 };
 
 // ============================================================================
+// Sort Options
+// ============================================================================
+
+export type GAHAPSortOption = 'relevance' | 'year_asc' | 'year_desc';
+
+export const GAHAP_SORT_OPTIONS: GAHAPSortOption[] = ['relevance', 'year_asc', 'year_desc'];
+
+// Map user-friendly sort options to ArcGIS orderByFields parameter
+export const GAHAP_SORT_MAPPINGS: Record<GAHAPSortOption, string | null> = {
+  relevance: null, // Default (no sort param)
+  year_asc: 'YEAR_START ASC',
+  year_desc: 'YEAR_START DESC',
+};
+
+// ============================================================================
 // Search Parameters
 // ============================================================================
 
@@ -52,6 +67,8 @@ export interface GAHAPSearchParams {
   bbox?: string;
   /** Film number filter (e.g., "MAP2080") */
   filmNumber?: string;
+  /** Sort order for results */
+  sortby?: GAHAPSortOption;
 }
 
 export interface GAHAPGetPhotoParams {

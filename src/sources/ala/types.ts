@@ -63,6 +63,22 @@ export interface ALAFacet {
 }
 
 // ============================================================================
+// Sort Options
+// ============================================================================
+
+export type ALASortOption = 'relevance' | 'date_asc' | 'date_desc' | 'taxon_name';
+
+export const ALA_SORT_OPTIONS: ALASortOption[] = ['relevance', 'date_asc', 'date_desc', 'taxon_name'];
+
+// Map user-friendly sort options to ALA API sort/dir parameters
+export const ALA_SORT_MAPPINGS: Record<ALASortOption, { sort: string; dir: string } | null> = {
+  relevance: null, // Default (no sort param)
+  date_asc: { sort: 'event_date', dir: 'asc' },
+  date_desc: { sort: 'event_date', dir: 'desc' },
+  taxon_name: { sort: 'taxon_name', dir: 'asc' },
+};
+
+// ============================================================================
 // Search Parameter Types
 // ============================================================================
 

@@ -7,7 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { museumsVictoriaClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { MV_RECORD_TYPES, MV_CATEGORIES, MV_LICENCES } from '../../../core/enums.js';
-import type { MuseumSearchParams, MuseumRecord } from '../types.js';
+import type { MuseumSearchParams, MuseumRecord, MVSortOption } from '../types.js';
+import { MV_SORT_OPTIONS } from '../types.js';
 import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
 
 // Facet configuration for Museums Victoria
@@ -34,7 +35,7 @@ export const museumsvicSearchTool: SourceTool = {
         imageLicence: { type: 'string', description: 'Image licence', enum: MV_LICENCES },
         locality: { type: 'string', description: 'Collection locality' },
         taxon: { type: 'string', description: PARAMS.TAXON },
-        random: { type: 'boolean', description: PARAMS.RANDOM, default: false },
+        sortby: { type: 'string', description: PARAMS.SORT_BY, enum: MV_SORT_OPTIONS, default: 'relevance' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -55,7 +56,7 @@ export const museumsvicSearchTool: SourceTool = {
       imageLicence?: string;
       locality?: string;
       taxon?: string;
-      random?: boolean;
+      sortby?: MVSortOption;
       limit?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -78,7 +79,7 @@ export const museumsvicSearchTool: SourceTool = {
         imageLicence: input.imageLicence as MuseumSearchParams['imageLicence'],
         locality: input.locality,
         taxon: input.taxon,
-        random: input.random,
+        sortby: input.sortby,
         perPage: Math.min(input.limit ?? 20, 100),
       };
 

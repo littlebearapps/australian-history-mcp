@@ -7,8 +7,8 @@ import { successResponse, errorResponse } from '../../../core/types.js';
 import { alaClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
 import { ALA_KINGDOMS, AU_STATES_FULL } from '../../../core/enums.js';
-import type { ALAOccurrenceSearchParams, ALAOccurrence, ALAFacetField } from '../types.js';
-import { ALA_FACET_FIELDS } from '../types.js';
+import type { ALAOccurrenceSearchParams, ALAOccurrence, ALAFacetField, ALASortOption } from '../types.js';
+import { ALA_FACET_FIELDS, ALA_SORT_OPTIONS, ALA_SORT_MAPPINGS } from '../types.js';
 
 export const alaSearchOccurrencesTool: SourceTool = {
   schema: {
@@ -28,6 +28,7 @@ export const alaSearchOccurrencesTool: SourceTool = {
         endYear: { type: 'number', description: PARAMS.YEAR_TO },
         hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
         spatiallyValid: { type: 'boolean', description: PARAMS.SPATIALLY_VALID },
+        sortby: { type: 'string', description: PARAMS.SORT_BY, enum: ALA_SORT_OPTIONS, default: 'relevance' },
         limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
@@ -51,6 +52,7 @@ export const alaSearchOccurrencesTool: SourceTool = {
       endYear?: number;
       hasImages?: boolean;
       spatiallyValid?: boolean;
+      sortby?: ALASortOption;
       limit?: number;
       // Faceted search
       includeFacets?: boolean;
@@ -67,6 +69,9 @@ export const alaSearchOccurrencesTool: SourceTool = {
     }
 
     try {
+      // Map sortby to ALA API parameters
+      const sortMapping = input.sortby ? ALA_SORT_MAPPINGS[input.sortby] : null;
+
       const params: ALAOccurrenceSearchParams = {
         q: input.query,
         scientificName: input.scientificName,
@@ -79,6 +84,8 @@ export const alaSearchOccurrencesTool: SourceTool = {
         endYear: input.endYear,
         hasImages: input.hasImages,
         spatiallyValid: input.spatiallyValid,
+        sort: sortMapping?.sort as ALAOccurrenceSearchParams['sort'],
+        dir: sortMapping?.dir as ALAOccurrenceSearchParams['dir'],
         pageSize: Math.min(input.limit ?? 20, 100),
         // Faceted search
         includeFacets: input.includeFacets,

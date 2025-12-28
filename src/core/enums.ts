@@ -90,6 +90,82 @@ export type SortOrderDate = (typeof SORT_ORDERS_DATE)[number];
 export const SORT_ORDERS_ASC_DESC = ['asc', 'desc'] as const;
 export type SortOrderAscDesc = (typeof SORT_ORDERS_ASC_DESC)[number];
 
+/**
+ * Common sort options for federated search
+ * Maps to source-specific sort parameters
+ */
+export const COMMON_SORT_OPTIONS = [
+  'relevance',
+  'date_asc',
+  'date_desc',
+  'alphabetical',
+  'random',
+] as const;
+
+export type CommonSortOption = (typeof COMMON_SORT_OPTIONS)[number];
+
+/**
+ * Source-specific sort parameter mappings
+ */
+export const SOURCE_SORT_MAPPINGS: Record<string, Record<CommonSortOption, string | null>> = {
+  trove: {
+    relevance: 'relevance',
+    date_asc: 'dateasc',
+    date_desc: 'datedesc',
+    alphabetical: null, // Not supported
+    random: null, // Not supported
+  },
+  prov: {
+    relevance: null, // Default (no param)
+    date_asc: 'start_dt asc',
+    date_desc: 'start_dt desc',
+    alphabetical: 'title asc',
+    random: null, // Not supported
+  },
+  museumsvic: {
+    relevance: null, // Default
+    date_asc: 'datemodified',
+    date_desc: 'datemodified',
+    alphabetical: 'displaytitle',
+    random: 'random',
+  },
+  ala: {
+    relevance: null, // Default
+    date_asc: 'first_loaded_date',
+    date_desc: 'first_loaded_date',
+    alphabetical: 'taxon_name',
+    random: null, // Not supported
+  },
+  nma: {
+    relevance: null, // Default
+    date_asc: 'date',
+    date_desc: '-date',
+    alphabetical: 'title',
+    random: null, // Not supported
+  },
+  vhd: {
+    relevance: null, // Default
+    date_asc: null, // Not supported
+    date_desc: null, // Not supported
+    alphabetical: 'name',
+    random: null, // Not supported
+  },
+  acmi: {
+    relevance: null, // Default
+    date_asc: null, // Check API
+    date_desc: null, // Check API
+    alphabetical: null, // Check API
+    random: null, // Not supported
+  },
+  'ga-hap': {
+    relevance: null, // Default
+    date_asc: 'YEAR ASC',
+    date_desc: 'YEAR DESC',
+    alphabetical: null, // Not supported
+    random: null, // Not supported
+  },
+};
+
 // ============================================================================
 // Trove Categories
 // ============================================================================

@@ -16,6 +16,14 @@ import {
   type ContentType,
   type SourceRoute,
 } from '../source-router.js';
+import { parseQuery, type ParsedQuery } from '../query/index.js';
+import {
+  classifyIntent,
+  filterByDateCoverage,
+  findNameSuggestions,
+  type IntentResult,
+  type NameSuggestion,
+} from '../search/index.js';
 
 // ============================================================================
 // Types
@@ -29,6 +37,9 @@ interface SearchInput {
   dateTo?: string;
   state?: string;
   limit?: number;
+  parseAdvancedSyntax?: boolean;
+  smart?: boolean;
+  explain?: boolean;
 }
 
 interface SourceResult {
@@ -45,6 +56,7 @@ interface SourceError {
 
 interface SearchResponse {
   query: string;
+  parsedQuery?: ParsedQuery;
   sourcesSearched: string[];
   totalResults: number;
   results: SourceResult[];
@@ -53,6 +65,17 @@ interface SearchResponse {
     total_ms: number;
     sources: Record<string, number>;
   };
+  _routing?: RoutingExplanation;
+  _suggestions?: NameSuggestion[];
+}
+
+interface RoutingExplanation {
+  detectedIntent: string;
+  intentConfidence: number;
+  matchedKeywords: string[];
+  dateRange?: { from: string; to: string };
+  sourcesSelected: string[];
+  sourcesExcluded?: Record<string, string>;
 }
 
 // ============================================================================
@@ -96,6 +119,21 @@ export const searchMetaTool: SourceTool = {
           type: 'number',
           description: 'Max results per source (default: 10)',
         },
+        parseAdvancedSyntax: {
+          type: 'boolean',
+          description: 'Parse advanced query syntax (date ranges like 1920-1930, field:value, "phrases", -exclusions). Default: false',
+          default: false,
+        },
+        smart: {
+          type: 'boolean',
+          description: 'Enable intelligent source selection based on query intent and date filtering. Default: false',
+          default: false,
+        },
+        explain: {
+          type: 'boolean',
+          description: 'Include routing decisions and suggestions in response. Default: false',
+          default: false,
+        },
       },
       required: ['query'],
     },
@@ -119,9 +157,46 @@ export const searchMetaTool: SourceTool = {
       dateTo: typeof args.dateTo === 'string' ? args.dateTo : undefined,
       state: typeof args.state === 'string' ? args.state : undefined,
       limit: typeof args.limit === 'number' ? args.limit : undefined,
+      parseAdvancedSyntax: typeof args.parseAdvancedSyntax === 'boolean' ? args.parseAdvancedSyntax : false,
+      smart: typeof args.smart === 'boolean' ? args.smart : false,
+      explain: typeof args.explain === 'boolean' ? args.explain : false,
     };
 
-    // Select sources
+    // Parse query if advanced syntax is enabled
+    let parsed: ParsedQuery | undefined;
+    if (input.parseAdvancedSyntax) {
+      parsed = parseQuery(input.query);
+      // Apply parsed date range if not explicitly provided
+      if (parsed.dateRange && !input.dateFrom && !input.dateTo) {
+        input.dateFrom = parsed.dateRange.from;
+        input.dateTo = parsed.dateRange.to;
+      }
+    }
+
+    // Smart source selection using intent classification
+    let intentResult: IntentResult | undefined;
+    let excludedSources: Record<string, string> = {};
+
+    if (input.smart && !input.sources) {
+      // Classify query intent
+      intentResult = classifyIntent(input.query);
+
+      // Start with intent-recommended sources
+      input.sources = intentResult.recommendedSources;
+
+      // Apply date filtering if date range specified
+      if (input.dateFrom || input.dateTo) {
+        const dateRange = {
+          from: input.dateFrom ?? '*',
+          to: input.dateTo ?? '*',
+        };
+        const filtered = filterByDateCoverage(input.sources, dateRange);
+        input.sources = filtered.includedSources;
+        excludedSources = filtered.excludedSources;
+      }
+    }
+
+    // Select sources (uses explicit sources if provided, or falls back to keyword matching)
     const routes = selectSources(
       input.query,
       input.type,
@@ -147,7 +222,7 @@ export const searchMetaTool: SourceTool = {
 
     // Build search promises
     const searchPromises = filteredRoutes.map((route) =>
-      executeSourceSearch(route, input)
+      executeSourceSearch(route, input, parsed)
     );
 
     // Execute in parallel
@@ -190,6 +265,7 @@ export const searchMetaTool: SourceTool = {
 
     const response: SearchResponse = {
       query: input.query,
+      ...(parsed && { parsedQuery: parsed }),
       sourcesSearched: filteredRoutes.map((r) => r.source),
       totalResults,
       results: successResults,
@@ -199,6 +275,28 @@ export const searchMetaTool: SourceTool = {
         sources: timings,
       },
     };
+
+    // Add routing explanation if explain mode enabled
+    if (input.explain) {
+      response._routing = {
+        detectedIntent: intentResult?.intent ?? 'general',
+        intentConfidence: intentResult?.confidence ?? 0.5,
+        matchedKeywords: intentResult?.matchedKeywords ?? [],
+        sourcesSelected: filteredRoutes.map((r) => r.source),
+        ...(input.dateFrom || input.dateTo ? {
+          dateRange: { from: input.dateFrom ?? '*', to: input.dateTo ?? '*' },
+        } : {}),
+        ...(Object.keys(excludedSources).length > 0 ? {
+          sourcesExcluded: excludedSources,
+        } : {}),
+      };
+
+      // Add historical name suggestions
+      const suggestions = findNameSuggestions(input.query);
+      if (suggestions.length > 0) {
+        response._suggestions = suggestions;
+      }
+    }
 
     return successResponse(response);
   },
@@ -221,20 +319,21 @@ interface SourceSearchResult {
  */
 async function executeSourceSearch(
   route: SourceRoute,
-  input: SearchInput
+  input: SearchInput,
+  parsed?: ParsedQuery
 ): Promise<SourceSearchResult> {
   const startTime = Date.now();
   const source = route.source;
 
   try {
-    // Map common args to source-specific params
+    // Map common args to source-specific params (with optional parsed query for builders)
     const sourceArgs = mapArgsToSource(source, {
       query: input.query,
       dateFrom: input.dateFrom,
       dateTo: input.dateTo,
       state: input.state,
       limit: input.limit ?? 10,
-    });
+    }, parsed);
 
     // Execute via registry
     const result = await registry.executeTool(route.tool, sourceArgs);

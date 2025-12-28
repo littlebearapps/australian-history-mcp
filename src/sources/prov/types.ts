@@ -41,6 +41,19 @@ export const PROV_FACET_DISPLAY_NAMES: Record<PROVFacetField, string> = {
   'agencies.ids': 'Agency',
 };
 
+// Sort options for PROV search
+export type PROVSortOption = 'relevance' | 'date_asc' | 'date_desc' | 'title';
+
+export const PROV_SORT_OPTIONS: PROVSortOption[] = ['relevance', 'date_asc', 'date_desc', 'title'];
+
+// Solr sort parameter mappings
+export const PROV_SORT_MAPPINGS: Record<PROVSortOption, string | null> = {
+  relevance: null, // Default Solr relevance (no sort param)
+  date_asc: 'start_dt asc',
+  date_desc: 'start_dt desc',
+  title: 'title asc',
+};
+
 export interface PROVSearchParams {
   query?: string;
   series?: string;      // VPRS number (e.g., "VPRS 515")
@@ -52,6 +65,7 @@ export interface PROVSearchParams {
   digitisedOnly?: boolean;
   rows?: number;        // max results (default 20)
   start?: number;       // pagination offset
+  sortby?: PROVSortOption; // sort order
   // Faceted search
   includeFacets?: boolean;
   facetFields?: PROVFacetField[];

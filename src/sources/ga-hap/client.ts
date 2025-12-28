@@ -18,7 +18,7 @@ import type {
   GAHAPAttributes,
   GAHAPSearchResult,
 } from './types.js';
-import { STATE_CODES as CODES, STATE_NAMES as NAMES } from './types.js';
+import { STATE_CODES as CODES, STATE_NAMES as NAMES, GAHAP_SORT_MAPPINGS } from './types.js';
 
 const API_BASE =
   'https://services1.arcgis.com/wfNKYeHsOyaFyPw3/arcgis/rest/services/HistoricalAerialPhotography_AGOL_DIST_gdb/FeatureServer';
@@ -54,6 +54,14 @@ export class GAHAPClient extends BaseClient {
       resultOffset: offset,
       f: 'json',
     };
+
+    // Add sort order if specified
+    if (params.sortby && params.sortby !== 'relevance') {
+      const orderByFields = GAHAP_SORT_MAPPINGS[params.sortby];
+      if (orderByFields) {
+        queryParams.orderByFields = orderByFields;
+      }
+    }
 
     // Add spatial filter if bbox provided
     if (params.bbox) {
