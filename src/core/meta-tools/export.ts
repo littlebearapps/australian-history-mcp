@@ -65,8 +65,12 @@ function toMarkdown(records: Record<string, unknown>[], fields?: string[]): stri
     const values = headers.map((field) => {
       const value = record[field];
       if (value === null || value === undefined) return '';
-      // Escape pipe characters and truncate long values
-      return String(value).replace(/\|/g, '\\|').substring(0, 100);
+      // Escape backslash, pipe, and newlines for Markdown table cells
+      return String(value)
+        .replace(/\\/g, '\\\\')    // Escape backslashes first
+        .replace(/\|/g, '\\|')     // Escape pipe characters
+        .replace(/\n/g, ' ')       // Replace newlines with space
+        .substring(0, 100);
     });
     return `| ${values.join(' | ')} |`;
   });
