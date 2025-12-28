@@ -64,6 +64,11 @@ export class VHDClient extends BaseClient {
       queryParams.per = params.period;
     }
 
+    // VHD API uses 'thm' for theme (numeric ID or name)
+    if (params.theme) {
+      queryParams.thm = params.theme;
+    }
+
     if (params.page) {
       queryParams.page = params.page.toString();
     }

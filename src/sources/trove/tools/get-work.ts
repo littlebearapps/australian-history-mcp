@@ -5,33 +5,20 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { REC_LEVELS, TROVE_INCLUDE_OPTIONS } from '../../../core/enums.js';
 import type { TroveRecLevel, TroveIncludeOption } from '../types.js';
 
 export const troveGetWorkTool: SourceTool = {
   schema: {
     name: 'trove_get_work',
-    description: 'Get detailed information about a Trove work (book, image, map, music, or archive) by ID. Returns full metadata with optional holdings, links, and version information.',
+    description: 'Get work details (book, image, map, music).',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        workId: {
-          type: 'string',
-          description: 'The Trove work ID (e.g., "12345678")',
-        },
-        reclevel: {
-          type: 'string',
-          enum: ['brief', 'full'],
-          default: 'full',
-          description: 'Record detail level: "brief" for basic metadata, "full" for extended metadata',
-        },
-        include: {
-          type: 'array',
-          items: {
-            type: 'string',
-            enum: ['holdings', 'links', 'workversions', 'subscribinglibs'],
-          },
-          description: 'Additional data to include: holdings (library copies), links (external URLs), workversions (editions), subscribinglibs (subscribing libraries)',
-        },
+        workId: { type: 'string', description: PARAMS.WORK_ID },
+        reclevel: { type: 'string', description: PARAMS.RECLEVEL, enum: REC_LEVELS, default: 'full' },
+        include: { type: 'array', description: PARAMS.INCLUDE, items: { type: 'string', enum: TROVE_INCLUDE_OPTIONS } },
       },
       required: ['workId'],
     },

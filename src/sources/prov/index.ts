@@ -13,6 +13,7 @@ import { provGetImagesTool } from './tools/images.js';
 import { provHarvestTool } from './tools/harvest.js';
 import { provGetSeriesTool } from './tools/get-series.js';
 import { provGetAgencyTool } from './tools/get-agency.js';
+import { provGetItemsTool } from './tools/get-items.js';
 
 export const provSource = defineSource({
   name: 'prov',
@@ -25,6 +26,7 @@ export const provSource = defineSource({
     provHarvestTool,
     provGetSeriesTool,
     provGetAgencyTool,
+    provGetItemsTool,
   ],
 });
 

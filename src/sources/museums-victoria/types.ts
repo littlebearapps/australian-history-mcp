@@ -3,6 +3,22 @@
  */
 
 // ============================================================================
+// Sort Options
+// ============================================================================
+
+export type MVSortOption = 'relevance' | 'date_desc' | 'alphabetical' | 'random';
+
+export const MV_SORT_OPTIONS: MVSortOption[] = ['relevance', 'date_desc', 'alphabetical', 'random'];
+
+// Map user-friendly sort options to Museums Victoria API sort parameter
+export const MV_SORT_MAPPINGS: Record<MVSortOption, string | null> = {
+  relevance: null, // Default (no sort param)
+  date_desc: 'datemodified', // Most recent first
+  alphabetical: 'displaytitle', // A-Z by title
+  random: 'random', // Random order
+};
+
+// ============================================================================
 // Search Parameter Types
 // ============================================================================
 
@@ -30,7 +46,10 @@ export interface MuseumSearchParams {
   locality?: string;
   taxon?: string;
   collectingArea?: string;
+  /** @deprecated Use sortby instead */
   random?: boolean;
+  /** Sort order for results */
+  sortby?: MVSortOption;
   perPage?: number;
   page?: number;
 }

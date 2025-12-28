@@ -17,6 +17,10 @@ export interface VHDPlaceSearchParams {
   architecturalStyle?: string;
   /** Period filter */
   period?: string;
+  /** Heritage theme filter (from vhd_list_themes) */
+  theme?: string;
+  /** Only return places with images */
+  hasImages?: boolean;
   /** Page number (1-based) */
   page?: number;
   /** Results per page */

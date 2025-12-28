@@ -25,10 +25,28 @@ Search species occurrence records.
 | `family` | string | Taxonomic family |
 | `genus` | string | Taxonomic genus |
 | `stateProvince` | string | Australian state (e.g., "Victoria") |
+| `lat` | number | Centre latitude for point+radius search ⭐ NEW |
+| `lon` | number | Centre longitude for point+radius search ⭐ NEW |
+| `radiusKm` | number | Search radius in kilometres (requires lat/lon) ⭐ NEW |
 | `startYear` | number | Filter by year range start |
 | `endYear` | number | Filter by year range end |
 | `hasImages` | boolean | Only records with images |
+| `basisOfRecord` | string | How recorded: PRESERVED_SPECIMEN, HUMAN_OBSERVATION, MACHINE_OBSERVATION, FOSSIL_SPECIMEN, LIVING_SPECIMEN |
+| `coordinateUncertaintyMax` | number | Max coordinate uncertainty in metres |
+| `occurrenceStatus` | string | "present" or "absent" |
+| `dataResourceName` | string | Contributing dataset name |
+| `collector` | string | Collector name (matches recordedBy or collectors) |
 | `limit` | number | Max results (default 20, max 100) |
+
+**Spatial Query Example:**
+```
+# Find koala sightings within 50km of Melbourne CBD
+ala_search_occurrences with:
+  scientificName: "Phascolarctos cinereus"
+  lat: -37.8136
+  lon: 144.9631
+  radiusKm: 50
+```
 
 ### ala_search_species
 Search species by name.
@@ -58,12 +76,54 @@ Bulk download occurrence records.
 | `maxRecords` | number | Max records (1-1000, default 100) |
 | `startIndex` | number | Pagination offset |
 
+## Historical Research Filters
+
+Use these parameters to find historical museum specimens:
+
+| Use Case | Parameters |
+|----------|------------|
+| 19th century specimens | `basisOfRecord: "PRESERVED_SPECIMEN"`, `endYear: 1899` |
+| Specimens by collector | `collector: "Baldwin Spencer"` |
+| Precise location data | `coordinateUncertaintyMax: 1000` (within 1km) |
+| Specific museum | `dataResourceName: "Museums Victoria provider"` |
+
+### Basis of Record Values
+
+| Value | Description |
+|-------|-------------|
+| `PRESERVED_SPECIMEN` | Museum specimens (skins, bones, pressed plants) |
+| `HUMAN_OBSERVATION` | Direct sightings, citizen science |
+| `MACHINE_OBSERVATION` | Camera traps, acoustic sensors |
+| `FOSSIL_SPECIMEN` | Fossils and palaeontological specimens |
+| `LIVING_SPECIMEN` | Zoo, botanical garden records |
+
 ## Key Quirks
 
 - Uses two separate APIs: biocache-ws (occurrences) and bie-ws (species)
 - Species identified by LSID GUIDs (e.g., `https://biodiversity.org.au/afd/taxa/...`)
 - BIE API uses `nameString` for scientific name, taxonomy in `classification` object
 - Occurrence records include citizen science observations
+- Use `basisOfRecord: "PRESERVED_SPECIMEN"` for historical research (museum specimens)
+- Collector names searched across both `recordedBy` and `collectors` fields
+
+### Collector Name Format
+
+The `collector` filter may require specific name formats for reliable matching. The data contains various formats depending on the contributing institution:
+
+| Format | Example | Notes |
+|--------|---------|-------|
+| Surname only | `Spencer` | May return many false positives |
+| First Last | `Baldwin Spencer` | Common format |
+| Last, First | `Spencer, Baldwin` | Institution format |
+| Abbreviated | `Spencer, B.` | Short form |
+| With title | `von Mueller, F.` | Includes particles |
+| Full formal | `Baron Ferdinand von Mueller` | Complete name |
+
+**Recommendations:**
+- Start with surname, refine if needed
+- Try different formats if initial search returns 0 results
+- Use `dataResourceName` to narrow to specific museum/herbarium
+- Check returned `collector` field values to see actual format used
 
 ## Example GUIDs
 

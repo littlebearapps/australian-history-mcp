@@ -9,7 +9,7 @@ import { vhdClient } from '../client.js';
 export const vhdListArchitecturalStylesTool: SourceTool = {
   schema: {
     name: 'vhd_list_architectural_styles',
-    description: 'List all architectural style classifications used in the Victorian Heritage Database. Use style IDs or names when searching for heritage places.',
+    description: 'List architectural style classifications.',
     inputSchema: {
       type: 'object' as const,
       properties: {},

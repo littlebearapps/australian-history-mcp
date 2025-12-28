@@ -5,7 +5,8 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
-import { TROVE_STATES } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { AU_STATES_WITH_NATIONAL, PUBLICATION_TYPES, type AUStateWithNational } from '../../../core/enums.js';
 
 /**
  * Get full details of a newspaper/gazette article
@@ -13,25 +14,13 @@ import { TROVE_STATES } from '../types.js';
 export const troveNewspaperArticleTool: SourceTool = {
   schema: {
     name: 'trove_newspaper_article',
-    description: 'Get full article details including OCR text and PDF link.',
+    description: 'Get article details with OCR text and PDF.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        articleId: {
-          type: 'string',
-          description: 'The Trove article ID (from search results)',
-        },
-        type: {
-          type: 'string',
-          enum: ['newspaper', 'gazette'],
-          description: 'Article type',
-          default: 'newspaper',
-        },
-        includeText: {
-          type: 'boolean',
-          description: 'Include the full OCR text of the article',
-          default: true,
-        },
+        articleId: { type: 'string', description: PARAMS.ID },
+        type: { type: 'string', description: PARAMS.TYPE, enum: PUBLICATION_TYPES, default: 'newspaper' },
+        includeText: { type: 'boolean', description: PARAMS.INCLUDE_FULL_TEXT, default: true },
       },
       required: ['articleId'],
     },
@@ -95,21 +84,12 @@ export const troveNewspaperArticleTool: SourceTool = {
 export const troveListTitlesTool: SourceTool = {
   schema: {
     name: 'trove_list_titles',
-    description: 'List available newspaper or gazette titles by state.',
+    description: 'List newspaper or gazette titles by state.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        type: {
-          type: 'string',
-          enum: ['newspaper', 'gazette'],
-          description: 'Type of publication',
-          default: 'newspaper',
-        },
-        state: {
-          type: 'string',
-          enum: TROVE_STATES,
-          description: 'Filter by state',
-        },
+        type: { type: 'string', description: PARAMS.TYPE, enum: PUBLICATION_TYPES, default: 'newspaper' },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_WITH_NATIONAL },
       },
       required: [],
     },
@@ -127,7 +107,7 @@ export const troveListTitlesTool: SourceTool = {
 
     try {
       const type = input.type ?? 'newspaper';
-      const state = input.state as typeof TROVE_STATES[number] | undefined;
+      const state = input.state as AUStateWithNational | undefined;
 
       const titles = type === 'gazette'
         ? await troveClient.listGazetteTitles(state)
@@ -159,33 +139,15 @@ export const troveListTitlesTool: SourceTool = {
 export const troveTitleDetailsTool: SourceTool = {
   schema: {
     name: 'trove_title_details',
-    description: 'Get title details with available years and issue counts.',
+    description: 'Get title details with years and issues.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        titleId: {
-          type: 'string',
-          description: 'The Trove title ID',
-        },
-        type: {
-          type: 'string',
-          enum: ['newspaper', 'gazette'],
-          description: 'Type of publication',
-          default: 'newspaper',
-        },
-        includeYears: {
-          type: 'boolean',
-          description: 'Include list of available years',
-          default: true,
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Start of date range for issue list (YYYYMMDD)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'End of date range for issue list (YYYYMMDD)',
-        },
+        titleId: { type: 'string', description: PARAMS.ID },
+        type: { type: 'string', description: PARAMS.TYPE, enum: PUBLICATION_TYPES, default: 'newspaper' },
+        includeYears: { type: 'boolean', description: PARAMS.INCLUDE_YEARS, default: true },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
       },
       required: ['titleId'],
     },

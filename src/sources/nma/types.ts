@@ -13,6 +13,14 @@ export interface NMASearchParams {
   type?: string;
   /** Collection filter */
   collection?: string;
+  /** Material/medium filter (e.g., "Wood", "Paper") */
+  medium?: string;
+  /** Place/location filter (e.g., "Victoria", "Queensland") */
+  spatial?: string;
+  /** Year filter (e.g., 1850) */
+  temporal?: number;
+  /** Creator/maker name filter */
+  creator?: string;
   /** Maximum results per page */
   limit?: number;
   /** Offset for pagination */

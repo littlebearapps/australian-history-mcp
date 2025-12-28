@@ -82,6 +82,29 @@ export type TroveIncludeOption =
   | 'listitems'
   | 'years';
 
+// Available facet fields for Trove search
+export type TroveFacetField =
+  | 'decade'
+  | 'year'
+  | 'state'
+  | 'format'
+  | 'category'
+  | 'audience'
+  | 'language'
+  | 'availability'
+  | 'nuc';
+
+export const TROVE_FACET_FIELDS: TroveFacetField[] = [
+  'decade',
+  'year',
+  'state',
+  'format',
+  'category',
+  'language',
+  'availability',
+  'nuc',
+];
+
 export interface TroveSearchParams {
   query: string;
   category?: TroveCategory | TroveCategory[];
@@ -94,6 +117,8 @@ export interface TroveSearchParams {
   includeFullText?: boolean;
   format?: string;      // Photograph, Map, Book, etc.
   facets?: string[];
+  includeFacets?: boolean;  // Enable facet counting in response
+  facetFields?: TroveFacetField[];  // Specific facets to return
   nuc?: string;         // NUC code to filter by contributor (e.g., "ANL" for NLA, "VSL" for SLV)
   illustrated?: 'Y' | 'N';  // Filter by illustration (Y = illustrated, N = not illustrated)
 
@@ -166,12 +191,26 @@ export interface TroveWork {
   subjects?: string[];
 }
 
+// Facet value from Trove API response
+export interface TroveFacetValue {
+  display: string;
+  count: number;
+}
+
+// Facet from Trove API response
+export interface TroveFacet {
+  name: string;
+  displayname: string;
+  term: TroveFacetValue[];
+}
+
 export interface TroveSearchResult {
   query: string;
   category: string;
   totalResults: number;
   nextStart?: string;   // cursor for next page
   records: (TroveArticle | TroveWork)[];
+  facets?: TroveFacet[];
 }
 
 // ============================================================================

@@ -8,53 +8,21 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { iiifClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const iiifGetImageUrlTool: SourceTool = {
   schema: {
     name: 'iiif_get_image_url',
-    description: `Construct IIIF Image API URLs for downloading images in various sizes and formats.
-
-Requires an image service URL from a manifest (imageServiceUrl field from iiif_get_manifest).
-
-Examples:
-- Full size: region=full, size=max
-- Thumbnail: region=full, size=!200,200
-- Specific region: region=100,100,500,500, size=max
-- Percentage: region=full, size=pct:50`,
+    description: 'Construct IIIF Image API URL for any size/format.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        imageServiceUrl: {
-          type: 'string',
-          description: 'The IIIF Image API base URL (from manifest imageServiceUrl field)',
-        },
-        region: {
-          type: 'string',
-          description: 'Image region: "full", "square", or "x,y,w,h" coordinates, or "pct:x,y,w,h" for percentages',
-          default: 'full',
-        },
-        size: {
-          type: 'string',
-          description: 'Image size: "max", "full", "w,", ",h", "pct:n", "w,h", or "!w,h" (best fit)',
-          default: 'max',
-        },
-        rotation: {
-          type: 'string',
-          description: 'Rotation in degrees: "0", "90", "180", "270", or "!n" for mirrored',
-          default: '0',
-        },
-        quality: {
-          type: 'string',
-          description: 'Image quality: "default", "color", "gray", or "bitonal"',
-          enum: ['default', 'color', 'gray', 'bitonal'],
-          default: 'default',
-        },
-        format: {
-          type: 'string',
-          description: 'Output format: "jpg", "png", "gif", "webp", or "tif"',
-          enum: ['jpg', 'png', 'gif', 'webp', 'tif'],
-          default: 'jpg',
-        },
+        imageServiceUrl: { type: 'string', description: PARAMS.IMAGE_SERVICE_URL },
+        region: { type: 'string', description: PARAMS.REGION, default: 'full' },
+        size: { type: 'string', description: PARAMS.SIZE, default: 'max' },
+        rotation: { type: 'string', description: PARAMS.ROTATION, default: '0' },
+        quality: { type: 'string', description: PARAMS.QUALITY, enum: ['default', 'color', 'gray', 'bitonal'], default: 'default' },
+        format: { type: 'string', description: PARAMS.FORMAT, enum: ['jpg', 'png', 'gif', 'webp', 'tif'], default: 'jpg' },
       },
       required: ['imageServiceUrl'],
     },

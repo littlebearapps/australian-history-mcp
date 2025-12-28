@@ -2,7 +2,18 @@
 /**
  * Australian History MCP Server
  *
- * Provides Claude Code with programmatic access to:
+ * Dynamic Tool Loading Architecture:
+ * Exposes 5 meta-tools for discovery, schema lookup, and execution.
+ * All 69 data tools are available via run(tool, args).
+ *
+ * Meta-tools:
+ * - tools: Discover available data tools by keyword, source, or category
+ * - schema: Get full input schema for a specific tool
+ * - run: Execute any data tool by name with arguments
+ * - open: Open a URL in the default browser
+ * - export: Export records to CSV, JSON, Markdown, or download script
+ *
+ * Data sources (69 tools across 11 sources):
  * - PROV (Public Record Office Victoria) - Victorian state archives
  * - Trove (National Library of Australia) - Federal digitised collections
  * - Museums Victoria - Victorian museum collections
@@ -25,7 +36,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 
-// Import registry and source modules
+// Import registry and source modules (for run dispatch)
 import { registry } from './registry.js';
 import { provSource } from './sources/prov/index.js';
 import { troveSource } from './sources/trove/index.js';
@@ -38,6 +49,21 @@ import { pmTranscriptsSource } from './sources/pm-transcripts/index.js';
 import { iiifSource } from './sources/iiif/index.js';
 import { gaHapSource } from './sources/ga-hap/index.js';
 import { ghapSource } from './sources/ghap/index.js';
+
+// Import meta-tools (only these are exposed in dynamic mode)
+import { metaTools } from './core/meta-tools/index.js';
+import { errorResponse } from './core/types.js';
+
+// ============================================================================
+// Mode Configuration
+// ============================================================================
+
+/**
+ * MCP_MODE environment variable controls tool exposure:
+ * - "dynamic" (default): 5 meta-tools, 69 data tools via run()
+ * - "legacy": All 69 data tools exposed directly (backwards compatible)
+ */
+const MCP_MODE = process.env.MCP_MODE?.toLowerCase() === 'legacy' ? 'legacy' : 'dynamic';
 
 // ============================================================================
 // Register Source Modules
@@ -72,20 +98,46 @@ const server = new Server(
 );
 
 // ============================================================================
-// Tool Registration
+// Tool Registration (mode-dependent)
 // ============================================================================
 
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools: registry.listTools(),
-}));
+server.setRequestHandler(ListToolsRequestSchema, async () => {
+  if (MCP_MODE === 'legacy') {
+    // Legacy mode: expose all 69 data tools directly
+    return { tools: registry.listTools() };
+  }
+  // Dynamic mode: expose only 5 meta-tools
+  return { tools: metaTools.map((t) => t.schema) };
+});
 
 // ============================================================================
-// Tool Execution
+// Tool Execution (mode-dependent)
 // ============================================================================
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-  return registry.executeTool(name, args ?? {});
+
+  if (MCP_MODE === 'legacy') {
+    // Legacy mode: execute data tools directly
+    if (registry.hasTool(name)) {
+      return registry.executeTool(name, args ?? {});
+    }
+    return errorResponse(`Unknown tool: ${name}`, 'server');
+  }
+
+  // Dynamic mode: check meta-tools first
+  const metaTool = metaTools.find((t) => t.schema.name === name);
+  if (metaTool) {
+    return metaTool.execute(args ?? {});
+  }
+
+  // Fallback for direct tool calls (backwards compatibility in dynamic mode)
+  if (registry.hasTool(name)) {
+    return registry.executeTool(name, args ?? {});
+  }
+
+  // Unknown tool
+  return errorResponse(`Unknown tool: ${name}. Use tools() to discover available tools.`, 'server');
 });
 
 // ============================================================================
@@ -97,20 +149,29 @@ async function main() {
   await server.connect(transport);
 
   console.error('Australian History MCP Server running on stdio');
+  console.error('');
+
+  if (MCP_MODE === 'legacy') {
+    console.error('Mode: LEGACY (all 69 tools exposed directly)');
+    console.error(`  Tools: ${registry.toolCount} data tools`);
+    console.error('  Tip: Set MCP_MODE=dynamic for 93% token reduction');
+  } else {
+    console.error('Mode: DYNAMIC (5 meta-tools, lazy loading)');
+    console.error(`  Exposed: ${metaTools.length} meta-tools (tools, schema, run, open, export)`);
+    console.error(`  Available: ${registry.toolCount} data tools via run(tool, args)`);
+    console.error('  Tip: Set MCP_MODE=legacy for backwards compatibility');
+  }
 
   // Show source status
   const sources = registry.getSourcesStatus();
   console.error('');
-  console.error('Registered sources:');
+  console.error('Data sources:');
   for (const source of sources) {
     const authStatus = source.authRequired
-      ? (source.authConfigured ? '✓' : '✗ (API key required)')
-      : '(no auth)';
+      ? (source.authConfigured ? '✓' : '✗ (key required)')
+      : '';
     console.error(`  ${source.name}: ${source.toolCount} tools ${authStatus}`);
   }
-
-  console.error('');
-  console.error(`Total: ${registry.toolCount} tools from ${registry.sourceCount} sources`);
 
   if (!process.env.TROVE_API_KEY) {
     console.error('');

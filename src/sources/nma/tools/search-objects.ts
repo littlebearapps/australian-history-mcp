@@ -5,31 +5,39 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
+
+// Facet configuration for NMA objects
+const NMA_FACET_CONFIGS = [
+  simpleFacetConfig('type', 'Type', 'additionalType'),
+  simpleFacetConfig('collection', 'Collection', 'collection.title'),
+  simpleFacetConfig('medium', 'Material', 'medium.title'),
+  simpleFacetConfig('spatial', 'Place', 'spatial.title'),
+];
+
+const NMA_FACET_FIELDS = NMA_FACET_CONFIGS.map(c => c.name);
 
 export const nmaSearchObjectsTool: SourceTool = {
   schema: {
     name: 'nma_search_objects',
-    description: 'Search National Museum of Australia collection for objects by keyword. Returns museum artefacts, photographs, technology, and historical items.',
+    description: 'Search museum collection objects.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (e.g., "boomerang", "gold rush", "convict")',
-        },
-        type: {
-          type: 'string',
-          description: 'Object type filter (e.g., "Photographs", "Boomerangs")',
-        },
-        collection: {
-          type: 'string',
-          description: 'Collection name filter',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        type: { type: 'string', description: PARAMS.TYPE },
+        collection: { type: 'string', description: PARAMS.COLLECTION },
+        // SEARCH-011: New filter parameters
+        medium: { type: 'string', description: 'Material (e.g., Wood, Paper, Metal)' },
+        spatial: { type: 'string', description: 'Place/location (e.g., Victoria, Queensland)' },
+        year: { type: 'number', description: PARAMS.YEAR },
+        creator: { type: 'string', description: PARAMS.CREATOR },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: NMA_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: ['query'],
     },
@@ -40,7 +48,16 @@ export const nmaSearchObjectsTool: SourceTool = {
       query?: string;
       type?: string;
       collection?: string;
+      // SEARCH-011: New filter parameters
+      medium?: string;
+      spatial?: string;
+      year?: number;
+      creator?: string;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: string[];
+      facetLimit?: number;
     };
 
     if (!input.query) {
@@ -52,10 +69,16 @@ export const nmaSearchObjectsTool: SourceTool = {
         text: input.query,
         type: input.type,
         collection: input.collection,
+        // SEARCH-011: New filter parameters
+        medium: input.medium,
+        spatial: input.spatial,
+        temporal: input.year,
+        creator: input.creator,
         limit: Math.min(input.limit ?? 20, 100),
       });
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'nma',
         totalResults: result.meta.results,
         returned: result.data.length,
@@ -72,7 +95,22 @@ export const nmaSearchObjectsTool: SourceTool = {
           licence: obj._meta?.licence,
           webUrl: obj._meta?.hasFormat,
         })),
-      });
+      };
+
+      // Add client-side facets if requested
+      if (input.includeFacets && result.data.length > 0) {
+        const facetResult = countFacets(
+          result.data as unknown as Record<string, unknown>[],
+          {
+            facetConfigs: NMA_FACET_CONFIGS,
+            includeFacets: input.facetFields,
+            limit: input.facetLimit ?? 10,
+          }
+        );
+        response.facets = Object.values(facetResult.facets);
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

@@ -5,8 +5,98 @@
  */
 
 // ============================================================================
+// Facet Types
+// ============================================================================
+
+// Available facet fields for ALA occurrence search
+export type ALAFacetField =
+  | 'kingdom'
+  | 'phylum'
+  | 'class'
+  | 'order'
+  | 'family'
+  | 'genus'
+  | 'species'
+  | 'stateProvince'
+  | 'basisOfRecord'
+  | 'year'
+  | 'month'
+  | 'dataResourceName';
+
+export const ALA_FACET_FIELDS: ALAFacetField[] = [
+  'kingdom',
+  'phylum',
+  'class',
+  'order',
+  'family',
+  'genus',
+  'stateProvince',
+  'basisOfRecord',
+  'year',
+];
+
+// User-friendly facet field names
+export const ALA_FACET_DISPLAY_NAMES: Record<ALAFacetField, string> = {
+  'kingdom': 'Kingdom',
+  'phylum': 'Phylum',
+  'class': 'Class',
+  'order': 'Order',
+  'family': 'Family',
+  'genus': 'Genus',
+  'species': 'Species',
+  'stateProvince': 'State/Province',
+  'basisOfRecord': 'Basis of Record',
+  'year': 'Year',
+  'month': 'Month',
+  'dataResourceName': 'Data Resource',
+};
+
+export interface ALAFacetValue {
+  value: string;
+  count: number;
+}
+
+export interface ALAFacet {
+  name: ALAFacetField;
+  displayName: string;
+  values: ALAFacetValue[];
+}
+
+// ============================================================================
+// Sort Options
+// ============================================================================
+
+export type ALASortOption = 'relevance' | 'date_asc' | 'date_desc' | 'taxon_name';
+
+export const ALA_SORT_OPTIONS: ALASortOption[] = ['relevance', 'date_asc', 'date_desc', 'taxon_name'];
+
+// Map user-friendly sort options to ALA API sort/dir parameters
+export const ALA_SORT_MAPPINGS: Record<ALASortOption, { sort: string; dir: string } | null> = {
+  relevance: null, // Default (no sort param)
+  date_asc: { sort: 'event_date', dir: 'asc' },
+  date_desc: { sort: 'event_date', dir: 'desc' },
+  taxon_name: { sort: 'taxon_name', dir: 'asc' },
+};
+
+// ============================================================================
 // Search Parameter Types
 // ============================================================================
+
+/** Basis of record types - how the occurrence was recorded */
+export type ALABasisOfRecord =
+  | 'PRESERVED_SPECIMEN'
+  | 'HUMAN_OBSERVATION'
+  | 'MACHINE_OBSERVATION'
+  | 'FOSSIL_SPECIMEN'
+  | 'LIVING_SPECIMEN';
+
+export const ALA_BASIS_OF_RECORD: ALABasisOfRecord[] = [
+  'PRESERVED_SPECIMEN',
+  'HUMAN_OBSERVATION',
+  'MACHINE_OBSERVATION',
+  'FOSSIL_SPECIMEN',
+  'LIVING_SPECIMEN',
+];
 
 export interface ALAOccurrenceSearchParams {
   /** Search query (taxon name, location, etc.) */
@@ -25,8 +115,10 @@ export interface ALAOccurrenceSearchParams {
   species?: string;
   /** Filter by state/territory */
   stateProvince?: string;
-  /** Filter by data resource */
+  /** Filter by data resource UID */
   dataResourceUid?: string;
+  /** Filter by data resource name */
+  dataResourceName?: string;
   /** Start year */
   startYear?: number;
   /** End year */
@@ -35,6 +127,20 @@ export interface ALAOccurrenceSearchParams {
   hasImages?: boolean;
   /** Only spatially valid records */
   spatiallyValid?: boolean;
+  /** Basis of record filter */
+  basisOfRecord?: ALABasisOfRecord;
+  /** Maximum coordinate uncertainty in metres */
+  coordinateUncertaintyMax?: number;
+  /** Occurrence status (present/absent) */
+  occurrenceStatus?: 'present' | 'absent';
+  /** Collector/recorded by name */
+  collector?: string;
+  /** Centre latitude for spatial search (SEARCH-016) */
+  lat?: number;
+  /** Centre longitude for spatial search (SEARCH-016) */
+  lon?: number;
+  /** Search radius in kilometres (SEARCH-016) */
+  radius?: number;
   /** Page size (max 100) */
   pageSize?: number;
   /** Start index for pagination */
@@ -43,6 +149,12 @@ export interface ALAOccurrenceSearchParams {
   sort?: 'score' | 'taxon_name' | 'event_date';
   /** Sort direction */
   dir?: 'asc' | 'desc';
+  /** Include facet counts */
+  includeFacets?: boolean;
+  /** Facet fields to return */
+  facetFields?: ALAFacetField[];
+  /** Max values per facet */
+  facetLimit?: number;
 }
 
 export interface ALASpeciesSearchParams {
@@ -103,6 +215,7 @@ export interface ALAOccurrenceSearchResult {
   sort: string;
   dir: string;
   occurrences: ALAOccurrence[];
+  facets?: ALAFacet[];
 }
 
 // ============================================================================

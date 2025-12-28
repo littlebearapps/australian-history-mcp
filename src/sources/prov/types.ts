@@ -4,9 +4,55 @@
  * Types specific to the PROV data source.
  */
 
+import {
+  PROV_RECORD_FORMS,
+  PROV_DOCUMENT_CATEGORIES,
+  type PROVRecordForm,
+  type PROVDocumentCategory,
+} from '../../core/enums.js';
+
+// Re-export for backwards compatibility
+export { PROV_RECORD_FORMS, PROV_DOCUMENT_CATEGORIES };
+export type { PROVRecordForm, PROVDocumentCategory };
+
 // ============================================================================
 // Search Parameters
 // ============================================================================
+
+// Available facet fields for PROV search (Solr field names)
+export type PROVFacetField =
+  | 'record_form'
+  | 'category'
+  | 'series_id'
+  | 'agencies.ids';
+
+export const PROV_FACET_FIELDS: PROVFacetField[] = [
+  'record_form',
+  'category',
+  'series_id',
+  'agencies.ids',
+];
+
+// User-friendly facet field names
+export const PROV_FACET_DISPLAY_NAMES: Record<PROVFacetField, string> = {
+  'record_form': 'Record Form',
+  'category': 'Category',
+  'series_id': 'Series',
+  'agencies.ids': 'Agency',
+};
+
+// Sort options for PROV search
+export type PROVSortOption = 'relevance' | 'date_asc' | 'date_desc' | 'title';
+
+export const PROV_SORT_OPTIONS: PROVSortOption[] = ['relevance', 'date_asc', 'date_desc', 'title'];
+
+// Solr sort parameter mappings
+export const PROV_SORT_MAPPINGS: Record<PROVSortOption, string | null> = {
+  relevance: null, // Default Solr relevance (no sort param)
+  date_asc: 'start_dt asc',
+  date_desc: 'start_dt desc',
+  title: 'title asc',
+};
 
 export interface PROVSearchParams {
   query?: string;
@@ -19,6 +65,11 @@ export interface PROVSearchParams {
   digitisedOnly?: boolean;
   rows?: number;        // max results (default 20)
   start?: number;       // pagination offset
+  sortby?: PROVSortOption; // sort order
+  // Faceted search
+  includeFacets?: boolean;
+  facetFields?: PROVFacetField[];
+  facetLimit?: number;  // max values per facet (default 10)
 }
 
 // ============================================================================
@@ -41,11 +92,24 @@ export interface PROVRecord {
   url: string;
 }
 
+// Facet types
+export interface PROVFacetValue {
+  value: string;
+  count: number;
+}
+
+export interface PROVFacet {
+  name: PROVFacetField;
+  displayName: string;
+  values: PROVFacetValue[];
+}
+
 export interface PROVSearchResult {
   totalResults: number;
   start: number;
   rows: number;
   records: PROVRecord[];
+  facets?: PROVFacet[];
 }
 
 export interface PROVSeries {
@@ -78,39 +142,6 @@ export interface PROVImagesResult {
   totalPages: number;
   images: PROVImage[];
 }
-
-// ============================================================================
-// Record Form Enum
-// ============================================================================
-
-export const PROV_RECORD_FORMS = [
-  'Photograph or Image',
-  'Map, Plan, or Drawing',
-  'File',
-  'Volume',
-  'Document',
-  'Card',
-  'Object',
-  'Moving Image',
-  'Sound Recording',
-] as const;
-
-export type PROVRecordForm = typeof PROV_RECORD_FORMS[number];
-
-// ============================================================================
-// Document Category Enum
-// ============================================================================
-
-export const PROV_DOCUMENT_CATEGORIES = [
-  'agency',
-  'function',
-  'series',
-  'consignment',
-  'item',
-  'image',
-] as const;
-
-export type PROVDocumentCategory = typeof PROV_DOCUMENT_CATEGORIES[number];
 
 // ============================================================================
 // Agency Types

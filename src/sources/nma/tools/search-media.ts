@@ -5,26 +5,18 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaSearchMediaTool: SourceTool = {
   schema: {
     name: 'nma_search_media',
-    description: 'Search National Museum of Australia for media items including images, videos, and sound recordings. Returns media associated with collection objects.',
+    description: 'Search images, videos, and sound recordings.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (e.g., "gold rush photograph", "aboriginal art")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100, default 20)',
-        },
-        offset: {
-          type: 'number',
-          description: 'Number of results to skip for pagination',
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        limit: { type: 'number', description: PARAMS.LIMIT },
+        offset: { type: 'number', description: PARAMS.OFFSET },
       },
       required: ['query'],
     },

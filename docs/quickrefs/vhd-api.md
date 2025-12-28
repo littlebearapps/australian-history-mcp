@@ -22,7 +22,12 @@ Search Victorian heritage places.
 | `municipality` | string | Municipality/suburb filter |
 | `architecturalStyle` | string | Architectural style filter |
 | `period` | string | Time period filter |
+| `theme` | string | Heritage theme filter (from vhd_list_themes) |
+| `hasImages` | boolean | Only return places with photographs |
 | `limit` | number | Max results (default 20, max 100) |
+| `includeFacets` | boolean | Include facet counts |
+| `facetFields` | array | Facets to return |
+| `facetLimit` | number | Max values per facet (default 10) |
 
 ### vhd_get_place
 Get detailed heritage place record.
@@ -91,6 +96,9 @@ The VHD API uses different parameter names than typical REST APIs:
 | `municipality` | `sub` | Suburb/municipality |
 | `architecturalStyle` | `arcs` | Architectural style ID |
 | `period` | `per` | Time period ID |
+| `theme` | `thm` | Heritage theme ID |
+| `heritageAuthority` | `aut` | Heritage authority |
+| `hasImages` | (client-side) | Filters by primary_image_id |
 
 ## Response Format
 
@@ -129,6 +137,22 @@ VHD uses HAL+JSON with `_embedded` and `_links`:
   - `/architectural-styles` → `_embedded.architectural_style`
   - `/themes` → `_embedded.themes`
   - `/periods` → `_embedded.period`
+
+### hasImages Facet Limitation
+
+When using faceted search with `hasImages` facet field, the API returns image IDs rather than boolean bucket counts:
+
+**Expected (not returned):**
+```json
+{ "hasImages": { "true": 500, "false": 100 } }
+```
+
+**Actual (what API returns):**
+```json
+{ "hasImages": { "127820": 1, "127843": 1, "127887": 1 } }
+```
+
+This is an API limitation. The facet counts individual image IDs rather than aggregating to boolean values. Use the `hasImages` parameter as a filter instead of as a facet for reliable results.
 
 ## Additional Endpoints
 

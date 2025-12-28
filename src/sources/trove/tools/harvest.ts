@@ -6,66 +6,28 @@ import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { runHarvest } from '../../../core/harvest-runner.js';
 import { troveClient } from '../client.js';
-import { TROVE_CATEGORIES, TROVE_STATES, type TroveArticle, type TroveWork } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { TROVE_CATEGORIES, AU_STATES_WITH_NATIONAL, SORT_ORDERS_DATE, type AUStateWithNational } from '../../../core/enums.js';
+import type { TroveArticle, TroveWork } from '../types.js';
 
 export const troveHarvestTool: SourceTool = {
   schema: {
     name: 'trove_harvest',
-    description: 'Bulk download Trove records with cursor-based pagination.',
+    description: 'Bulk download Trove records with pagination.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search terms',
-        },
-        category: {
-          type: 'string',
-          enum: TROVE_CATEGORIES,
-          description: 'Content category',
-          default: 'all',
-        },
-        state: {
-          type: 'string',
-          enum: TROVE_STATES,
-          description: 'Filter by state (newspapers)',
-        },
-        dateFrom: {
-          type: 'string',
-          description: 'Start date (YYYY)',
-        },
-        dateTo: {
-          type: 'string',
-          description: 'End date (YYYY)',
-        },
-        format: {
-          type: 'string',
-          description: 'Format filter',
-        },
-        includeFullText: {
-          type: 'boolean',
-          description: 'Include article text (newspapers only)',
-          default: false,
-        },
-        nuc: {
-          type: 'string',
-          description: 'NUC code to filter by contributor/partner. Common codes: VSL (State Library Victoria), SLNSW (State Library NSW), ANL (National Library), QSL (State Library Queensland)',
-        },
-        sortby: {
-          type: 'string',
-          enum: ['relevance', 'datedesc', 'dateasc'],
-          default: 'relevance',
-          description: 'Sort order: relevance (default), datedesc (newest first), dateasc (oldest first)',
-        },
-        maxRecords: {
-          type: 'number',
-          description: 'Maximum records to harvest (1-1000)',
-          default: 100,
-        },
-        cursor: {
-          type: 'string',
-          description: 'Pagination cursor from previous harvest',
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        category: { type: 'string', description: PARAMS.CATEGORY, enum: TROVE_CATEGORIES, default: 'all' },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_WITH_NATIONAL },
+        dateFrom: { type: 'string', description: PARAMS.DATE_FROM },
+        dateTo: { type: 'string', description: PARAMS.DATE_TO },
+        format: { type: 'string', description: PARAMS.FORMAT },
+        includeFullText: { type: 'boolean', description: PARAMS.INCLUDE_FULL_TEXT, default: false },
+        nuc: { type: 'string', description: PARAMS.NUC },
+        sortby: { type: 'string', description: PARAMS.SORT_BY, enum: SORT_ORDERS_DATE, default: 'relevance' },
+        maxRecords: { type: 'number', description: PARAMS.MAX_RECORDS, default: 100 },
+        cursor: { type: 'string', description: PARAMS.CURSOR },
       },
       required: ['query'],
     },
@@ -111,7 +73,7 @@ export const troveHarvestTool: SourceTool = {
           const searchResult = await troveClient.search({
             query: input.query,
             category: input.category as typeof TROVE_CATEGORIES[number],
-            state: input.state as typeof TROVE_STATES[number],
+            state: input.state as AUStateWithNational,
             dateFrom: input.dateFrom,
             dateTo: input.dateTo,
             format: input.format,

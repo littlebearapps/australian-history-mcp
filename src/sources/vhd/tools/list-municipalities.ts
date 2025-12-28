@@ -9,7 +9,7 @@ import { vhdClient } from '../client.js';
 export const vhdListMunicipalitiesTool: SourceTool = {
   schema: {
     name: 'vhd_list_municipalities',
-    description: 'List all Victorian municipalities (Local Government Areas) available for heritage place filtering. Use municipality IDs when searching for places.',
+    description: 'List Victorian municipalities (LGAs).',
     inputSchema: {
       type: 'object' as const,
       properties: {},

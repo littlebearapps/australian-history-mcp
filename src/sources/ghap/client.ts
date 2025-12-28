@@ -9,6 +9,7 @@
  */
 
 import { BaseClient } from '../../core/base-client.js';
+import { radiusToBBox, bboxToString } from '../../core/spatial/index.js';
 import type {
   GHAPSearchParams,
   GHAPSearchResult,
@@ -50,16 +51,21 @@ export class GHAPClient extends BaseClient {
     if (params.lga) {
       queryParams.lga = params.lga;
     }
-    if (params.bbox) {
-      queryParams.bbox = params.bbox;
+
+    // SEARCH-016: Convert point+radius to bbox if provided
+    let bboxValue = params.bbox;
+    if (params.lat !== undefined && params.lon !== undefined && params.radiusKm !== undefined) {
+      const bbox = radiusToBBox({ lat: params.lat, lon: params.lon, radiusKm: params.radiusKm });
+      bboxValue = bboxToString(bbox);
+    }
+    if (bboxValue) {
+      queryParams.bbox = bboxValue;
     }
 
-    // Also search community datasets if no specific gazetteer chosen
-    if (params.containsname || params.fuzzyname || params.name) {
-      queryParams.searchpublicdatasets = 'on';
-    }
+    // Note: searchpublicdatasets=on causes max paging redirect errors on TLCMap
+    // The Australian National Gazetteer (searchausgaz=on) is sufficient for most queries
 
-    const url = this.buildUrl('/', queryParams);
+    const url = this.buildUrl('/places', queryParams);
     const data = await this.fetchJSON<GeoJSONFeatureCollection>(url);
 
     return this.parseSearchResponse(data);

@@ -58,7 +58,7 @@ Standard ArcGIS REST Feature Service query parameters:
 | FOCAL_LENG | Number | Focal length in mm |
 | AVE_HEIGHT | Number | Average flight height in metres |
 | AVE_SCALE | Number | Average scale denominator (e.g., 80000 = 1:80,000) |
-| FILM_TYPE | String | Film type (1 = B&W, 2 = Colour, 3 = IR) |
+| FILM_TYPE | String | Film type code (see mapping below) |
 | SCANNED | String | "1" if digitised, "0" if not |
 | PREVIEW_URL | String | Preview JPG URL (HTML wrapped) |
 | TIF_URL | String | Full resolution TIFF download URL (HTML wrapped) |
@@ -78,6 +78,84 @@ Standard ArcGIS REST Feature Service query parameters:
 | 7 | Northern Territory |
 | 8 | Australian Capital Territory |
 
+### Film Type Code Mapping
+
+| Code | Type | Tool Value | Record Count |
+|------|------|------------|--------------|
+| 0 | Unknown | `unknown` | ~varies |
+| 1 | Black/White | `bw` | ~967,000 |
+| 2 | Colour | `colour` | ~127,000 |
+| 3 | Black/White Infrared | `bw-infrared` | ~26,000 |
+| 4 | Colour Infrared | `colour-infrared` | ~rare |
+| 5 | Infrared | `infrared` | ~rare |
+| 6 | Other | `other` | ~varies |
+
+## Tools
+
+### ga_hap_search
+Search historical aerial photos with filters.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `state` | string | State filter (NSW, VIC, QLD, SA, WA, TAS, NT, ACT) |
+| `yearFrom` | number | Start year filter (e.g., 1950) |
+| `yearTo` | number | End year filter (e.g., 1970) |
+| `scannedOnly` | boolean | Only return digitised images (default false) |
+| `filmNumber` | string | Film number (e.g., "MAP2080") |
+| `bbox` | string | Bounding box: minLon,minLat,maxLon,maxLat (WGS84) |
+| `lat` | number | Centre latitude for point+radius search ⭐ NEW |
+| `lon` | number | Centre longitude for point+radius search ⭐ NEW |
+| `radiusKm` | number | Search radius in kilometres (requires lat/lon) ⭐ NEW |
+| `filmType` | string | Film type: bw, colour, bw-infrared, colour-infrared, infrared |
+| `camera` | string | Camera model filter (partial match, e.g., "Williamson") |
+| `scaleMin` | number | Min scale denominator (e.g., 10000 for 1:10000 or more detailed) |
+| `scaleMax` | number | Max scale denominator (e.g., 50000 for 1:50000 or less detailed) |
+| `sortby` | string | Sort order: relevance, year_asc, year_desc |
+| `limit` | number | Max results (default 20, max 100) |
+| `offset` | number | Pagination offset |
+
+**Spatial Query Example:**
+```
+# Find aerial photos within 25km of Geelong
+ga_hap_search with:
+  lat: -38.1499
+  lon: 144.3617
+  radiusKm: 25
+  scannedOnly: true
+```
+
+### Filter Examples
+
+| Use Case | Parameters |
+|----------|------------|
+| Colour photos in Victoria | `filmType: "colour"`, `state: "VIC"` |
+| High-detail photos (large scale) | `scaleMin: 5000`, `scaleMax: 15000` |
+| Wide-area photos (small scale) | `scaleMin: 50000`, `scaleMax: 100000` |
+| Wild camera photos from 1960s | `camera: "Wild"`, `yearFrom: 1960`, `yearTo: 1969` |
+| B&W infrared in NSW | `filmType: "bw-infrared"`, `state: "NSW"` |
+
+### Scale Reference
+
+| Scale | Denominator | Use Case |
+|-------|-------------|----------|
+| 1:5,000 | 5000 | Very detailed urban/site surveys |
+| 1:10,000 | 10000 | Detailed urban mapping |
+| 1:25,000 | 25000 | Topographic mapping |
+| 1:50,000 | 50000 | Regional mapping |
+| 1:80,000 | 80000 | Wide-area coverage |
+| 1:100,000 | 100000 | Broad regional surveys |
+
+Note: Lower denominator = more detail (larger scale). Higher denominator = less detail (smaller scale).
+
+### Common Camera Types
+
+| Camera | Description |
+|--------|-------------|
+| Wild RC9 | Swiss precision mapping camera |
+| Williamson F24 | British reconnaissance camera |
+| Zeiss RMK | German aerial survey camera |
+| Fairchild | American aerial camera |
+
 ## Example Queries
 
 ### Search Victorian photos from 1950s
@@ -96,6 +174,24 @@ Standard ArcGIS REST Feature Service query parameters:
 
 ```
 /0/query?where=FILM_NUMBER='MAP2080'&outFields=*&returnGeometry=true&f=json
+```
+
+### Search colour photos (SEARCH-013)
+
+```
+/0/query?where=FILM_TYPE='2'&outFields=*&returnGeometry=true&resultRecordCount=20&f=json
+```
+
+### Search detailed photos by scale range (SEARCH-013)
+
+```
+/0/query?where=AVE_SCALE>=10000 AND AVE_SCALE<=25000&outFields=*&returnGeometry=true&resultRecordCount=20&f=json
+```
+
+### Search by camera type (SEARCH-013)
+
+```
+/0/query?where=CAMERA LIKE '%Wild%'&outFields=*&returnGeometry=true&resultRecordCount=20&f=json
 ```
 
 ### Bounding box search (Melbourne area)

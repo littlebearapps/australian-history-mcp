@@ -1,8 +1,8 @@
 # CLAUDE.md - Australian History MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-25
-**Version:** 0.6.1
+**Last Updated:** 2025-12-28
+**Version:** 0.8.0
 
 ---
 
@@ -98,8 +98,11 @@ npm run build
 # Development (watch mode)
 npm run dev
 
-# Run directly
+# Run directly (dynamic mode - default)
 node dist/index.js
+
+# Run in legacy mode (all 76 tools exposed)
+MCP_MODE=legacy node dist/index.js
 
 # Type check
 npx tsc --noEmit
@@ -107,9 +110,110 @@ npx tsc --noEmit
 
 ---
 
+## Dynamic Tool Loading (Default Mode)
+
+The server uses **dynamic tool loading** by default, exposing only 10 meta-tools instead of all 76 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
+
+### Meta-Tools Exposed
+
+| Tool | Purpose |
+|------|---------|
+| `tools` | Discover available data tools by keyword, source, or category |
+| `schema` | Get full input schema for a specific tool |
+| `run` | Execute any data tool by name with arguments |
+| `search` | **Federated search across multiple sources in parallel** |
+| `open` | Open a URL in the default browser |
+| `export` | Export records to CSV, JSON, Markdown, or download script |
+| `save_query` | Save a named query for later reuse |
+| `list_queries` | List saved queries with filtering options |
+| `run_query` | Execute a saved query with optional parameter overrides |
+| `delete_query` | Remove a saved query by name |
+
+### Federated Search
+
+The `search` meta-tool executes parallel searches across multiple sources:
+
+```
+# Auto-select sources based on query keywords
+search(query="Melbourne photos 1920s", limit=5)
+→ Searches PROV, Trove, NMA, Museums Victoria in parallel
+
+# Explicit source selection
+search(query="railway", sources=["prov", "trove"], limit=3)
+→ Searches only specified sources
+
+# With content type filter
+search(query="gold rush", type="image", limit=5)
+→ Searches sources that handle images
+```
+
+**Response includes:**
+- `sourcesSearched` - which sources were queried
+- `totalResults` - combined result count
+- `results` - per-source records with source attribution
+- `errors` - any sources that failed (others continue)
+- `_timing` - execution time per source (for debugging)
+
+### Workflow: tools() → schema() → run()
+
+```
+1. Discover: tools(query="newspaper")
+   → Returns matching tools: trove_search, trove_newspaper_article, etc.
+
+2. Get Schema: schema(tool="trove_search")
+   → Returns full inputSchema with all parameters
+
+3. Execute: run(tool="trove_search", args={query:"Melbourne", limit:5})
+   → Returns search results
+```
+
+### Example Session
+
+```
+# Find tools for searching newspapers
+tools(query="newspaper")
+→ 5 matching tools: trove_search, trove_harvest, trove_newspaper_article...
+
+# Get parameters for trove_search
+schema(tool="trove_search")
+→ {query, category, dateFrom, dateTo, state, creator, sortby, limit...}
+
+# Search for articles
+run(tool="trove_search", args={query:"Melbourne flood", category:"newspaper", dateFrom:"1930"})
+→ {totalResults: 1234, records: [...]}
+
+# Export results to CSV
+export(records=<results.records>, format="csv", path="/tmp/floods.csv")
+→ {status: "saved", path: "/tmp/floods.csv"}
+```
+
+### Mode Switching
+
+Set `MCP_MODE` environment variable:
+
+| Mode | Tools Exposed | Use Case |
+|------|---------------|----------|
+| `dynamic` (default) | 10 meta-tools | Research workflows, token-efficient |
+| `legacy` | 76 data tools | Backwards compatibility, direct access |
+
+```json
+{
+  "australian-history": {
+    "command": "npx",
+    "args": ["-y", "@littlebearapps/australian-history-mcp"],
+    "env": {
+      "TROVE_API_KEY": "your-key",
+      "MCP_MODE": "dynamic"
+    }
+  }
+}
+```
+
+---
+
 ## MCP Tools Available
 
-### PROV Tools (5)
+### PROV Tools (6)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `prov_search` | None | Search Victorian state archives (with category filter) |
@@ -117,8 +221,9 @@ npx tsc --noEmit
 | `prov_harvest` | None | Bulk download PROV records |
 | `prov_get_agency` | None | Get agency details by VA number |
 | `prov_get_series` | None | Get series details by VPRS number |
+| `prov_get_items` | None | Get items within a series by VPRS number |
 
-### Trove Tools (13)
+### Trove Tools (14)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `trove_search` | Required | Search newspapers, images, books (with sortby, filters, holdings) |
@@ -134,6 +239,7 @@ npx tsc --noEmit
 | `trove_get_person` | Required | Get person/organisation biographical data |
 | `trove_get_list` | Required | Get user-curated research list by ID |
 | `trove_search_people` | Required | Search people and organisations |
+| `trove_get_versions` | Required | Get all versions of a work with holdings info |
 
 ### GHAP Tools (5)
 | Tool | API Key | Purpose |
@@ -166,7 +272,7 @@ npx tsc --noEmit
 | `ala_list_species_lists` | None | List user-curated species lists |
 | `ala_get_species_list` | None | Get species list details by druid |
 
-### NMA Tools (9)
+### NMA Tools (10)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `nma_search_objects` | None | Search museum collection objects |
@@ -178,6 +284,7 @@ npx tsc --noEmit
 | `nma_get_party` | None | Get party (person/org) details by ID |
 | `nma_search_media` | None | Search images, video, and sound |
 | `nma_get_media` | None | Get media details by ID |
+| `nma_get_related` | None | Get related objects, places, parties from _links |
 
 ### VHD Tools (9)
 | Tool | API Key | Purpose |
@@ -192,7 +299,7 @@ npx tsc --noEmit
 | `vhd_list_themes` | None | List heritage themes (history, economics, etc.) |
 | `vhd_list_periods` | None | List historical periods |
 
-### ACMI Tools (7)
+### ACMI Tools (8)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `acmi_search_works` | None | Search ACMI collection (with field and size options) |
@@ -202,12 +309,16 @@ npx tsc --noEmit
 | `acmi_get_creator` | None | Get creator details and filmography |
 | `acmi_list_constellations` | None | List curated thematic collections |
 | `acmi_get_constellation` | None | Get constellation details with works |
+| `acmi_get_related` | None | Get related works (parts, groups, recommendations) |
 
-### PM Transcripts Tools (2)
+### PM Transcripts Tools (5)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `pm_transcripts_get_transcript` | None | Get Prime Ministerial transcript by ID |
 | `pm_transcripts_harvest` | None | Bulk download transcripts with filters |
+| `pm_transcripts_search` | None | Full-text search with FTS5 (requires local index) |
+| `pm_transcripts_build_index` | None | Build/rebuild/update local FTS5 search index |
+| `pm_transcripts_index_stats` | None | Get FTS5 index statistics and PM coverage |
 
 ### IIIF Tools (2)
 | Tool | API Key | Purpose |
@@ -280,22 +391,22 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (69 tools via registry) |
+| `src/index.ts` | MCP server entry point (76 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
 | `src/core/base-client.ts` | Shared fetch helpers with retry |
 | `src/core/base-source.ts` | Source interface definition |
 | `src/core/harvest-runner.ts` | Shared pagination logic |
-| `src/sources/prov/` | PROV source (5 tools) |
-| `src/sources/trove/` | Trove source (13 tools) |
+| `src/sources/prov/` | PROV source (6 tools) |
+| `src/sources/trove/` | Trove source (14 tools) |
 | `src/sources/ghap/` | GHAP source (5 tools) |
 | `src/sources/museums-victoria/` | Museums Victoria source (6 tools) |
 | `src/sources/ala/` | ALA source (8 tools) |
-| `src/sources/nma/` | NMA source (9 tools) |
+| `src/sources/nma/` | NMA source (10 tools) |
 | `src/sources/vhd/` | VHD source (9 tools) |
-| `src/sources/acmi/` | ACMI source (7 tools) |
-| `src/sources/pm-transcripts/` | PM Transcripts source (2 tools) |
+| `src/sources/acmi/` | ACMI source (8 tools) |
+| `src/sources/pm-transcripts/` | PM Transcripts source (5 tools) |
 | `src/sources/iiif/` | IIIF source (2 tools) |
 | `src/sources/ga-hap/` | GA HAP source (3 tools) |
 | `docs/quickrefs/` | Quick reference documentation |
@@ -306,26 +417,35 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 ## Architecture
 
+### Dynamic Mode (Default)
+
 ```
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│                             Claude Code Session                                  │
-└───────────────────────────────────┬─────────────────────────────────────────────┘
-                                    │ stdio
-┌───────────────────────────────────▼─────────────────────────────────────────────┐
-│               Australian History MCP Server (69 tools, 11 sources)               │
-│  ┌──────────────────────────────────────────────────────────────────────────┐   │
-│  │                         Tool Registry (Map-based)                         │   │
-│  └──────────────────────────────────────────────────────────────────────────┘   │
-│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌───┐ ┌───┐ ┌────┐ ┌────┐ ┌────┐ ┌────┐  │
-│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA│ │VHD│ │ACMI│ │PM T│ │IIIF│ │ GA │  │
-│  │(5) │ │(13) │ │(5) │ │(6)   │ │(8)│ │(9)│ │(9)│ │(7) │ │(2) │ │(2) │ │(3) │  │
-│  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘ └─┬──┘ └─┬──┘ └─┬──┘  │
-└─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼──────┼──────┼──────┼──────┘
-      │      │      │       │       │     │     │     │      │      │      │
-      ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼      ▼      ▼      ▼
-   PROV   Trove  TLCMap  MusVic  ALA   NMA   VHD   ACMI   PMC   Any    GA
-   Solr   API v3  WSAPI   API    API   API   API   API    XML  IIIF  ArcGIS
+┌─────────────────────────────────────────────────────────────────┐
+│                    Claude Code Session                           │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │ stdio
+┌───────────────────────────────▼─────────────────────────────────┐
+│    Australian History MCP Server (10 meta-tools exposed)         │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │  Meta-Tools: tools | schema | run | search | open | export │ │
+│  │              save_query | list_queries | run_query | ...   │ │
+│  └───────────────────────────┬────────────────────────────────┘ │
+│                              │ run(tool, args)                   │
+│  ┌───────────────────────────▼────────────────────────────────┐ │
+│  │              Tool Registry (76 data tools)                  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
+│  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌────┐ ┌───┐ ┌────┐ ...  │
+│  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA │ │VHD│ │ACMI│       │
+│  │(6) │ │(14) │ │(5) │ │(6)   │ │(8)│ │(10)│ │(9)│ │(8) │       │
+│  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘        │
+└─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼────────────┘
+      ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼
+    PROV  Trove  TLCMap  MusVic   ALA   NMA   VHD   ACMI (+ 3 more)
 ```
+
+### Legacy Mode (MCP_MODE=legacy)
+
+All 76 data tools exposed directly (backwards compatible).
 
 ---
 
@@ -480,6 +600,24 @@ Size options: "max" (full), "!w,h" (best fit), "pct:50" (percentage), "w," or ",
 Use ga_hap_search with state "VIC", yearFrom 1950, yearTo 1960, scannedOnly true
 ```
 
+### Search Colour Aerial Photos (GA HAP)
+```
+Use ga_hap_search with filmType "colour" and state "VIC"
+Film types: bw (Black/White), colour, bw-infrared, colour-infrared, infrared
+```
+
+### Search Detailed Large-Scale Photos (GA HAP)
+```
+Use ga_hap_search with scaleMin 5000, scaleMax 15000 for detailed urban/site surveys
+Scale: lower denominator = more detail (1:5000 is very detailed, 1:100000 is wide area)
+```
+
+### Search by Camera Type (GA HAP)
+```
+Use ga_hap_search with camera "Wild" or "Williamson" for partial match on camera model
+Common cameras: Wild RC9, Williamson F24, Zeiss RMK, Fairchild
+```
+
 ### Get Aerial Photo Details (GA HAP)
 ```
 Use ga_hap_get_photo with objectId from search results, or filmNumber + run + frame
@@ -496,6 +634,76 @@ State codes: NSW, VIC, QLD, SA, WA, TAS, NT, ACT
 Use prov_harvest, trove_harvest, ghap_harvest, museumsvic_harvest,
 ala_harvest, nma_harvest, vhd_harvest, acmi_harvest, pm_transcripts_harvest,
 or ga_hap_harvest
+```
+
+### Search by Location (Spatial - ALA, GA HAP, GHAP)
+```
+Use ala_search_occurrences with lat=-37.81, lon=144.96, radiusKm=50 for Melbourne area
+Use ga_hap_search with lat=-37.81, lon=144.96, radiusKm=25 for aerial photos near Melbourne
+Use ghap_search with lat=-37.81, lon=144.96, radiusKm=10 for historical placenames
+```
+
+### Get Items within a PROV Series
+```
+Use prov_get_items with seriesId "VPRS 515" to list items in the series
+Add query "Melbourne" to filter items within the series
+```
+
+### Get Related Museum Objects (NMA)
+```
+Use nma_get_related with objectId from nma_get_object results
+Returns related objects, places, parties, and media via _links
+```
+
+### Get Related Works (ACMI)
+```
+Use acmi_get_related with workId from acmi_get_work results
+Returns parts (episodes), groups (series), and recommendations
+```
+
+### Get Work Versions (Trove)
+```
+Use trove_get_versions with workId to see all versions
+Returns holdings, formats, and library locations for each version
+```
+
+### Full-Text Search PM Transcripts (FTS5)
+```
+1. Build index first: pm_transcripts_build_index with mode "build"
+   (Takes ~43 minutes for all 26,000+ transcripts)
+2. Search: pm_transcripts_search with query "climate change" or "economic reform"
+   Supports FTS5 operators: "phrase match", term1 OR term2, term1 NOT term2
+3. Check index: pm_transcripts_index_stats for coverage and size
+```
+
+### Update PM Transcripts Index (Incremental)
+```
+Use pm_transcripts_build_index with mode "update"
+Only fetches new transcripts since last build (seconds vs minutes)
+```
+
+### Save a Query for Later Reuse
+```
+Use save_query with:
+  name: "melbourne-floods-1930s"
+  source: "trove"
+  tool: "trove_search"
+  parameters: {query: "Melbourne flood", category: "newspaper", dateFrom: "1930", dateTo: "1939"}
+  tags: ["research", "floods"]
+```
+
+### Run a Saved Query
+```
+Use run_query with name "melbourne-floods-1930s"
+Add overrides {limit: 50} to modify parameters for this run
+```
+
+### List and Manage Saved Queries
+```
+Use list_queries to see all saved queries
+Filter with source "trove" or tag "research"
+Sort by lastUsed or useCount to find frequently used queries
+Use delete_query to remove old queries
 ```
 
 ---
@@ -630,7 +838,8 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 - **ACMI constellations:** API uses `name` field not `title` for constellation names
 - **PM Transcripts format:** XML responses requiring parsing
 - **PM Transcripts IDs:** Sequential integers, gaps exist for missing transcripts
-- **PM Transcripts harvest:** Slow for PM filtering due to sequential scanning. Use `pm_transcripts_get_transcript` for individual lookups. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000
+- **PM Transcripts no search API:** The API only supports lookup by transcript ID (`/query?transcript=ID`). There is no search endpoint and the sitemap is no longer accessible. Use `pm_transcripts_harvest` with PM/date filters to scan ID ranges.
+- **PM Transcripts harvest:** Sequential ID scanning only. Approximate PM era ID ranges: Curtin ~1-2000, Menzies ~2000-4000, Hawke ~5000-8000, Keating ~8000-10000, Howard ~10000-18000
 - **IIIF Presentation API versions:** Supports v2.x and v3.x manifests; v3 uses different structure (`items` instead of `sequences`)
 - **IIIF Image API port:** SLV uses port 2083 for images, standard 443 for manifests
 - **Trove NUC filtering:** Use `nuc` parameter to filter by contributor (e.g., "VSL" for State Library Victoria)
@@ -639,7 +848,14 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 - **GA HAP pagination:** Max 2000 records per query; use harvest tool for larger downloads
 - **GA HAP state codes:** NSW=1, VIC=2, QLD=3, SA=4, WA=5, TAS=6, NT=7, ACT=8
 - **GA HAP RUN/FRAME fields:** These are strings not integers (e.g., "COAST TIE 2", "C-KEY"); prefer objectId for lookups
+- **Spatial queries:** Point+radius converted to bounding box internally; results may include records slightly outside radius
+- **Spatial coordinate format:** All spatial params use WGS84 (lat, lon in decimal degrees); GA HAP internally converts to Web Mercator
+- **PM Transcripts FTS5 index:** Stored at `~/.local/share/australian-history-mcp/pm-transcripts.db` (~50-100MB)
+- **PM Transcripts FTS5 build time:** Initial build ~43 minutes (26k transcripts); incremental update much faster
+- **PM Transcripts FTS5 operators:** Supports "phrase match", term1 OR term2, term1 NOT term2, NEAR(a b, 5)
+- **Saved queries storage:** JSON file at `~/.local/share/australian-history-mcp/saved-queries.json`
+- **Saved query names:** Alphanumeric, hyphens, underscores only; max 64 characters
 
 ---
 
-**Token Count:** ~800 tokens
+**Token Count:** ~1100 tokens

@@ -33,6 +33,7 @@ import {
   type TroveMagazineYear,
   type TroveRecLevel,
   type TroveIncludeOption,
+  type TroveFacet,
 } from './types.js';
 
 const TROVE_API_BASE = 'https://api.trove.nla.gov.au/v3';
@@ -198,8 +199,12 @@ export class TroveClient extends BaseClient {
       urlParams.include = includes.join(',');
     }
 
-    // Request facets
-    if (params.facets) {
+    // Request facets - either explicit list or default set
+    if (params.includeFacets) {
+      const facetFields = params.facetFields || ['decade', 'state', 'format'];
+      urlParams.facet = facetFields;
+    } else if (params.facets) {
+      // Legacy support for direct facets array
       urlParams.facet = params.facets;
     }
 
@@ -585,13 +590,20 @@ export class TroveClient extends BaseClient {
   }
 
   private parseSearchResponse(data: unknown, query: string): TroveSearchResult {
-    const typedData = data as { category?: Array<{ code: string; records?: { total?: number; nextStart?: string; article?: unknown[]; work?: unknown[] } }> };
+    const typedData = data as {
+      category?: Array<{
+        code: string;
+        records?: { total?: number; nextStart?: string; article?: unknown[]; work?: unknown[] };
+        facets?: { facet?: unknown[] };
+      }>;
+    };
     const categories = typedData.category ?? [];
 
     // Combine results from all categories
     let totalResults = 0;
     let nextStart: string | undefined;
     const records: (TroveArticle | TroveWork)[] = [];
+    let facets: TroveFacet[] | undefined;
 
     for (const cat of categories) {
       const catRecords = cat.records ?? {};
@@ -606,15 +618,42 @@ export class TroveClient extends BaseClient {
           records.push(this.parseWork(item));
         }
       }
+
+      // Parse facets from first category that has them
+      if (!facets && cat.facets?.facet) {
+        facets = this.parseFacets(cat.facets.facet);
+      }
     }
 
-    return {
+    const result: TroveSearchResult = {
       query,
       category: categories.map((c) => c.code).join(','),
       totalResults,
       nextStart,
       records,
     };
+
+    if (facets && facets.length > 0) {
+      result.facets = facets;
+    }
+
+    return result;
+  }
+
+  private parseFacets(data: unknown[]): TroveFacet[] {
+    return data.map((f) => {
+      const facet = f as Record<string, unknown>;
+      const terms = (facet.term ?? []) as Array<Record<string, unknown>>;
+
+      return {
+        name: String(facet.name ?? ''),
+        displayname: String(facet.displayname ?? facet.name ?? ''),
+        term: terms.map((t) => ({
+          display: String(t.display ?? t.search ?? ''),
+          count: typeof t.count === 'number' ? t.count : parseInt(String(t.count ?? '0'), 10),
+        })),
+      };
+    });
   }
 
   private parseArticle(data: unknown): TroveArticle {

@@ -36,6 +36,48 @@ Bulk download transcripts with optional filters.
 | `maxRecords` | number | Max records (1-500, default 100) |
 | `useSitemap` | boolean | Use sitemap for faster PM filtering (default true) |
 
+### pm_transcripts_search ⭐ NEW
+Full-text search across all indexed transcripts using SQLite FTS5.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | string | **Required.** Search query with FTS5 operators |
+| `primeMinister` | string | Filter by PM name |
+| `releaseType` | string | Filter by type: Speech, Media Release, Interview |
+| `dateFrom` | string | Start date (YYYY-MM-DD) |
+| `dateTo` | string | End date (YYYY-MM-DD) |
+| `limit` | number | Max results (1-100, default 20) |
+| `snippetLength` | number | Snippet character length (default 200) |
+
+**FTS5 Query Operators:**
+- `"exact phrase"` - Match exact phrase
+- `term1 AND term2` - Both terms required
+- `term1 OR term2` - Either term
+- `term1 NOT term2` - Exclude term2
+- `term*` - Prefix matching
+
+**Requires local index.** Run `pm_transcripts_build_index` first.
+
+### pm_transcripts_build_index ⭐ NEW
+Build or update the local SQLite FTS5 search index.
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `mode` | string | `full` (rebuild all) or `update` (add new only) |
+| `startFrom` | number | Starting transcript ID |
+| `maxRecords` | number | Limit records (for testing) |
+
+**Build times:**
+- Full index (~26,000 transcripts): ~43 minutes
+- Update mode: Seconds (fetches only new IDs)
+
+**Storage:** `~/.local/share/australian-history-mcp/pm-transcripts.db` (~50-100MB)
+
+### pm_transcripts_index_stats ⭐ NEW
+Get statistics about the local FTS5 index.
+
+Returns: record count, database size, last updated, date range of indexed content.
+
 ## ⚠️ Harvest Limitations
 
 **The PM Transcripts API has no search or bulk endpoint.** Harvesting works by:

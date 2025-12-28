@@ -17,7 +17,10 @@ import type {
   PROVAgency,
   PROVImage,
   PROVImagesResult,
+  PROVFacetField,
+  PROVFacet,
 } from './types.js';
+import { PROV_FACET_DISPLAY_NAMES, PROV_SORT_MAPPINGS } from './types.js';
 
 const PROV_API_BASE = 'https://api.prov.vic.gov.au/search';
 
@@ -71,15 +74,36 @@ export class PROVClient extends BaseClient {
     const rows = params.rows ?? 20;
     const start = params.start ?? 0;
 
-    const url = this.buildUrl('/query', {
-      q,
-      wt: 'json',
-      rows,
-      start,
-    });
+    // Build URL with facet parameters (Solr requires multiple facet.field entries)
+    const urlParams = new URLSearchParams();
+    urlParams.append('q', q);
+    urlParams.append('wt', 'json');
+    urlParams.append('rows', String(rows));
+    urlParams.append('start', String(start));
 
+    // Add sort parameter if specified
+    if (params.sortby && params.sortby !== 'relevance') {
+      const sortValue = PROV_SORT_MAPPINGS[params.sortby];
+      if (sortValue) {
+        urlParams.append('sort', sortValue);
+      }
+    }
+
+    // Add Solr facet parameters if requested
+    if (params.includeFacets) {
+      urlParams.append('facet', 'true');
+      urlParams.append('facet.mincount', '1');
+      urlParams.append('facet.limit', String(params.facetLimit ?? 10));
+
+      const facetFields = params.facetFields ?? ['record_form', 'category'];
+      for (const field of facetFields) {
+        urlParams.append('facet.field', field);
+      }
+    }
+
+    const url = `${this.baseUrl}/query?${urlParams.toString()}`;
     const data = await this.fetchJSON<any>(url);
-    return this.parseSearchResponse(data, start, rows);
+    return this.parseSearchResponse(data, start, rows, params.includeFacets);
   }
 
   /**
@@ -133,7 +157,8 @@ export class PROVClient extends BaseClient {
     pages?: number[];
     pageRange?: string;
   }): Promise<PROVImagesResult> {
-    const manifest = await this.fetchJSON<any>(manifestUrl);
+    // PROV IIIF manifests reject Accept: application/json header (HTTP 406)
+    const manifest = await this.fetchJSON<any>(manifestUrl, { skipAcceptHeader: true });
 
     const title = this.extractManifestTitle(manifest);
     const description = this.extractManifestDescription(manifest);
@@ -185,17 +210,59 @@ export class PROVClient extends BaseClient {
   private parseSearchResponse(
     data: any,
     start: number,
-    rows: number
+    rows: number,
+    includeFacets?: boolean
   ): PROVSearchResult {
     const response = data.response ?? {};
     const docs = response.docs ?? [];
 
-    return {
+    const result: PROVSearchResult = {
       totalResults: response.numFound ?? 0,
       start,
       rows,
       records: docs.map((doc: any) => this.parseRecordDoc(doc)),
     };
+
+    // Parse Solr facets if requested
+    if (includeFacets && data.facet_counts?.facet_fields) {
+      result.facets = this.parseSolrFacets(data.facet_counts.facet_fields);
+    }
+
+    return result;
+  }
+
+  /**
+   * Parse Solr facet_fields format (alternating value/count arrays)
+   */
+  private parseSolrFacets(facetFields: Record<string, unknown[]>): PROVFacet[] {
+    const facets: PROVFacet[] = [];
+
+    for (const [fieldName, values] of Object.entries(facetFields)) {
+      if (!Array.isArray(values) || values.length === 0) continue;
+
+      const facetValues: { value: string; count: number }[] = [];
+
+      // Solr returns alternating [value, count, value, count, ...]
+      for (let i = 0; i < values.length; i += 2) {
+        const value = String(values[i]);
+        const rawCount = values[i + 1];
+        const count: number = typeof rawCount === 'number' ? rawCount : parseInt(String(rawCount), 10);
+
+        if (count > 0) {
+          facetValues.push({ value, count });
+        }
+      }
+
+      if (facetValues.length > 0) {
+        facets.push({
+          name: fieldName as PROVFacetField,
+          displayName: PROV_FACET_DISPLAY_NAMES[fieldName as PROVFacetField] ?? fieldName,
+          values: facetValues,
+        });
+      }
+    }
+
+    return facets;
   }
 
   private parseRecordDoc(doc: any): PROVRecord {

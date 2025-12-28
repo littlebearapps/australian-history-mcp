@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { vhdClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const vhdGetShipwreckTool: SourceTool = {
   schema: {
     name: 'vhd_get_shipwreck',
-    description: 'Get detailed Victorian shipwreck record by ID. Returns full history, vessel details, cargo, and loss information.',
+    description: 'Get shipwreck by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'number',
-          description: 'Shipwreck ID (from search results)',
-        },
+        id: { type: 'number', description: PARAMS.ID },
       },
       required: ['id'],
     },

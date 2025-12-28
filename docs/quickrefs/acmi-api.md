@@ -21,6 +21,8 @@ Search ACMI collection for films, TV, videogames, and digital art.
 | `query` | string | Search term (e.g., "Mad Max", "Australian cinema") |
 | `type` | string | Work type filter (Film, Television, Videogame, Artwork, Object) |
 | `year` | number | Production year filter |
+| `field` | string | Limit search to field: "title" or "description" |
+| `size` | number | Results per page (default 20, max 50) |
 | `page` | number | Page number (1-based, default 1) |
 
 ### acmi_get_work
@@ -86,6 +88,17 @@ Returns: name, description, authors, and key work.
 - `Artwork` - Digital art and installations
 - `Object` - Physical objects and artefacts
 
+## Search Tips
+
+| Use Case | Approach |
+|----------|----------|
+| Search by title only | `query: "Mad Max"`, `field: "title"` |
+| Films from a year | `query: "Australian"`, `type: "Film"`, `year: 1979` |
+| Find by director | Include director name in query (e.g., `query: "George Miller"`) |
+| More results | Set `size: 50` for max results per page |
+
+**Note:** The API does not support year ranges, creator filters, or genre filters directly. Include creator names in the query string for creator-based searches.
+
 ## Key Quirks
 
 - Pagination is page-based (page 1, 2, 3...) not offset-based
@@ -94,6 +107,8 @@ Returns: name, description, authors, and key work.
 - Creator information included in work details
 - Some works have multiple associated media items
 - **Constellations use `name` field** (not `title`) for the collection name
+- No year range support (use single `year` filter)
+- No creator/genre filters (include names in query instead)
 
 ## Example Queries
 

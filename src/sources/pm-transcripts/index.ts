@@ -11,6 +11,10 @@
 import { defineSource } from '../../core/base-source.js';
 import { pmTranscriptsGetTranscriptTool } from './tools/get-transcript.js';
 import { pmTranscriptsHarvestTool } from './tools/harvest.js';
+// SEARCH-018: FTS5 full-text search tools
+import { pmTranscriptsSearchTool } from './tools/search-fulltext.js';
+import { pmTranscriptsBuildIndexTool } from './tools/build-index.js';
+import { pmTranscriptsIndexStatsTool } from './tools/index-stats.js';
 
 export const pmTranscriptsSource = defineSource({
   name: 'pm-transcripts',
@@ -18,7 +22,14 @@ export const pmTranscriptsSource = defineSource({
   description:
     'Australian Prime Ministerial transcripts including speeches, media releases, and interviews.',
   requiresAuth: false,
-  tools: [pmTranscriptsGetTranscriptTool, pmTranscriptsHarvestTool],
+  tools: [
+    pmTranscriptsGetTranscriptTool,
+    pmTranscriptsHarvestTool,
+    // SEARCH-018: FTS5 full-text search tools
+    pmTranscriptsSearchTool,
+    pmTranscriptsBuildIndexTool,
+    pmTranscriptsIndexStatsTool,
+  ],
 });
 
 // Re-export types and client for external use

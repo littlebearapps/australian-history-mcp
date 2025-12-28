@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { acmiClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const acmiGetWorkTool: SourceTool = {
   schema: {
     name: 'acmi_get_work',
-    description: 'Get detailed information about an ACMI collection work by ID.',
+    description: 'Get work by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'number',
-          description: 'Work ID (from search results)',
-        },
+        id: { type: 'number', description: PARAMS.ID },
       },
       required: ['id'],
     },

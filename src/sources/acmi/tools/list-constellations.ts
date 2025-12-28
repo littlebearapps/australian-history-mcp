@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { acmiClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const acmiListConstellationsTool: SourceTool = {
   schema: {
     name: 'acmi_list_constellations',
-    description: 'List constellations (curated thematic collections) from ACMI. Constellations group related works by theme, genre, or topic.',
+    description: 'List curated thematic collections.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        page: {
-          type: 'number',
-          description: 'Page number (1-based, default 1)',
-        },
+        page: { type: 'number', description: PARAMS.PAGE },
       },
       required: [],
     },

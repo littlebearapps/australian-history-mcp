@@ -46,6 +46,15 @@ export class ACMIClient extends BaseClient {
       queryParams.year = params.year.toString();
     }
 
+    // SEARCH-012: New filter parameters
+    if (params.field) {
+      queryParams.field = params.field;
+    }
+
+    if (params.size) {
+      queryParams.size = Math.min(params.size, 50).toString();
+    }
+
     // ACMI API quirk: page 1 should have no page param, pages 2+ need ?page=N
     if (params.page && params.page > 1) {
       queryParams.page = params.page.toString();

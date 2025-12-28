@@ -5,18 +5,16 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { nmaClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const nmaGetObjectTool: SourceTool = {
   schema: {
     name: 'nma_get_object',
-    description: 'Get detailed museum object record from National Museum of Australia by ID. Returns full description, significance, materials, and metadata.',
+    description: 'Get museum object by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        id: {
-          type: 'string',
-          description: 'Object ID (from search results)',
-        },
+        id: { type: 'string', description: PARAMS.ID },
       },
       required: ['id'],
     },

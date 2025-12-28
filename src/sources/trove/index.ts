@@ -24,6 +24,7 @@ import { troveGetMagazineTitleTool } from './tools/get-magazine-title.js';
 import { troveGetPersonTool } from './tools/get-person.js';
 import { troveGetListTool } from './tools/get-list.js';
 import { troveSearchPeopleTool } from './tools/search-people.js';
+import { troveGetVersionsTool } from './tools/get-versions.js';
 
 export const troveSource = defineSource({
   name: 'trove',
@@ -48,6 +49,7 @@ export const troveSource = defineSource({
     troveGetMagazineTitleTool,
     // Work/Person/List tools (new)
     troveGetWorkTool,
+    troveGetVersionsTool,
     troveGetPersonTool,
     troveGetListTool,
     troveSearchPeopleTool,

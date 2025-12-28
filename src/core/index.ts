@@ -29,3 +29,19 @@ export { BaseClient, type FetchOptions } from './base-client.js';
 
 // Harvest runner
 export { runHarvest, formatPaginationInfo } from './harvest-runner.js';
+
+// Faceted search
+export {
+  type FacetValue,
+  type Facet,
+  type FacetsResponse,
+  type FacetableSearchInput,
+  type FacetFieldConfig,
+  type SourceFacetConfig,
+  type CountFacetsInput,
+  countFacets,
+  mergeFacets,
+  simpleFacetConfig,
+  yearToDecade,
+  countByDecade,
+} from './facets/index.js';

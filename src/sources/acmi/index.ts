@@ -15,6 +15,7 @@ import { acmiGetCreatorTool } from './tools/get-creator.js';
 import { acmiListConstellationsTool } from './tools/list-constellations.js';
 import { acmiGetConstellationTool } from './tools/get-constellation.js';
 import { acmiHarvestTool } from './tools/harvest.js';
+import { acmiGetRelatedTool } from './tools/get-related.js';
 
 export const acmiSource = defineSource({
   name: 'acmi',
@@ -24,6 +25,7 @@ export const acmiSource = defineSource({
   tools: [
     acmiSearchWorksTool,
     acmiGetWorkTool,
+    acmiGetRelatedTool,
     acmiListCreatorsTool,
     acmiGetCreatorTool,
     acmiListConstellationsTool,

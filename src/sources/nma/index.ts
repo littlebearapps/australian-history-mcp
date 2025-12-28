@@ -17,6 +17,7 @@ import { nmaGetPartyTool } from './tools/get-party.js';
 import { nmaSearchMediaTool } from './tools/search-media.js';
 import { nmaGetMediaTool } from './tools/get-media.js';
 import { nmaHarvestTool } from './tools/harvest.js';
+import { nmaGetRelatedTool } from './tools/get-related.js';
 
 export const nmaSource = defineSource({
   name: 'nma',
@@ -26,6 +27,7 @@ export const nmaSource = defineSource({
   tools: [
     nmaSearchObjectsTool,
     nmaGetObjectTool,
+    nmaGetRelatedTool,
     nmaSearchPlacesTool,
     nmaGetPlaceTool,
     nmaSearchPartiesTool,

@@ -17,6 +17,10 @@ export interface GHAPSearchParams {
   bbox?: string;         // Bounding box: minLon,minLat,maxLon,maxLat
   anpsId?: string;       // ANPS ID for exact lookup
   limit?: number;        // Max results
+  // SEARCH-016: Spatial query support
+  lat?: number;          // Centre latitude for point+radius search
+  lon?: number;          // Centre longitude for point+radius search
+  radiusKm?: number;     // Search radius in kilometres
 }
 
 // ============================================================================

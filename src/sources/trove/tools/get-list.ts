@@ -5,23 +5,17 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const troveGetListTool: SourceTool = {
   schema: {
     name: 'trove_get_list',
-    description: 'Get a user-curated research list from Trove by ID. Lists contain works, articles, and external links collected by researchers.',
+    description: 'Get user-curated research list by ID.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        listId: {
-          type: 'string',
-          description: 'The Trove list ID (e.g., "12345678")',
-        },
-        includeItems: {
-          type: 'boolean',
-          default: true,
-          description: 'Include the items in the list (works, articles, links)',
-        },
+        listId: { type: 'string', description: PARAMS.LIST_ID },
+        includeItems: { type: 'boolean', description: PARAMS.INCLUDE_ITEMS, default: true },
       },
       required: ['listId'],
     },

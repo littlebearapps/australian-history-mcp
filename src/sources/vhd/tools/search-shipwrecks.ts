@@ -5,23 +5,17 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { vhdClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
 
 export const vhdSearchShipwrecksTool: SourceTool = {
   schema: {
     name: 'vhd_search_shipwrecks',
-    description: 'Search Victorian Heritage Database for shipwrecks along the Victorian coast. Returns protected shipwreck sites and maritime heritage.',
+    description: 'Search Victorian shipwrecks.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (ship name, location, or keyword)',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: [],
     },

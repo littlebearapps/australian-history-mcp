@@ -5,29 +5,20 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { PERSON_TYPES } from '../../../core/enums.js';
 import type { TrovePersonType } from '../types.js';
 
 export const troveSearchPeopleTool: SourceTool = {
   schema: {
     name: 'trove_search_people',
-    description: 'Search for people, organisations, and families in Trove. Returns biographical records with occupations, biographies, and thumbnails.',
+    description: 'Search people and organisations.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query for people/organisations (e.g., "Henry Lawson", "Australian Museum")',
-        },
-        type: {
-          type: 'string',
-          enum: ['Person', 'Organisation', 'Family'],
-          description: 'Filter by entity type',
-        },
-        limit: {
-          type: 'number',
-          default: 20,
-          description: 'Maximum results to return (1-100)',
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        type: { type: 'string', description: PARAMS.TYPE, enum: PERSON_TYPES },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
       },
       required: ['query'],
     },

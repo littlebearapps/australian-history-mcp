@@ -5,35 +5,38 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { vhdClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
+
+// Facet configuration for VHD places
+const VHD_FACET_CONFIGS = [
+  simpleFacetConfig('municipality', 'Municipality', 'local_government_authority'),
+  simpleFacetConfig('architecturalStyle', 'Architectural Style', 'architectural_style'),
+  simpleFacetConfig('period', 'Period', 'period'),
+  simpleFacetConfig('heritageAuthority', 'Heritage Authority', 'heritage_authority_name'),
+  simpleFacetConfig('hasImage', 'Has Image', 'primary_image_id'),
+];
+
+const VHD_FACET_FIELDS = VHD_FACET_CONFIGS.map(c => c.name);
 
 export const vhdSearchPlacesTool: SourceTool = {
   schema: {
     name: 'vhd_search_places',
-    description: 'Search Victorian Heritage Database for heritage places by name, location, or style. Returns registered heritage places across Victoria.',
+    description: 'Search Victorian heritage places.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Search query (place name, location, or keyword)',
-        },
-        municipality: {
-          type: 'string',
-          description: 'Filter by municipality (e.g., "MELBOURNE CITY", "YARRA CITY")',
-        },
-        architecturalStyle: {
-          type: 'string',
-          description: 'Filter by architectural style (e.g., "Victorian Period (1851-1901)")',
-        },
-        period: {
-          type: 'string',
-          description: 'Filter by period (e.g., "1880 - 1909")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        municipality: { type: 'string', description: PARAMS.MUNICIPALITY },
+        architecturalStyle: { type: 'string', description: PARAMS.ARCH_STYLE },
+        period: { type: 'string', description: PARAMS.PERIOD },
+        theme: { type: 'string', description: PARAMS.THEME },
+        hasImages: { type: 'boolean', description: PARAMS.HAS_IMAGES },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: VHD_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: [],
     },
@@ -45,7 +48,13 @@ export const vhdSearchPlacesTool: SourceTool = {
       municipality?: string;
       architecturalStyle?: string;
       period?: string;
+      theme?: string;
+      hasImages?: boolean;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: string[];
+      facetLimit?: number;
     };
 
     try {
@@ -54,12 +63,18 @@ export const vhdSearchPlacesTool: SourceTool = {
         municipality: input.municipality,
         architecturalStyle: input.architecturalStyle,
         period: input.period,
+        theme: input.theme,
         limit: Math.min(input.limit ?? 20, 100),
       });
 
-      const places = result._embedded?.places ?? [];
+      // Get places and optionally filter by image presence
+      let places = result._embedded?.places ?? [];
+      if (input.hasImages) {
+        places = places.filter((place) => place.primary_image_id != null);
+      }
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'vhd',
         returned: places.length,
         places: places.map((place) => ({
@@ -74,7 +89,22 @@ export const vhdSearchPlacesTool: SourceTool = {
           imageUrl: place.primary_image_url,
           url: place.url,
         })),
-      });
+      };
+
+      // Add client-side facets if requested
+      if (input.includeFacets && places.length > 0) {
+        const facetResult = countFacets(
+          places as unknown as Record<string, unknown>[],
+          {
+            facetConfigs: VHD_FACET_CONFIGS,
+            includeFacets: input.facetFields,
+            limit: input.facetLimit ?? 10,
+          }
+        );
+        response.facets = Object.values(facetResult.facets);
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

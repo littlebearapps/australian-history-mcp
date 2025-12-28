@@ -5,42 +5,42 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { ghapClient } from '../client.js';
-import { GHAP_STATES, type GHAPSearchParams } from '../types.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { AU_STATES_UPPER } from '../../../core/enums.js';
+import type { GHAPSearchParams } from '../types.js';
+import { countFacets, simpleFacetConfig } from '../../../core/facets/index.js';
+
+// Facet configuration for GHAP
+const GHAP_FACET_CONFIGS = [
+  simpleFacetConfig('state', 'State', 'state'),
+  simpleFacetConfig('lga', 'Local Government Area', 'lga'),
+  simpleFacetConfig('featureType', 'Feature Type', 'featureType'),
+  simpleFacetConfig('source', 'Source', 'source'),
+];
+
+const GHAP_FACET_FIELDS = GHAP_FACET_CONFIGS.map(c => c.name);
 
 export const ghapSearchTool: SourceTool = {
   schema: {
     name: 'ghap_search',
-    description: 'Search the Gazetteer of Historical Australian Placenames (GHAP) for placenames with coordinates. Includes ANPS gazetteer and community-contributed historical datasets.',
+    description: 'Search historical Australian placenames with coordinates.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        query: {
-          type: 'string',
-          description: 'Placename to search for (partial match)',
-        },
-        fuzzy: {
-          type: 'boolean',
-          description: 'Use fuzzy matching (handles typos)',
-          default: false,
-        },
-        state: {
-          type: 'string',
-          description: 'Filter by Australian state',
-          enum: GHAP_STATES,
-        },
-        lga: {
-          type: 'string',
-          description: 'Filter by Local Government Area (e.g., "BALLARAT CITY")',
-        },
-        bbox: {
-          type: 'string',
-          description: 'Bounding box: minLon,minLat,maxLon,maxLat (e.g., "143,-38,144,-37")',
-        },
-        limit: {
-          type: 'number',
-          description: 'Maximum results to return (1-100)',
-          default: 20,
-        },
+        query: { type: 'string', description: PARAMS.QUERY },
+        fuzzy: { type: 'boolean', description: PARAMS.FUZZY, default: false },
+        state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_UPPER },
+        lga: { type: 'string', description: PARAMS.LGA },
+        bbox: { type: 'string', description: PARAMS.BBOX },
+        // SEARCH-016: Spatial query support
+        lat: { type: 'number', description: PARAMS.LAT },
+        lon: { type: 'number', description: PARAMS.LON },
+        radiusKm: { type: 'number', description: PARAMS.RADIUS_KM },
+        limit: { type: 'number', description: PARAMS.LIMIT, default: 20 },
+        // Faceted search
+        includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
+        facetFields: { type: 'array', items: { type: 'string', enum: GHAP_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        facetLimit: { type: 'number', description: PARAMS.FACET_LIMIT, default: 10 },
       },
       required: ['query'],
     },
@@ -53,7 +53,15 @@ export const ghapSearchTool: SourceTool = {
       state?: string;
       lga?: string;
       bbox?: string;
+      // SEARCH-016: Spatial query support
+      lat?: number;
+      lon?: number;
+      radiusKm?: number;
       limit?: number;
+      // Faceted search
+      includeFacets?: boolean;
+      facetFields?: string[];
+      facetLimit?: number;
     };
 
     if (!input.query || input.query.trim() === '') {
@@ -66,6 +74,10 @@ export const ghapSearchTool: SourceTool = {
         state: input.state as GHAPSearchParams['state'],
         lga: input.lga,
         bbox: input.bbox,
+        // SEARCH-016: Spatial query support
+        lat: input.lat,
+        lon: input.lon,
+        radiusKm: input.radiusKm,
       };
 
       // Use fuzzy or contains search
@@ -77,7 +89,8 @@ export const ghapSearchTool: SourceTool = {
 
       const result = await ghapClient.search(params);
 
-      return successResponse({
+      // Build response with optional facets
+      const response: Record<string, unknown> = {
         source: 'ghap',
         totalResults: result.totalResults,
         returned: result.places.length,
@@ -93,7 +106,22 @@ export const ghapSearchTool: SourceTool = {
           dateRange: p.dateRange,
           url: p.url,
         })),
-      });
+      };
+
+      // Add client-side facets if requested
+      if (input.includeFacets && result.places.length > 0) {
+        const facetResult = countFacets(
+          result.places as unknown as Record<string, unknown>[],
+          {
+            facetConfigs: GHAP_FACET_CONFIGS,
+            includeFacets: input.facetFields,
+            limit: input.facetLimit ?? 10,
+          }
+        );
+        response.facets = Object.values(facetResult.facets);
+      }
+
+      return successResponse(response);
     } catch (error) {
       return errorResponse(error);
     }

@@ -5,25 +5,19 @@
 import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
+import { PARAMS } from '../../../core/param-descriptions.js';
+import { REC_LEVELS } from '../../../core/enums.js';
 import type { TroveRecLevel } from '../types.js';
 
 export const troveGetPersonTool: SourceTool = {
   schema: {
     name: 'trove_get_person',
-    description: 'Get detailed information about a person, organisation, or family in Trove by ID. Returns biographical data including names, occupation, and biography.',
+    description: 'Get person/organisation biographical data.',
     inputSchema: {
       type: 'object' as const,
       properties: {
-        personId: {
-          type: 'string',
-          description: 'The Trove people ID (e.g., "12345678")',
-        },
-        reclevel: {
-          type: 'string',
-          enum: ['brief', 'full'],
-          default: 'full',
-          description: 'Record detail level: "brief" for basic metadata, "full" for extended details',
-        },
+        personId: { type: 'string', description: PARAMS.ID },
+        reclevel: { type: 'string', description: PARAMS.RECLEVEL, enum: REC_LEVELS, default: 'full' },
       },
       required: ['personId'],
     },
