@@ -22,31 +22,6 @@ That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](
 
 → **Next:** Add to your MCP client via [Configuration](#configuration)
 
-## How It Works
-
-This server uses **dynamic tool loading** - instead of exposing all 75 data tools upfront, it presents just 10 meta-tools:
-
-| Meta-Tool | Purpose |
-|-----------|---------|
-| `tools` | Discover available data tools by keyword, source, or category |
-| `schema` | Get full parameters for a specific tool |
-| `run` | Execute any data tool by name |
-| `search` | Search across multiple sources at once |
-| `open` | Open URLs in your browser |
-| `export` | Export results to CSV, JSON, or Markdown |
-| `save_query` | Save a named query for later reuse |
-| `list_queries` | List saved queries with filtering options |
-| `run_query` | Execute a saved query with optional overrides |
-| `delete_query` | Remove a saved query by name |
-
-**Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
-
-> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 75 tools directly.
-
-### Demo
-
-![Demo showing tool discovery, federated search, and browser view](demos/output/combined.gif)
-
 ## What You Can Ask
 
 Instead of navigating 11 different archive websites, just ask your AI:
@@ -66,12 +41,12 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 ## Table of Contents
 
 - [Quick Start](#quick-start)
-- [How It Works](#how-it-works)
 - [What You Can Ask](#what-you-can-ask)
 - [Data Sources - What You Can Find](#data-sources---what-you-can-find)
 - [Important Notice - Third-Party Data Sources](#important-notice---third-party-data-sources)
 - [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Add this MCP to Your AI Agent](#add-this-mcp-to-your-ai-agent)
+- [How It Works](#how-it-works)
 - [Data Sources - Tools & Examples](#data-sources---tools--examples)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Rate Limits](#rate-limits)
@@ -266,6 +241,27 @@ Add to `.vscode/mcp.json` or user MCP configuration:
   }
 }
 ```
+
+## How It Works
+
+This server uses **dynamic tool loading** - instead of exposing all 75 data tools upfront, it presents just 10 meta-tools:
+
+| Meta-Tool | Purpose |
+|-----------|---------|
+| `tools` | Discover available data tools by keyword, source, or category |
+| `schema` | Get full parameters for a specific tool |
+| `run` | Execute any data tool by name |
+| `search` | Search across multiple sources at once |
+| `open` | Open URLs in your browser |
+| `export` | Export results to CSV, JSON, or Markdown |
+| `save_query` | Save a named query for later reuse |
+| `list_queries` | List saved queries with filtering options |
+| `run_query` | Execute a saved query with optional overrides |
+| `delete_query` | Remove a saved query by name |
+
+**Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
+
+> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 75 tools directly.
 
 ## Data Sources - Tools & Examples
 
