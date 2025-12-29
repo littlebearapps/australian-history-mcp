@@ -10,44 +10,7 @@ _Last updated: December 2025_
 
 Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos from 1928, species records, heritage buildings, or government datasets - no manual searching required.
 
-## Quick Start
-
-Run directly with npx - no installation required:
-
-```bash
-npx @littlebearapps/australian-history-mcp
-```
-
-That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](#trove-api-key---how-to-apply) requires a free API key.
-
-→ **Next:** Add to your MCP client via [Configuration](#configuration)
-
-## How It Works
-
-This server uses **dynamic tool loading** - instead of exposing all 76 data tools upfront, it presents just 10 meta-tools:
-
-| Meta-Tool | Purpose |
-|-----------|---------|
-| `tools` | Discover available data tools by keyword, source, or category |
-| `schema` | Get full parameters for a specific tool |
-| `run` | Execute any data tool by name |
-| `search` | Search across multiple sources at once |
-| `open` | Open URLs in your browser |
-| `export` | Export results to CSV, JSON, or Markdown |
-| `save_query` | Save a named query for later reuse |
-| `list_queries` | List saved queries with filtering options |
-| `run_query` | Execute a saved query with optional overrides |
-| `delete_query` | Remove a saved query by name |
-
-**Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
-
-> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 76 tools directly.
-
-### Demo
-
-![Demo showing tool discovery, federated search, and browser view](demos/output/combined.gif)
-
-## What You Can Ask
+## What You Can Ask Your AI to Search For
 
 Instead of navigating 11 different archive websites, just ask your AI:
 
@@ -63,15 +26,27 @@ Instead of navigating 11 different archive websites, just ask your AI:
 
 Your AI handles the API calls, pagination, and formatting - you just ask questions in plain English.
 
+## Quick Start
+
+Run directly with npx - no installation required:
+
+```bash
+npx @littlebearapps/australian-history-mcp
+```
+
+That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](#trove-api-key---why--how-to-apply) requires a free API key.
+
+→ **Next:** Add to your MCP client via [Configuration](#add-this-mcp-to-your-ai-agent)
+
 ## Table of Contents
 
+- [What You Can Ask Your AI to Search For](#what-you-can-ask-your-ai-to-search-for)
 - [Quick Start](#quick-start)
-- [How It Works](#how-it-works)
-- [What You Can Ask](#what-you-can-ask)
 - [Data Sources - What You Can Find](#data-sources---what-you-can-find)
+- [Trove API Key - Why & How to Apply](#trove-api-key---why--how-to-apply)
 - [Important Notice - Third-Party Data Sources](#important-notice---third-party-data-sources)
-- [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Add this MCP to Your AI Agent](#add-this-mcp-to-your-ai-agent)
+- [How It Works](#how-it-works)
 - [Data Sources - Tools & Examples](#data-sources---tools--examples)
 - [Frequently Asked Questions](#frequently-asked-questions)
 - [Rate Limits](#rate-limits)
@@ -83,12 +58,12 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 ## Data Sources - What You Can Find
 
 > [!IMPORTANT]
-> Most sources work immediately with no registration. Only Trove requires a [free API key](#trove-api-key---how-to-apply).
+> Most sources work immediately with no registration. Only Trove requires a [free API key](#trove-api-key---why--how-to-apply).
 
 | Source | Content |
 |--------|---------|
 | 🏛️ **Public Record Office Victoria (PROV)** | Victorian state archives: photos, maps, council records, court files, immigration |
-| 📰 [***Trove (National Library of Australia)****](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
+| 📰 [***Trove (National Library of Australia)****](#trove-api-key---why--how-to-apply) | **1,500+ partner collections**: newspapers 1803-1954+, gazettes, books, images, magazines, diaries. [See all partner collections →](#extra-data-sources-available-via-trove-api-key) |
 | 📍 **Gazetteer of Historical Australian Placenames (GHAP)** | 330,000+ historical placenames with coordinates from ANPS and community datasets via TLCMap |
 | 🦘 **Museums Victoria** | Museum objects, natural specimens, species info, educational articles |
 | 🌿 **Atlas of Living Australia (ALA)** | 165M+ records including historical museum specimens (1800s-1900s), contemporary citizen science, 153,000+ species profiles |
@@ -100,6 +75,37 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 | ✈️ **Geoscience Australia Historical Aerial Photography (GA HAP)** | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
+
+## Trove API Key - Why & How to Apply
+
+Trove is Australia's largest digital research portal, aggregating content from **1,500+ partner organisations** including state libraries, the National Archives, Australian War Memorial, universities, museums, and research institutions. A free API key unlocks access to all of this.
+
+### Extra Data Sources Available via Trove API Key
+
+With just one API key, you gain access to collections from:
+
+| Category | Notable Partners | What You Can Find |
+|----------|-----------------|-------------------|
+| 📚 **State Libraries** | State Library Victoria, State Library NSW, State Library Queensland, and all other state/territory libraries | Historical photographs, manuscripts, maps, local history, family history records |
+| 🏛️ **National Archives** | National Archives of Australia | Immigration records, military service files, government photographs, policy files |
+| ⚔️ **War Memorial** | Australian War Memorial | WWI & WWII photographs, unit diaries, service records, military art |
+| 🎓 **Universities** | ANU, Melbourne, Sydney, Monash, UNSW, and 30+ other universities | Research papers, theses, academic journals, institutional archives |
+| 🖼️ **Museums** | National Gallery, Powerhouse, Australian Museum, state museums | Art collections, object documentation, scientific specimens |
+| 🔬 **Research** | CSIRO, AIATSIS, NFSA | Scientific publications, Indigenous collections, film & sound archives |
+| ⚖️ **Government** | High Court, Federal Court, Parliament | Legal judgments, parliamentary papers, government publications |
+| 📰 **Newspapers** | NLA Digitised (1803-1954+) | 35 million+ newspaper articles with full-text search and OCR |
+
+> **One key, 1,500+ collections** - Instead of registering with dozens of institutions individually, Trove aggregates them all. Use the `nuc` parameter to filter by specific partners (e.g., `nuc: "AWM"` for War Memorial, `nuc: "VSL"` for State Library Victoria).
+
+### How to Apply
+
+> [!IMPORTANT]
+> Before applying, review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and ensure your intended use is eligible.
+
+1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
+2. Select "Level 1" (personal/research use)
+3. Approval typically within 1 week
+4. Add `TROVE_API_KEY` to your MCP configuration (see [Configuration](#add-this-mcp-to-your-ai-agent) below)
 
 ## Important Notice - Third-Party Data Sources
 
@@ -128,18 +134,6 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 | PM Transcripts | [Disclaimer](https://pmtranscripts.pmc.gov.au/disclaimer) |
 | GA (HAP) | [Copyright](https://www.ga.gov.au/copyright) |
 | IIIF | Varies by institution - check manifest attribution |
-
-## Trove API Key - How to Apply
-
-Trove tools require an API key. All other sources work without any registration or API key.
-
-> [!IMPORTANT]
-> Before applying, review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and ensure your intended use is eligible.
-
-1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
-2. Select "Level 1" (personal/research use)
-3. Approval typically within 1 week
-4. Add `TROVE_API_KEY` to your MCP configuration (see below)
 
 ## Add this MCP to Your AI Agent
 
@@ -267,6 +261,27 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 }
 ```
 
+## How It Works
+
+This server uses **dynamic tool loading** - instead of exposing all 75 data tools upfront, it presents just 10 meta-tools:
+
+| Meta-Tool | Purpose |
+|-----------|---------|
+| `tools` | Discover available data tools by keyword, source, or category |
+| `schema` | Get full parameters for a specific tool |
+| `run` | Execute any data tool by name |
+| `search` | Search across multiple sources at once |
+| `open` | Open URLs in your browser |
+| `export` | Export results to CSV, JSON, or Markdown |
+| `save_query` | Save a named query for later reuse |
+| `list_queries` | List saved queries with filtering options |
+| `run_query` | Execute a saved query with optional overrides |
+| `delete_query` | Remove a saved query by name |
+
+**Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
+
+> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 75 tools directly.
+
 ## Data Sources - Tools & Examples
 
 <details open>
@@ -334,6 +349,36 @@ trove_search with query: "gold rush", category: "image", nuc: "VSL"
 trove_search with query: "bushrangers", sortby: "dateasc",
   includeFullText: true, limit: 100
 ```
+
+**Partner Collections Available via Trove:**
+
+Trove aggregates content from **1,500+ partner organisations** across Australia. Use the `nuc` parameter to filter by contributing institution:
+
+| Partner Type | Example NUC Codes | Content |
+|--------------|-------------------|---------|
+| **State Libraries** | `VSL`, `SLNSW`, `QSL`, `SLSA`, `SLWA`, `TLIB` | Photographs, manuscripts, maps, local history |
+| **National Archives** | `NAA` | Government records, immigration files, photographs |
+| **War Memorial** | `AWM` | Military history, photographs, unit records |
+| **Universities** | `ANU`, `UMEL`, `UNSW`, `USYD`, `UQ` + `:IR` suffix for repositories | Research papers, theses, academic collections |
+| **Museums** | `NMA`, `NGA`, `NGV`, `MAAS`, `AM`, `MV` | Objects, art collections, documentation |
+| **Research** | `CSIRO`, `AIATSIS`, `NFSA` | Scientific publications, Indigenous collections, film/sound |
+
+```
+# Search State Library Victoria photographs
+trove_search with query: "Melbourne", category: "image", nuc: "VSL"
+
+# Search War Memorial collections
+trove_search with query: "Gallipoli", nuc: "AWM"
+
+# Browse all contributing libraries
+trove_list_contributors with query: "university"
+
+# See which partners have content for your search
+trove_search with query: "gold rush", includeFacets: true,
+  facetFields: ["partnerNuc"]
+```
+
+> **Note:** NUC filtering works for `image`, `book`, `magazine`, `research`, `diary`, `music` categories. Newspaper/gazette content is NLA-digitised without per-article NUC data. See [docs/quickrefs/trove-partners.md](docs/quickrefs/trove-partners.md) for the complete partner guide.
 
 </details>
 
@@ -497,8 +542,7 @@ vhd_get_place with id: 12345
 | `acmi_search_works` | Search ACMI collection with field and size options |
 | `acmi_get_work` | Get detailed work information by ID |
 | `acmi_harvest` | Bulk download ACMI collection works with pagination |
-| `acmi_list_creators` | List creators (directors, actors, studios) |
-| `acmi_get_creator` | Get creator details and filmography |
+| `acmi_list_creators` | List creators (directors, actors, studios) with pagination |
 | `acmi_list_constellations` | List curated thematic collections |
 | `acmi_get_constellation` | Get constellation details with works |
 | `acmi_get_related` | Get related works (parts, recommendations, group members) |
@@ -511,8 +555,8 @@ acmi_search_works with query: "Australian", type: "Film", year: 1975
 # Research: Search for classic videogames in the collection
 acmi_search_works with query: "arcade", type: "Videogame"
 
-# Technical: Get creator filmography and biography
-acmi_get_creator with id: 12345
+# Technical: Get related works for a film (parts, recommendations)
+acmi_get_related with workId: 12345
 ```
 
 </details>
@@ -675,7 +719,7 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 
 **Dynamic mode** (default) exposes 10 meta-tools (`tools`, `schema`, `run`, `search`, `open`, `export`, `save_query`, `list_queries`, `run_query`, `delete_query`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
 
-**Legacy mode** exposes all 76 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
+**Legacy mode** exposes all 75 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
 
 Switch modes by setting `MCP_MODE=legacy` in your configuration environment variables.
 

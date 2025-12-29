@@ -73,9 +73,9 @@ export const ALA_SORT_OPTIONS: ALASortOption[] = ['relevance', 'date_asc', 'date
 // Map user-friendly sort options to ALA API sort/dir parameters
 export const ALA_SORT_MAPPINGS: Record<ALASortOption, { sort: string; dir: string } | null> = {
   relevance: null, // Default (no sort param)
-  date_asc: { sort: 'event_date', dir: 'asc' },
-  date_desc: { sort: 'event_date', dir: 'desc' },
-  taxon_name: { sort: 'taxon_name', dir: 'asc' },
+  date_asc: { sort: 'eventDate', dir: 'asc' },    // Note: ALA uses camelCase field names
+  date_desc: { sort: 'eventDate', dir: 'desc' },  // Note: ALA uses camelCase field names
+  taxon_name: { sort: 'taxon_name', dir: 'asc' }, // taxon_name works with snake_case
 };
 
 // ============================================================================

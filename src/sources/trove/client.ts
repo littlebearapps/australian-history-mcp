@@ -34,6 +34,7 @@ import {
   type TroveRecLevel,
   type TroveIncludeOption,
   type TroveFacet,
+  type TroveComment,
 } from './types.js';
 
 const TROVE_API_BASE = 'https://api.trove.nla.gov.au/v3';
@@ -130,6 +131,37 @@ export class TroveClient extends BaseClient {
       query = `${query} imageInd:thumbnail`;
     }
 
+    // NEW: User-friendly aliases for fullTextInd and imageInd
+    if (params.fullTextAvailable) {
+      query = `${query} fullTextInd:y`;
+    }
+    if (params.hasThumbnail) {
+      query = `${query} imageInd:thumbnail`;
+    }
+
+    // NEW: User-contributed content filters
+    if (params.hasTags) {
+      query = `${query} has:tags`;
+    }
+    if (params.hasComments) {
+      query = `${query} has:comments`;
+    }
+
+    // NEW: Series/collection filter
+    if (params.series) {
+      query = `${query} series:"${params.series}"`;
+    }
+
+    // NUC filter (contributor library) - uses search index, not facet
+    // NOTE: NUC filter only works for: magazine, image, research, book, diary, music
+    // It does NOT work for newspaper category (newspapers don't have NUC data)
+    if (params.nuc) {
+      // Escape backslashes and colons in NUC codes (e.g., ANL:DL → ANL\:DL)
+      // Backslash must be escaped first, then colons
+      const escapedNuc = params.nuc.replace(/[\\:]/g, '\\$&');
+      query = `${query} nuc:${escapedNuc}`;
+    }
+
     urlParams.q = query;
 
     // State filter (for newspapers) - API requires full state names
@@ -142,14 +174,22 @@ export class TroveClient extends BaseClient {
       urlParams['l-format'] = params.format;
     }
 
-    // NUC code filter (contributor/partner)
-    if (params.nuc) {
-      urlParams['l-partnerNuc'] = params.nuc;
-    }
+    // NUC code filter moved to search index (see query section above)
+    // The nuc: search index is more reliable than l-partnerNuc facet
 
     // Illustrated filter (for newspapers)
     if (params.illustrated) {
       urlParams['l-illustrated'] = params.illustrated;
+    }
+
+    // Illustration types (Photo, Cartoon, Map, Illustration, Graph)
+    if (params.illustrationTypes && params.illustrationTypes.length > 0) {
+      urlParams['l-illustrationType'] = params.illustrationTypes;
+    }
+
+    // Article category (Article, Advertising, Family Notices, etc.)
+    if (params.articleCategory) {
+      urlParams['l-category'] = params.articleCategory;
     }
 
     // Advanced facet filters
@@ -184,16 +224,35 @@ export class TroveClient extends BaseClient {
       urlParams['l-austlanguage'] = params.austlanguage;
     }
 
+    // Year filter (requires decade)
+    if (params.year) {
+      urlParams['l-year'] = params.year;
+    }
+
+    // Month filter (requires decade and year)
+    if (params.month) {
+      urlParams['l-month'] = String(params.month);
+    }
+
+    // Journal/magazine title filter
+    if (params.journalTitle) {
+      urlParams['l-title'] = params.journalTitle;
+    }
+
     // Build include options
+    // NOTE: 'holdings' and 'links' are only valid for individual work records
+    // (/work/{id}), NOT for search results. Using them in search causes HTTP 400.
+    // These params are intentionally ignored here - use getWork() for holdings/links.
     const includes: string[] = [];
     if (params.includeFullText) {
       includes.push('articletext');
     }
-    if (params.includeHoldings) {
-      includes.push('holdings');
+    // User-contributed content
+    if (params.includeTags) {
+      includes.push('tags');
     }
-    if (params.includeLinks) {
-      includes.push('links');
+    if (params.includeComments) {
+      includes.push('comments');
     }
     if (includes.length > 0) {
       urlParams.include = includes.join(',');
@@ -667,7 +726,8 @@ export class TroveClient extends BaseClient {
     const titleId = typeof titleObj === 'object' && titleObj !== null
       ? String(titleObj.id ?? '')
       : '';
-    return {
+
+    const article: TroveArticle = {
       id,
       heading: String(d.heading ?? 'Untitled'),
       title: titleStr,
@@ -683,6 +743,26 @@ export class TroveClient extends BaseClient {
       correctionCount: typeof d.correctionCount === 'number' ? d.correctionCount : undefined,
       illustrated: d.illustrated === 'Y',
     };
+
+    // Extract tags if present (with includeTags)
+    // Tags are objects: {value: "tag text"} or may be strings
+    if (Array.isArray(d.tag)) {
+      article.tags = d.tag.map((t) => {
+        if (typeof t === 'string') return t;
+        if (typeof t === 'object' && t !== null) {
+          const tagObj = t as Record<string, unknown>;
+          return String(tagObj.value ?? tagObj.tag ?? tagObj.display ?? t);
+        }
+        return String(t);
+      });
+    }
+
+    // Extract comments if present (with includeComments)
+    if (Array.isArray(d.comment)) {
+      article.comments = this.parseComments(d.comment);
+    }
+
+    return article;
   }
 
   private parseArticleDetail(data: unknown): TroveArticleDetail {
@@ -723,7 +803,7 @@ export class TroveClient extends BaseClient {
     const types = Array.isArray(d.type) ? d.type.map(String) : [String(d.type)].filter(Boolean);
     const id = String(d.id ?? '');
 
-    return {
+    const work: TroveWork = {
       id,
       title: String(d.title ?? 'Untitled'),
       contributor: d.contributor ? String(d.contributor) : undefined,
@@ -736,6 +816,36 @@ export class TroveClient extends BaseClient {
       abstract: d.abstract ? String(d.abstract) : undefined,
       subjects: Array.isArray(d.subject) ? d.subject.map(String) : undefined,
     };
+
+    // Extract tags if present (with includeTags)
+    // Tags are objects: {value: "tag text"} or may be strings
+    if (Array.isArray(d.tag)) {
+      work.tags = d.tag.map((t) => {
+        if (typeof t === 'string') return t;
+        if (typeof t === 'object' && t !== null) {
+          const tagObj = t as Record<string, unknown>;
+          return String(tagObj.value ?? tagObj.tag ?? tagObj.display ?? t);
+        }
+        return String(t);
+      });
+    }
+
+    // Extract comments if present (with includeComments)
+    if (Array.isArray(d.comment)) {
+      work.comments = this.parseComments(d.comment);
+    }
+
+    return work;
+  }
+
+  private parseComments(data: unknown[]): TroveComment[] {
+    return data.map((c) => {
+      const comment = c as Record<string, unknown>;
+      return {
+        by: String(comment.by ?? comment.user ?? 'Anonymous'),
+        text: String(comment.value ?? comment.text ?? ''),
+      };
+    });
   }
 
   private parseNewspaperTitles(data: unknown): TroveNewspaperTitle[] {

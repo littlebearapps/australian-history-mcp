@@ -31,10 +31,11 @@
 - Council records and meeting minutes
 - Court and immigration records
 
-**Trove Content (National Library):**
-- Old newspaper articles
+**Trove Content (National Library + 1,500+ Partner Organisations):**
+- Old newspaper articles (1803-1954+)
 - Government gazettes
 - Books, magazines, images
+- **Partner collections:** State Libraries (VSL, SLNSW, QSL, etc.), university repositories, National Archives, War Memorial, museums, AIATSIS, and more. Use `nuc` parameter to filter by contributor.
 
 **GHAP Content (Historical Placenames):**
 - 330,000+ historical placenames with coordinates
@@ -101,7 +102,7 @@ npm run dev
 # Run directly (dynamic mode - default)
 node dist/index.js
 
-# Run in legacy mode (all 76 tools exposed)
+# Run in legacy mode (all 75 tools exposed)
 MCP_MODE=legacy node dist/index.js
 
 # Type check
@@ -112,7 +113,7 @@ npx tsc --noEmit
 
 ## Dynamic Tool Loading (Default Mode)
 
-The server uses **dynamic tool loading** by default, exposing only 10 meta-tools instead of all 76 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
+The server uses **dynamic tool loading** by default, exposing only 10 meta-tools instead of all 75 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
 
 ### Meta-Tools Exposed
 
@@ -194,7 +195,7 @@ Set `MCP_MODE` environment variable:
 | Mode | Tools Exposed | Use Case |
 |------|---------------|----------|
 | `dynamic` (default) | 10 meta-tools | Research workflows, token-efficient |
-| `legacy` | 76 data tools | Backwards compatibility, direct access |
+| `legacy` | 75 data tools | Backwards compatibility, direct access |
 
 ```json
 {
@@ -299,14 +300,13 @@ Set `MCP_MODE` environment variable:
 | `vhd_list_themes` | None | List heritage themes (history, economics, etc.) |
 | `vhd_list_periods` | None | List historical periods |
 
-### ACMI Tools (8)
+### ACMI Tools (7)
 | Tool | API Key | Purpose |
 |------|---------|---------|
 | `acmi_search_works` | None | Search ACMI collection (with field and size options) |
 | `acmi_get_work` | None | Get detailed work information by ID |
 | `acmi_harvest` | None | Bulk download ACMI collection works |
 | `acmi_list_creators` | None | List creators (directors, actors, studios) |
-| `acmi_get_creator` | None | Get creator details and filmography |
 | `acmi_list_constellations` | None | List curated thematic collections |
 | `acmi_get_constellation` | None | Get constellation details with works |
 | `acmi_get_related` | None | Get related works (parts, groups, recommendations) |
@@ -391,7 +391,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 | Path | Description |
 |:--|:--|
-| `src/index.ts` | MCP server entry point (76 tools via registry) |
+| `src/index.ts` | MCP server entry point (75 tools via registry) |
 | `src/registry.ts` | Tool registry with Map-based dispatch |
 | `src/core/` | Shared infrastructure |
 | `src/core/types.ts` | Base types (MCPToolResponse, APIError) |
@@ -432,11 +432,11 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 │  └───────────────────────────┬────────────────────────────────┘ │
 │                              │ run(tool, args)                   │
 │  ┌───────────────────────────▼────────────────────────────────┐ │
-│  │              Tool Registry (76 data tools)                  │ │
+│  │              Tool Registry (75 data tools)                  │ │
 │  └─────────────────────────────────────────────────────────────┘ │
 │  ┌────┐ ┌─────┐ ┌────┐ ┌──────┐ ┌───┐ ┌────┐ ┌───┐ ┌────┐ ...  │
 │  │PROV│ │Trove│ │GHAP│ │MusVic│ │ALA│ │NMA │ │VHD│ │ACMI│       │
-│  │(6) │ │(14) │ │(5) │ │(6)   │ │(8)│ │(10)│ │(9)│ │(8) │       │
+│  │(6) │ │(14) │ │(5) │ │(6)   │ │(8)│ │(10)│ │(9)│ │(7) │       │
 │  └──┬─┘ └──┬──┘ └─┬──┘ └──┬───┘ └─┬─┘ └─┬─┘ └─┬─┘ └─┬──┘        │
 └─────┼──────┼──────┼───────┼───────┼─────┼─────┼─────┼────────────┘
       ▼      ▼      ▼       ▼       ▼     ▼     ▼     ▼
@@ -445,7 +445,7 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 
 ### Legacy Mode (MCP_MODE=legacy)
 
-All 76 data tools exposed directly (backwards compatible).
+All 75 data tools exposed directly (backwards compatible).
 
 ---
 
@@ -499,6 +499,43 @@ Use trove_search_people with query "Henry Lawson" to find biographical records
 ```
 Use trove_list_contributors to list all 1500+ libraries,
 or with query "university" to filter
+```
+
+### Search Illustrated Articles (Trove)
+```
+Use trove_search with query "Melbourne", category "newspaper",
+illustrationTypes ["Photo", "Cartoon"] to find articles with photos or cartoons
+```
+
+### Search by Word Count (Trove)
+```
+Use trove_search with query "gold rush", category "newspaper",
+wordCount "<100 Words" for short articles
+```
+
+### Filter Magazine Articles by Publication Title (Trove)
+```
+Use trove_search with query "photography", category "magazine",
+journalTitle "The Bulletin" to search The Bulletin magazine specifically
+Popular magazines: The Bulletin, Women's Weekly, Pix, Walkabout
+```
+
+### Find Tagged/Corrected Articles (Trove)
+```
+Use trove_search with query "Ned Kelly", hasTags true to find articles
+with user tags, or includeComments true to get user corrections
+```
+
+### Filter by Rights (Trove)
+```
+Use trove_search with query "photograph", category "image",
+rights "Free" to find freely reusable content
+```
+
+### Search Partner Collections (Trove)
+```
+Use trove_search with query "immigration", nuc "NAA" for National Archives,
+or nuc "AWM" for War Memorial collections. See docs/quickrefs/trove-partners.md
 ```
 
 ### Find Historical Placenames (GHAP)
@@ -714,17 +751,18 @@ Use delete_query to remove old queries
 2. **`docs/quickrefs/tools-reference.md`** - Complete tool parameters
 3. **`docs/quickrefs/prov-api.md`** - PROV API details and tips
 4. **`docs/quickrefs/trove-api.md`** - Trove API details and tips
-5. **`docs/quickrefs/ghap-api.md`** - GHAP/TLCMap API details
-6. **`docs/quickrefs/museums-victoria-api.md`** - Museums Victoria API details
-7. **`docs/quickrefs/ala-api.md`** - Atlas of Living Australia API details
-8. **`docs/quickrefs/nma-api.md`** - National Museum of Australia API details
-9. **`docs/quickrefs/vhd-api.md`** - Victorian Heritage Database API details
-10. **`docs/quickrefs/acmi-api.md`** - ACMI API details
-11. **`docs/quickrefs/pm-transcripts-api.md`** - PM Transcripts API details and limitations
-12. **`docs/quickrefs/iiif-api.md`** - IIIF standard reference and tools
-13. **`docs/quickrefs/slv-guide.md`** - State Library Victoria access patterns
-14. **`docs/quickrefs/ga-hap-api.md`** - Geoscience Australia HAP API details
-15. **`README.md`** - Public documentation for npm
+5. **`docs/quickrefs/trove-partners.md`** - Trove partner data sources (NUC codes)
+6. **`docs/quickrefs/ghap-api.md`** - GHAP/TLCMap API details
+7. **`docs/quickrefs/museums-victoria-api.md`** - Museums Victoria API details
+8. **`docs/quickrefs/ala-api.md`** - Atlas of Living Australia API details
+9. **`docs/quickrefs/nma-api.md`** - National Museum of Australia API details
+10. **`docs/quickrefs/vhd-api.md`** - Victorian Heritage Database API details
+11. **`docs/quickrefs/acmi-api.md`** - ACMI API details
+12. **`docs/quickrefs/pm-transcripts-api.md`** - PM Transcripts API details and limitations
+13. **`docs/quickrefs/iiif-api.md`** - IIIF standard reference and tools
+14. **`docs/quickrefs/slv-guide.md`** - State Library Victoria access patterns
+15. **`docs/quickrefs/ga-hap-api.md`** - Geoscience Australia HAP API details
+16. **`README.md`** - Public documentation for npm
 
 ---
 
@@ -843,13 +881,17 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 - **IIIF Presentation API versions:** Supports v2.x and v3.x manifests; v3 uses different structure (`items` instead of `sequences`)
 - **IIIF Image API port:** SLV uses port 2083 for images, standard 443 for manifests
 - **Trove NUC filtering:** Use `nuc` parameter to filter by contributor (e.g., "VSL" for State Library Victoria)
+- **Trove sortby and pagination:** Using `sortby=dateasc/datedesc` for bulk harvesting may cause cursor instability if new records are added during harvest. Use `bulkHarvest=true` for stable ID-based pagination.
 - **GA HAP coordinates:** API uses Web Mercator (EPSG:3857); our tools convert to WGS84 latitude/longitude
 - **GA HAP URL fields:** PREVIEW_URL and TIF_URL contain HTML anchor tags; client extracts href automatically
 - **GA HAP pagination:** Max 2000 records per query; use harvest tool for larger downloads
 - **GA HAP state codes:** NSW=1, VIC=2, QLD=3, SA=4, WA=5, TAS=6, NT=7, ACT=8
 - **GA HAP RUN/FRAME fields:** These are strings not integers (e.g., "COAST TIE 2", "C-KEY"); prefer objectId for lookups
-- **Spatial queries:** Point+radius converted to bounding box internally; results may include records slightly outside radius
+- **Spatial queries:** Point+radius converted to bounding box internally; results may include records slightly outside radius. Haversine approximation optimal for radii <500km; at high latitudes (>60°) or large radii, bounding box becomes less accurate.
 - **Spatial coordinate format:** All spatial params use WGS84 (lat, lon in decimal degrees); GA HAP internally converts to Web Mercator
+- **PROV sorting:** Only `relevance` and `title` sorting available; date sorting not supported (PROV Solr uses SpatialField for `start_dt` which cannot be sorted)
+- **Museums Victoria sorting:** Supports `relevance`, `quality`, `date`, `random`; alphabetical sorting is NOT supported (API ignores invalid values)
+- **ALA sorting:** Uses camelCase field names (`eventDate` not `event_date`); `taxon_name` works with snake_case
 - **PM Transcripts FTS5 index:** Stored at `~/.local/share/australian-history-mcp/pm-transcripts.db` (~50-100MB)
 - **PM Transcripts FTS5 build time:** Initial build ~43 minutes (26k transcripts); incremental update much faster
 - **PM Transcripts FTS5 operators:** Supports "phrase match", term1 OR term2, term1 NOT term2, NEAR(a b, 5)

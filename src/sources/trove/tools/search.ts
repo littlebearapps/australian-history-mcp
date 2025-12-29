@@ -6,7 +6,17 @@ import type { SourceTool } from '../../../core/base-source.js';
 import { successResponse, errorResponse } from '../../../core/types.js';
 import { troveClient } from '../client.js';
 import { PARAMS } from '../../../core/param-descriptions.js';
-import { TROVE_CATEGORIES, AU_STATES_WITH_NATIONAL, SORT_ORDERS_DATE, TROVE_AVAILABILITY, ILLUSTRATION_TYPES } from '../../../core/enums.js';
+import {
+  TROVE_CATEGORIES,
+  AU_STATES_WITH_NATIONAL,
+  SORT_ORDERS_DATE,
+  TROVE_AVAILABILITY,
+  ILLUSTRATION_TYPES,
+  TROVE_ILLUSTRATION_TYPES,
+  TROVE_WORD_COUNTS,
+  TROVE_ARTICLE_CATEGORIES,
+  TROVE_RIGHTS,
+} from '../../../core/enums.js';
 import type { TroveSearchParams, TroveFacetField } from '../types.js';
 import { TROVE_FACET_FIELDS } from '../types.js';
 
@@ -42,6 +52,41 @@ export const troveSearchTool: SourceTool = {
         // Faceted search
         includeFacets: { type: 'boolean', description: PARAMS.INCLUDE_FACETS, default: false },
         facetFields: { type: 'array', items: { type: 'string', enum: TROVE_FACET_FIELDS }, description: PARAMS.FACET_FIELDS },
+        // NEW: Newspaper-specific filters
+        illustrationTypes: {
+          type: 'array',
+          items: { type: 'string', enum: TROVE_ILLUSTRATION_TYPES },
+          description: 'Filter by illustration types (Photo, Cartoon, Map, Illustration, Graph)',
+        },
+        wordCount: {
+          type: 'string',
+          enum: TROVE_WORD_COUNTS,
+          description: 'Filter by article word count range',
+        },
+        articleCategory: {
+          type: 'string',
+          enum: TROVE_ARTICLE_CATEGORIES,
+          description: 'Filter by newspaper article category (Article, Advertising, Family Notices, etc.)',
+        },
+        // NEW: User-contributed content
+        includeTags: { type: 'boolean', description: 'Include user-added tags in results', default: false },
+        includeComments: { type: 'boolean', description: 'Include user corrections/comments in results', default: false },
+        hasTags: { type: 'boolean', description: 'Only return items that have user tags', default: false },
+        hasComments: { type: 'boolean', description: 'Only return items that have user comments', default: false },
+        // NEW: Rights and content availability
+        rights: {
+          type: 'string',
+          enum: TROVE_RIGHTS,
+          description: 'Filter by copyright/rights status for reusable content',
+        },
+        fullTextAvailable: { type: 'boolean', description: 'Only return items with downloadable full text', default: false },
+        hasThumbnail: { type: 'boolean', description: 'Only return items with preview thumbnails', default: false },
+        // NEW: Advanced date filtering
+        year: { type: 'string', description: 'Specific year (requires decade to be set)' },
+        month: { type: 'number', description: 'Specific month 1-12 (requires decade and year)', minimum: 1, maximum: 12 },
+        // NEW: Collection/series filtering
+        series: { type: 'string', description: 'Search within a series/collection (partial match, case-insensitive)' },
+        journalTitle: { type: 'string', description: 'Filter magazine/journal articles by publication title' },
       },
       required: ['query'],
     },
@@ -75,7 +120,31 @@ export const troveSearchTool: SourceTool = {
       // Faceted search
       includeFacets?: boolean;
       facetFields?: TroveFacetField[];
+      // NEW: Newspaper-specific filters
+      illustrationTypes?: string[];
+      wordCount?: string;
+      articleCategory?: string;
+      // NEW: User-contributed content
+      includeTags?: boolean;
+      includeComments?: boolean;
+      hasTags?: boolean;
+      hasComments?: boolean;
+      // NEW: Rights and content availability
+      rights?: string;
+      fullTextAvailable?: boolean;
+      hasThumbnail?: boolean;
+      // NEW: Advanced date filtering
+      year?: string;
+      month?: number;
+      // NEW: Collection/series filtering
+      series?: string;
+      journalTitle?: string;
     };
+
+    // Validate query is not empty
+    if (!input.query || input.query.trim() === '') {
+      return errorResponse('query cannot be empty');
+    }
 
     if (!troveClient.hasApiKey()) {
       return errorResponse('TROVE_API_KEY not configured. See CLAUDE.md for setup instructions.');
@@ -92,6 +161,37 @@ export const troveSearchTool: SourceTool = {
       return errorResponse(
         `Invalid dateTo format: "${input.dateTo}". Use YYYY, YYYY-MM, or YYYY-MM-DD (e.g., 1920, 1920-03, 1920-03-15).`
       );
+    }
+
+    // Collect parameter conflict warnings
+    const warnings: string[] = [];
+
+    // includeHoldings/includeLinks are ignored in search - only work with trove_get_work
+    if (input.includeHoldings) {
+      warnings.push('includeHoldings is ignored in trove_search - use trove_get_work with work ID to get holdings');
+    }
+    if (input.includeLinks) {
+      warnings.push('includeLinks is ignored in trove_search - use trove_get_work with work ID to get links');
+    }
+
+    // hasThumbnail (imageInd) doesn't apply to newspaper category
+    if (input.hasThumbnail && input.category === 'newspaper') {
+      warnings.push('hasThumbnail does not apply to newspaper category');
+    }
+
+    // year requires decade to be set
+    if (input.year && !input.decade) {
+      warnings.push('year parameter requires decade to be set - add decade parameter (e.g., decade="193" for 1930s)');
+    }
+
+    // month requires both decade and year
+    if (input.month && (!input.decade || !input.year)) {
+      warnings.push('month parameter requires both decade and year to be set');
+    }
+
+    // NUC filtering doesn't work for newspaper/gazette categories
+    if (input.nuc && (input.category === 'newspaper' || input.category === 'gazette')) {
+      warnings.push('nuc filter does not work for newspaper/gazette categories - NLA-digitised content has no per-article NUC data');
     }
 
     try {
@@ -140,6 +240,25 @@ export const troveSearchTool: SourceTool = {
         // Faceted search
         includeFacets: input.includeFacets,
         facetFields: input.facetFields,
+        // NEW: Newspaper-specific filters
+        illustrationTypes: input.illustrationTypes,
+        wordCount: input.wordCount,
+        articleCategory: input.articleCategory,
+        // NEW: User-contributed content
+        includeTags: input.includeTags,
+        includeComments: input.includeComments,
+        hasTags: input.hasTags,
+        hasComments: input.hasComments,
+        // NEW: Rights and content availability
+        rights: input.rights,
+        fullTextAvailable: input.fullTextAvailable,
+        hasThumbnail: input.hasThumbnail,
+        // NEW: Advanced date filtering
+        year: input.year,
+        month: input.month,
+        // NEW: Collection/series filtering
+        series: input.series,
+        journalTitle: input.journalTitle,
       };
 
       const result = await troveClient.search(params);
@@ -155,7 +274,7 @@ export const troveSearchTool: SourceTool = {
         records: result.records.map(r => {
           if ('heading' in r) {
             // Newspaper/gazette article
-            return {
+            const articleRecord: Record<string, unknown> = {
               id: r.id,
               type: 'article',
               heading: r.heading,
@@ -168,9 +287,18 @@ export const troveSearchTool: SourceTool = {
               pdfUrl: r.pdfUrl,
               illustrated: r.illustrated,
             };
+            // Include tags if requested and present
+            if (input.includeTags && r.tags && r.tags.length > 0) {
+              articleRecord.tags = r.tags;
+            }
+            // Include comments if requested and present
+            if (input.includeComments && r.comments && r.comments.length > 0) {
+              articleRecord.comments = r.comments;
+            }
+            return articleRecord;
           } else {
             // Work (book, image, etc.)
-            return {
+            const workRecord: Record<string, unknown> = {
               id: r.id,
               type: 'work',
               title: r.title,
@@ -180,6 +308,15 @@ export const troveSearchTool: SourceTool = {
               url: r.troveUrl,
               thumbnailUrl: r.thumbnailUrl,
             };
+            // Include tags if requested and present
+            if (input.includeTags && r.tags && r.tags.length > 0) {
+              workRecord.tags = r.tags;
+            }
+            // Include comments if requested and present
+            if (input.includeComments && r.comments && r.comments.length > 0) {
+              workRecord.comments = r.comments;
+            }
+            return workRecord;
           }
         }),
       };
@@ -194,6 +331,11 @@ export const troveSearchTool: SourceTool = {
             count: t.count,
           })),
         }));
+      }
+
+      // Add warnings for parameter conflicts
+      if (warnings.length > 0) {
+        response._warnings = warnings;
       }
 
       return successResponse(response);

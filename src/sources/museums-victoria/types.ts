@@ -6,15 +6,21 @@
 // Sort Options
 // ============================================================================
 
-export type MVSortOption = 'relevance' | 'date_desc' | 'alphabetical' | 'random';
+// Note: Museums Victoria API only supports these sort values:
+// - quality: Record quality based on how many fields and images a record has
+// - relevance: Search relevance (only valid when query parameter is used)
+// - date: Date record was last modified (always descending)
+// - random: Random order
+// Alphabetical sorting is NOT supported by the API.
+export type MVSortOption = 'relevance' | 'quality' | 'date' | 'random';
 
-export const MV_SORT_OPTIONS: MVSortOption[] = ['relevance', 'date_desc', 'alphabetical', 'random'];
+export const MV_SORT_OPTIONS: MVSortOption[] = ['relevance', 'quality', 'date', 'random'];
 
 // Map user-friendly sort options to Museums Victoria API sort parameter
 export const MV_SORT_MAPPINGS: Record<MVSortOption, string | null> = {
-  relevance: null, // Default (no sort param)
-  date_desc: 'datemodified', // Most recent first
-  alphabetical: 'displaytitle', // A-Z by title
+  relevance: null, // Default for searches with query (no sort param needed)
+  quality: 'quality', // Record quality (fields, images)
+  date: 'date', // Most recently modified first (always descending)
   random: 'random', // Random order
 };
 

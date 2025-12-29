@@ -11,7 +11,8 @@ import { defineSource } from '../../core/base-source.js';
 import { acmiSearchWorksTool } from './tools/search-works.js';
 import { acmiGetWorkTool } from './tools/get-work.js';
 import { acmiListCreatorsTool } from './tools/list-creators.js';
-import { acmiGetCreatorTool } from './tools/get-creator.js';
+// acmi_get_creator disabled: ACMI API returns 404 for valid IDs from list endpoint
+// import { acmiGetCreatorTool } from './tools/get-creator.js';
 import { acmiListConstellationsTool } from './tools/list-constellations.js';
 import { acmiGetConstellationTool } from './tools/get-constellation.js';
 import { acmiHarvestTool } from './tools/harvest.js';
@@ -27,7 +28,7 @@ export const acmiSource = defineSource({
     acmiGetWorkTool,
     acmiGetRelatedTool,
     acmiListCreatorsTool,
-    acmiGetCreatorTool,
+    // acmiGetCreatorTool disabled: ACMI API bug - IDs from list return 404 on get
     acmiListConstellationsTool,
     acmiGetConstellationTool,
     acmiHarvestTool,

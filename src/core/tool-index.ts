@@ -1,7 +1,7 @@
 /**
  * Tool Index for Dynamic Discovery
  *
- * Contains metadata for all 76 tools across 11 sources.
+ * Contains metadata for all 75 tools across 11 sources.
  * Used by the `tools` meta-tool for keyword-based discovery.
  */
 
@@ -584,15 +584,7 @@ export const TOOL_INDEX: ToolEntry[] = [
     description: 'List creators (directors, actors, studios).',
     authRequired: false,
   },
-  {
-    name: 'acmi_get_creator',
-    source: 'acmi',
-    sourceDisplay: 'ACMI',
-    category: 'get',
-    keywords: ['creator', 'director', 'actor', 'studio', 'filmmaker', 'details'],
-    description: 'Get creator by ID.',
-    authRequired: false,
-  },
+  // acmi_get_creator removed: ACMI API bug - IDs from list return 404 on get
   {
     name: 'acmi_list_constellations',
     source: 'acmi',

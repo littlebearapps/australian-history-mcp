@@ -42,15 +42,15 @@ export const PROV_FACET_DISPLAY_NAMES: Record<PROVFacetField, string> = {
 };
 
 // Sort options for PROV search
-export type PROVSortOption = 'relevance' | 'date_asc' | 'date_desc' | 'title';
+// Note: Date sorting is not available because PROV's Solr uses SpatialField types
+// for start_dt/end_dt which cannot be sorted (HTTP 400: "Sorting not supported on SpatialField")
+export type PROVSortOption = 'relevance' | 'title';
 
-export const PROV_SORT_OPTIONS: PROVSortOption[] = ['relevance', 'date_asc', 'date_desc', 'title'];
+export const PROV_SORT_OPTIONS: PROVSortOption[] = ['relevance', 'title'];
 
 // Solr sort parameter mappings
 export const PROV_SORT_MAPPINGS: Record<PROVSortOption, string | null> = {
   relevance: null, // Default Solr relevance (no sort param)
-  date_asc: 'start_dt asc',
-  date_desc: 'start_dt desc',
   title: 'title asc',
 };
 

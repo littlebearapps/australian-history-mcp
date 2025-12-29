@@ -82,17 +82,27 @@ export type TroveIncludeOption =
   | 'listitems'
   | 'years';
 
-// Available facet fields for Trove search
+/**
+ * Available facet fields for Trove search.
+ *
+ * Category applicability:
+ * - `decade`, `year`, `language`, `availability`: All categories
+ * - `state`, `category`: Newspaper only
+ * - `format`, `audience`, `nuc`, `partnerNuc`: Non-newspaper categories (magazine, image, research, book, diary, music)
+ *
+ * Note: `partnerNuc` and `nuc` facets don't apply to newspaper/gazette - these are NLA-digitised content.
+ */
 export type TroveFacetField =
-  | 'decade'
-  | 'year'
-  | 'state'
-  | 'format'
-  | 'category'
-  | 'audience'
-  | 'language'
-  | 'availability'
-  | 'nuc';
+  | 'decade'      // Publication decade (e.g., "190" for 1900s) - all categories
+  | 'year'        // Publication year (e.g., "1923") - all categories
+  | 'state'       // Australian state/territory - newspaper only
+  | 'format'      // Format/type (Photo, Book, Map) - non-newspaper categories
+  | 'category'    // Article category (Article, Advertising) - newspaper only
+  | 'audience'    // Target audience (General, Academic) - non-newspaper categories
+  | 'language'    // Language of content - all categories
+  | 'availability' // Online availability status - all categories
+  | 'nuc'         // Contributing library (holdings) - non-newspaper categories
+  | 'partnerNuc'; // Partner organisation - non-newspaper categories
 
 export const TROVE_FACET_FIELDS: TroveFacetField[] = [
   'decade',
@@ -103,6 +113,7 @@ export const TROVE_FACET_FIELDS: TroveFacetField[] = [
   'language',
   'availability',
   'nuc',
+  'partnerNuc',
 ];
 
 export interface TroveSearchParams {
@@ -152,13 +163,43 @@ export interface TroveSearchParams {
   imageInd?: boolean;
 
   // Include options
+  // NOTE: includeHoldings and includeLinks are only valid for individual work
+  // records (trove_get_work), NOT for search. They are ignored in trove_search.
   includeHoldings?: boolean;
   includeLinks?: boolean;
+
+  // NEW: Newspaper-specific filters
+  illustrationTypes?: string[];  // Photo, Cartoon, Map, Illustration, Graph
+  articleCategory?: string;      // Article, Advertising, Family Notices, etc.
+
+  // NEW: User-contributed content
+  includeTags?: boolean;         // Include user-added tags in results
+  includeComments?: boolean;     // Include user corrections/comments
+  hasTags?: boolean;             // Only return items that have tags
+  hasComments?: boolean;         // Only return items that have comments
+
+  // NEW: Rights and content availability (rights already defined in search indexes above)
+  fullTextAvailable?: boolean;   // Only return items with downloadable full text
+  hasThumbnail?: boolean;        // Only return items with preview thumbnails
+
+  // NEW: Advanced date filtering
+  year?: string;                 // Specific year (requires decade to be set)
+  month?: number;                // Specific month 1-12 (requires decade+year)
+
+  // NEW: Collection/series filtering
+  series?: string;               // Search within a series/collection
+  journalTitle?: string;         // Filter magazine/journal articles by title
 }
 
 // ============================================================================
 // Article and Work Types
 // ============================================================================
+
+// User comment from Trove API
+export interface TroveComment {
+  by: string;
+  text: string;
+}
 
 export interface TroveArticle {
   id: string;
@@ -175,6 +216,9 @@ export interface TroveArticle {
   wordCount?: number;
   correctionCount?: number;
   illustrated?: boolean;
+  // User-contributed content (with includeTags/includeComments)
+  tags?: string[];
+  comments?: TroveComment[];
 }
 
 export interface TroveWork {
@@ -189,6 +233,9 @@ export interface TroveWork {
   thumbnailUrl?: string;
   abstract?: string;
   subjects?: string[];
+  // User-contributed content (with includeTags/includeComments)
+  tags?: string[];
+  comments?: TroveComment[];
 }
 
 // Facet value from Trove API response

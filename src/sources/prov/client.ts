@@ -201,10 +201,15 @@ export class PROVClient extends BaseClient {
 
   private escapeQuery(query: string): string {
     const trimmed = query.trim();
+    // Escape special characters - backslash is included in the character class
+    // This single-pass approach handles all Solr special characters including backslash
+    const solrSpecialChars = /[\\+\-!(){}[\]^"~*?:/]/g;
+    const escaped = trimmed.replace(solrSpecialChars, '\\$&');
+    // Wrap multi-word queries in quotes
     if (trimmed.includes(' ')) {
-      return `"${trimmed.replace(/"/g, '\\"')}"`;
+      return `"${escaped}"`;
     }
-    return trimmed.replace(/([+\-!(){}[\]^"~*?:\\/])/g, '\\$1');
+    return escaped;
   }
 
   private parseSearchResponse(
