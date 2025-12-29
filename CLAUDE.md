@@ -1,8 +1,8 @@
 # CLAUDE.md - Australian History MCP Server
 
 **Language:** Australian English
-**Last Updated:** 2025-12-28
-**Version:** 0.8.0
+**Last Updated:** 2025-12-29
+**Version:** 0.9.0
 
 ---
 
