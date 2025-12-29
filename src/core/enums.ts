@@ -192,6 +192,40 @@ export const TROVE_AVAILABILITY = ['online', 'free', 'restricted', 'subscription
 export type TroveAvailabilityType = (typeof TROVE_AVAILABILITY)[number];
 
 // ============================================================================
+// Trove Illustration Types (for newspaper articles)
+// ============================================================================
+
+export const TROVE_ILLUSTRATION_TYPES = ['Photo', 'Cartoon', 'Map', 'Illustration', 'Graph'] as const;
+export type TroveIllustrationType = (typeof TROVE_ILLUSTRATION_TYPES)[number];
+
+// ============================================================================
+// Trove Word Count Ranges (for newspaper articles)
+// ============================================================================
+
+export const TROVE_WORD_COUNTS = ['<100 Words', '100 - 1000 Words', '1000+ Words'] as const;
+export type TroveWordCount = (typeof TROVE_WORD_COUNTS)[number];
+
+// ============================================================================
+// Trove Article Categories (for newspaper content types)
+// ============================================================================
+
+export const TROVE_ARTICLE_CATEGORIES = [
+  'Article',
+  'Advertising',
+  'Detailed lists, results, guides',
+  'Family Notices',
+  'Literature',
+] as const;
+export type TroveArticleCategory = (typeof TROVE_ARTICLE_CATEGORIES)[number];
+
+// ============================================================================
+// Trove Rights Filters (for copyright/reuse status)
+// ============================================================================
+
+export const TROVE_RIGHTS = ['Free', 'Out of Copyright', 'Creative Commons'] as const;
+export type TroveRights = (typeof TROVE_RIGHTS)[number];
+
+// ============================================================================
 // Trove Include Options
 // ============================================================================
 

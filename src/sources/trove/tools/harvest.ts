@@ -48,6 +48,11 @@ export const troveHarvestTool: SourceTool = {
       cursor?: string;
     };
 
+    // Validate query is not empty
+    if (!input.query || input.query.trim() === '') {
+      return errorResponse('query cannot be empty');
+    }
+
     if (!troveClient.hasApiKey()) {
       return errorResponse('TROVE_API_KEY not configured. See CLAUDE.md for setup instructions.');
     }

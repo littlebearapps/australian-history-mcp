@@ -24,7 +24,7 @@ That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](
 
 ## How It Works
 
-This server uses **dynamic tool loading** - instead of exposing all 76 data tools upfront, it presents just 10 meta-tools:
+This server uses **dynamic tool loading** - instead of exposing all 75 data tools upfront, it presents just 10 meta-tools:
 
 | Meta-Tool | Purpose |
 |-----------|---------|
@@ -41,7 +41,7 @@ This server uses **dynamic tool loading** - instead of exposing all 76 data tool
 
 **Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
 
-> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 76 tools directly.
+> 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 75 tools directly.
 
 ### Demo
 
@@ -88,7 +88,7 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 | Source | Content |
 |--------|---------|
 | 🏛️ **Public Record Office Victoria (PROV)** | Victorian state archives: photos, maps, council records, court files, immigration |
-| 📰 [***Trove (National Library of Australia)****](#trove-api-key---how-to-apply) | Newspapers 1803-1954+, gazettes, books, images, magazines, diaries |
+| 📰 [***Trove (National Library of Australia)****](#trove-api-key---how-to-apply) | **1,500+ partner collections**: newspapers 1803-1954+, gazettes, books, images, magazines, diaries. Partners include state libraries, National Archives, War Memorial, universities, museums, AIATSIS & more |
 | 📍 **Gazetteer of Historical Australian Placenames (GHAP)** | 330,000+ historical placenames with coordinates from ANPS and community datasets via TLCMap |
 | 🦘 **Museums Victoria** | Museum objects, natural specimens, species info, educational articles |
 | 🌿 **Atlas of Living Australia (ALA)** | 165M+ records including historical museum specimens (1800s-1900s), contemporary citizen science, 153,000+ species profiles |
@@ -335,6 +335,36 @@ trove_search with query: "bushrangers", sortby: "dateasc",
   includeFullText: true, limit: 100
 ```
 
+**Partner Collections Available via Trove:**
+
+Trove aggregates content from **1,500+ partner organisations** across Australia. Use the `nuc` parameter to filter by contributing institution:
+
+| Partner Type | Example NUC Codes | Content |
+|--------------|-------------------|---------|
+| **State Libraries** | `VSL`, `SLNSW`, `QSL`, `SLSA`, `SLWA`, `TLIB` | Photographs, manuscripts, maps, local history |
+| **National Archives** | `NAA` | Government records, immigration files, photographs |
+| **War Memorial** | `AWM` | Military history, photographs, unit records |
+| **Universities** | `ANU`, `UMEL`, `UNSW`, `USYD`, `UQ` + `:IR` suffix for repositories | Research papers, theses, academic collections |
+| **Museums** | `NMA`, `NGA`, `NGV`, `MAAS`, `AM`, `MV` | Objects, art collections, documentation |
+| **Research** | `CSIRO`, `AIATSIS`, `NFSA` | Scientific publications, Indigenous collections, film/sound |
+
+```
+# Search State Library Victoria photographs
+trove_search with query: "Melbourne", category: "image", nuc: "VSL"
+
+# Search War Memorial collections
+trove_search with query: "Gallipoli", nuc: "AWM"
+
+# Browse all contributing libraries
+trove_list_contributors with query: "university"
+
+# See which partners have content for your search
+trove_search with query: "gold rush", includeFacets: true,
+  facetFields: ["partnerNuc"]
+```
+
+> **Note:** NUC filtering works for `image`, `book`, `magazine`, `research`, `diary`, `music` categories. Newspaper/gazette content is NLA-digitised without per-article NUC data. See [docs/quickrefs/trove-partners.md](docs/quickrefs/trove-partners.md) for the complete partner guide.
+
 </details>
 
 <details>
@@ -497,8 +527,7 @@ vhd_get_place with id: 12345
 | `acmi_search_works` | Search ACMI collection with field and size options |
 | `acmi_get_work` | Get detailed work information by ID |
 | `acmi_harvest` | Bulk download ACMI collection works with pagination |
-| `acmi_list_creators` | List creators (directors, actors, studios) |
-| `acmi_get_creator` | Get creator details and filmography |
+| `acmi_list_creators` | List creators (directors, actors, studios) with pagination |
 | `acmi_list_constellations` | List curated thematic collections |
 | `acmi_get_constellation` | Get constellation details with works |
 | `acmi_get_related` | Get related works (parts, recommendations, group members) |
@@ -511,8 +540,8 @@ acmi_search_works with query: "Australian", type: "Film", year: 1975
 # Research: Search for classic videogames in the collection
 acmi_search_works with query: "arcade", type: "Videogame"
 
-# Technical: Get creator filmography and biography
-acmi_get_creator with id: 12345
+# Technical: Get related works for a film (parts, recommendations)
+acmi_get_related with workId: 12345
 ```
 
 </details>
@@ -675,7 +704,7 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 
 **Dynamic mode** (default) exposes 10 meta-tools (`tools`, `schema`, `run`, `search`, `open`, `export`, `save_query`, `list_queries`, `run_query`, `delete_query`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
 
-**Legacy mode** exposes all 76 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
+**Legacy mode** exposes all 75 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
 
 Switch modes by setting `MCP_MODE=legacy` in your configuration environment variables.
 

@@ -8,7 +8,7 @@ This guide explains the dynamic tool loading architecture introduced in v0.7.0.
 
 ## Overview
 
-The Australian History MCP Server uses **dynamic tool loading** by default. Instead of exposing all 76 data tools upfront (which consumes ~12,500 tokens), it exposes only 10 meta-tools (~1,100 tokens).
+The Australian History MCP Server uses **dynamic tool loading** by default. Instead of exposing all 75 data tools upfront (which consumes ~12,500 tokens), it exposes only 10 meta-tools (~1,100 tokens).
 
 **Token reduction: 93%**
 
@@ -225,7 +225,7 @@ Meta-tools include caching hints in responses:
 
 ### Legacy Mode
 
-All 76 data tools exposed directly. Set `MCP_MODE=legacy`:
+All 75 data tools exposed directly. Set `MCP_MODE=legacy`:
 
 ```json
 {
@@ -264,11 +264,11 @@ All 76 data tools exposed directly. Set `MCP_MODE=legacy`:
 | ALA | 8 | None |
 | NMA | 10 | None |
 | VHD | 9 | None |
-| ACMI | 8 | None |
+| ACMI | 7 | None |
 | PM Transcripts | 5 | None |
 | IIIF | 2 | None |
 | GA HAP | 3 | None |
-| **Total** | **76** | |
+| **Total** | **75** | |
 
 ---
 

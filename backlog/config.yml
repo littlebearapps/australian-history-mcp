@@ -1,0 +1,25 @@
+project_name: "australian-history-mcp"
+default_status: "To Do"
+statuses: ["To Do", "In Progress", "Done"]
+labels:
+  - blocked
+  - needs-investigation
+  - wont-fix
+  - duplicate
+  - api-integration
+  - search
+  - infrastructure
+  - testing
+  - phase-1
+  - phase-2
+milestones: []
+date_format: yyyy-mm-dd
+max_column_width: 20
+default_editor: "nano"
+auto_open_browser: true
+default_port: 6420
+remote_operations: true
+auto_commit: false
+bypass_git_hooks: false
+check_active_branches: true
+active_branch_days: 30

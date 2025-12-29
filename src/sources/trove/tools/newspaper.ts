@@ -79,17 +79,19 @@ export const troveNewspaperArticleTool: SourceTool = {
 };
 
 /**
- * List available newspaper/gazette titles
+ * List available newspaper/gazette titles with client-side pagination
  */
 export const troveListTitlesTool: SourceTool = {
   schema: {
     name: 'trove_list_titles',
-    description: 'List newspaper or gazette titles by state.',
+    description: 'List newspaper or gazette titles by state with pagination.',
     inputSchema: {
       type: 'object' as const,
       properties: {
         type: { type: 'string', description: PARAMS.TYPE, enum: PUBLICATION_TYPES, default: 'newspaper' },
         state: { type: 'string', description: PARAMS.STATE, enum: AU_STATES_WITH_NATIONAL },
+        offset: { type: 'number', description: 'Number of titles to skip (default: 0)', default: 0 },
+        limit: { type: 'number', description: 'Maximum titles to return (default: 100, max: 500)', default: 100 },
       },
       required: [],
     },
@@ -99,6 +101,8 @@ export const troveListTitlesTool: SourceTool = {
     const input = args as {
       type?: 'newspaper' | 'gazette';
       state?: string;
+      offset?: number;
+      limit?: number;
     };
 
     if (!troveClient.hasApiKey()) {
@@ -108,17 +112,31 @@ export const troveListTitlesTool: SourceTool = {
     try {
       const type = input.type ?? 'newspaper';
       const state = input.state as AUStateWithNational | undefined;
+      const offset = Math.max(0, input.offset ?? 0);
+      const limit = Math.min(500, Math.max(1, input.limit ?? 100));
 
-      const titles = type === 'gazette'
+      // API returns all titles at once; we paginate client-side
+      const allTitles = type === 'gazette'
         ? await troveClient.listGazetteTitles(state)
         : await troveClient.listNewspaperTitles(state);
+
+      // Apply client-side pagination
+      const paginatedTitles = allTitles.slice(offset, offset + limit);
+      const hasMore = offset + limit < allTitles.length;
 
       return successResponse({
         source: 'trove',
         type,
         state: state ?? 'all',
-        count: titles.length,
-        titles: titles.map(t => ({
+        totalResults: allTitles.length,
+        returned: paginatedTitles.length,
+        _pagination: {
+          offset,
+          limit,
+          hasMore,
+          nextOffset: hasMore ? offset + limit : null,
+        },
+        titles: paginatedTitles.map(t => ({
           id: t.id,
           title: t.title,
           state: t.state,
