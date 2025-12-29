@@ -10,19 +10,7 @@ _Last updated: December 2025_
 
 Search Australian archives the easy way. Ask your AI to find newspapers from 1803, aerial photos from 1928, species records, heritage buildings, or government datasets - no manual searching required.
 
-## Quick Start
-
-Run directly with npx - no installation required:
-
-```bash
-npx @littlebearapps/australian-history-mcp
-```
-
-That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](#trove-api-key---how-to-apply) requires a free API key.
-
-→ **Next:** Add to your MCP client via [Configuration](#configuration)
-
-## What You Can Ask
+## What You Can Ask Your AI to Search For
 
 Instead of navigating 11 different archive websites, just ask your AI:
 
@@ -38,13 +26,25 @@ Instead of navigating 11 different archive websites, just ask your AI:
 
 Your AI handles the API calls, pagination, and formatting - you just ask questions in plain English.
 
+## Quick Start
+
+Run directly with npx - no installation required:
+
+```bash
+npx @littlebearapps/australian-history-mcp
+```
+
+That's it! 10 of 11 data sources work immediately with no API key. Only [Trove](#trove-api-key---why--how-to-apply) requires a free API key.
+
+→ **Next:** Add to your MCP client via [Configuration](#add-this-mcp-to-your-ai-agent)
+
 ## Table of Contents
 
+- [What You Can Ask Your AI to Search For](#what-you-can-ask-your-ai-to-search-for)
 - [Quick Start](#quick-start)
-- [What You Can Ask](#what-you-can-ask)
 - [Data Sources - What You Can Find](#data-sources---what-you-can-find)
+- [Trove API Key - Why & How to Apply](#trove-api-key---why--how-to-apply)
 - [Important Notice - Third-Party Data Sources](#important-notice---third-party-data-sources)
-- [Trove API Key - How to Apply](#trove-api-key---how-to-apply)
 - [Add this MCP to Your AI Agent](#add-this-mcp-to-your-ai-agent)
 - [How It Works](#how-it-works)
 - [Data Sources - Tools & Examples](#data-sources---tools--examples)
@@ -58,12 +58,12 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 ## Data Sources - What You Can Find
 
 > [!IMPORTANT]
-> Most sources work immediately with no registration. Only Trove requires a [free API key](#trove-api-key---how-to-apply).
+> Most sources work immediately with no registration. Only Trove requires a [free API key](#trove-api-key---why--how-to-apply).
 
 | Source | Content |
 |--------|---------|
 | 🏛️ **Public Record Office Victoria (PROV)** | Victorian state archives: photos, maps, council records, court files, immigration |
-| 📰 [***Trove (National Library of Australia)****](#trove-api-key---how-to-apply) | **1,500+ partner collections**: newspapers 1803-1954+, gazettes, books, images, magazines, diaries. Partners include state libraries, National Archives, War Memorial, universities, museums, AIATSIS & more |
+| 📰 [***Trove (National Library of Australia)****](#trove-api-key---why--how-to-apply) | **1,500+ partner collections**: newspapers 1803-1954+, gazettes, books, images, magazines, diaries. [See all partner collections →](#extra-data-sources-available-via-trove-api-key) |
 | 📍 **Gazetteer of Historical Australian Placenames (GHAP)** | 330,000+ historical placenames with coordinates from ANPS and community datasets via TLCMap |
 | 🦘 **Museums Victoria** | Museum objects, natural specimens, species info, educational articles |
 | 🌿 **Atlas of Living Australia (ALA)** | 165M+ records including historical museum specimens (1800s-1900s), contemporary citizen science, 153,000+ species profiles |
@@ -75,6 +75,37 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 | ✈️ **Geoscience Australia Historical Aerial Photography (GA HAP)** | 1.2M+ historical aerial photos (1928-1996), all states/territories |
 
 > **Want another data source added?** [Share your idea in Discussions](https://github.com/littlebearapps/australian-history-mcp/discussions/categories/ideas)
+
+## Trove API Key - Why & How to Apply
+
+Trove is Australia's largest digital research portal, aggregating content from **1,500+ partner organisations** including state libraries, the National Archives, Australian War Memorial, universities, museums, and research institutions. A free API key unlocks access to all of this.
+
+### Extra Data Sources Available via Trove API Key
+
+With just one API key, you gain access to collections from:
+
+| Category | Notable Partners | What You Can Find |
+|----------|-----------------|-------------------|
+| 📚 **State Libraries** | State Library Victoria, State Library NSW, State Library Queensland, and all other state/territory libraries | Historical photographs, manuscripts, maps, local history, family history records |
+| 🏛️ **National Archives** | National Archives of Australia | Immigration records, military service files, government photographs, policy files |
+| ⚔️ **War Memorial** | Australian War Memorial | WWI & WWII photographs, unit diaries, service records, military art |
+| 🎓 **Universities** | ANU, Melbourne, Sydney, Monash, UNSW, and 30+ other universities | Research papers, theses, academic journals, institutional archives |
+| 🖼️ **Museums** | National Gallery, Powerhouse, Australian Museum, state museums | Art collections, object documentation, scientific specimens |
+| 🔬 **Research** | CSIRO, AIATSIS, NFSA | Scientific publications, Indigenous collections, film & sound archives |
+| ⚖️ **Government** | High Court, Federal Court, Parliament | Legal judgments, parliamentary papers, government publications |
+| 📰 **Newspapers** | NLA Digitised (1803-1954+) | 35 million+ newspaper articles with full-text search and OCR |
+
+> **One key, 1,500+ collections** - Instead of registering with dozens of institutions individually, Trove aggregates them all. Use the `nuc` parameter to filter by specific partners (e.g., `nuc: "AWM"` for War Memorial, `nuc: "VSL"` for State Library Victoria).
+
+### How to Apply
+
+> [!IMPORTANT]
+> Before applying, review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and ensure your intended use is eligible.
+
+1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
+2. Select "Level 1" (personal/research use)
+3. Approval typically within 1 week
+4. Add `TROVE_API_KEY` to your MCP configuration (see [Configuration](#add-this-mcp-to-your-ai-agent) below)
 
 ## Important Notice - Third-Party Data Sources
 
@@ -103,18 +134,6 @@ Your AI handles the API calls, pagination, and formatting - you just ask questio
 | PM Transcripts | [Disclaimer](https://pmtranscripts.pmc.gov.au/disclaimer) |
 | GA (HAP) | [Copyright](https://www.ga.gov.au/copyright) |
 | IIIF | Varies by institution - check manifest attribution |
-
-## Trove API Key - How to Apply
-
-Trove tools require an API key. All other sources work without any registration or API key.
-
-> [!IMPORTANT]
-> Before applying, review the [Trove API Terms of Use](https://trove.nla.gov.au/about/create-something/using-api/trove-api-terms-use) to understand the requirements and ensure your intended use is eligible.
-
-1. Apply at: https://trove.nla.gov.au/about/create-something/using-api
-2. Select "Level 1" (personal/research use)
-3. Approval typically within 1 week
-4. Add `TROVE_API_KEY` to your MCP configuration (see below)
 
 ## Add this MCP to Your AI Agent
 
