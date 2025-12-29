@@ -156,8 +156,9 @@ export class TroveClient extends BaseClient {
     // NOTE: NUC filter only works for: magazine, image, research, book, diary, music
     // It does NOT work for newspaper category (newspapers don't have NUC data)
     if (params.nuc) {
-      // Escape colons in NUC codes (e.g., ANL:DL → ANL\:DL)
-      const escapedNuc = params.nuc.replace(/:/g, '\\:');
+      // Escape backslashes and colons in NUC codes (e.g., ANL:DL → ANL\:DL)
+      // Backslash must be escaped first, then colons
+      const escapedNuc = params.nuc.replace(/[\\:]/g, '\\$&');
       query = `${query} nuc:${escapedNuc}`;
     }
 
