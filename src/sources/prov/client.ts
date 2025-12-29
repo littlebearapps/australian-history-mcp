@@ -202,9 +202,12 @@ export class PROVClient extends BaseClient {
   private escapeQuery(query: string): string {
     const trimmed = query.trim();
     if (trimmed.includes(' ')) {
-      return `"${trimmed.replace(/"/g, '\\"')}"`;
+      // Escape backslashes first, then quotes (order matters for proper escaping)
+      const escaped = trimmed.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+      return `"${escaped}"`;
     }
-    return trimmed.replace(/([+\-!(){}[\]^"~*?:\\/])/g, '\\$1');
+    // Escape special Solr characters including backslash
+    return trimmed.replace(/\\/g, '\\\\').replace(/([+\-!(){}[\]^"~*?:/])/g, '\\$1');
   }
 
   private parseSearchResponse(
