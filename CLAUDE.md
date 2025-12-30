@@ -2,7 +2,7 @@
 
 **Language:** Australian English
 **Last Updated:** 2025-12-29
-**Version:** 0.9.0
+**Version:** 1.0.0
 
 ---
 
@@ -113,10 +113,11 @@ npx tsc --noEmit
 
 ## Dynamic Tool Loading (Default Mode)
 
-The server uses **dynamic tool loading** by default, exposing only 10 meta-tools instead of all 75 data tools. This reduces initial token usage by **93%** (~900 vs ~11,909 tokens).
+The server uses **dynamic tool loading** by default, exposing 22 meta-tools instead of all 75 data tools. This reduces initial token usage by **86%** (~1,600 vs ~11,909 tokens).
 
 ### Meta-Tools Exposed
 
+#### Core Tools (10)
 | Tool | Purpose |
 |------|---------|
 | `tools` | Discover available data tools by keyword, source, or category |
@@ -129,6 +130,30 @@ The server uses **dynamic tool loading** by default, exposing only 10 meta-tools
 | `list_queries` | List saved queries with filtering options |
 | `run_query` | Execute a saved query with optional parameter overrides |
 | `delete_query` | Remove a saved query by name |
+
+#### Research Planning Tools (1)
+| Tool | Purpose |
+|------|---------|
+| `plan_search` | Analyse topic, generate search strategy, create plan.md |
+
+#### Session Management Tools (7)
+| Tool | Purpose |
+|------|---------|
+| `session_start` | Start a named research session |
+| `session_status` | Get current progress and coverage gaps |
+| `session_end` | End session with final report |
+| `session_resume` | Resume a paused or previous session |
+| `session_list` | List all sessions with optional filters |
+| `session_export` | Export session data (JSON, Markdown, CSV) |
+| `session_note` | Add notes to current session |
+
+#### Context Compression Tools (4)
+| Tool | Purpose |
+|------|---------|
+| `compress` | Reduce records to essential fields (minimal/standard/full) |
+| `urls` | Extract only URLs from records |
+| `dedupe` | Remove duplicate records using URL and title matching |
+| `checkpoint` | Save/load/list/delete research checkpoints |
 
 ### Federated Search
 
@@ -194,7 +219,7 @@ Set `MCP_MODE` environment variable:
 
 | Mode | Tools Exposed | Use Case |
 |------|---------------|----------|
-| `dynamic` (default) | 10 meta-tools | Research workflows, token-efficient |
+| `dynamic` (default) | 22 meta-tools | Research workflows, token-efficient |
 | `legacy` | 75 data tools | Backwards compatibility, direct access |
 
 ```json
@@ -425,10 +450,12 @@ GA HAP tools work immediately with no configuration. CC-BY 4.0 licensed.
 └───────────────────────────────┬─────────────────────────────────┘
                                 │ stdio
 ┌───────────────────────────────▼─────────────────────────────────┐
-│    Australian History MCP Server (10 meta-tools exposed)         │
+│    Australian History MCP Server (22 meta-tools exposed)         │
 │  ┌────────────────────────────────────────────────────────────┐ │
-│  │  Meta-Tools: tools | schema | run | search | open | export │ │
-│  │              save_query | list_queries | run_query | ...   │ │
+│  │  Core: tools | schema | run | search | open | export       │ │
+│  │  Planning: plan_search                                      │ │
+│  │  Sessions: session_start | session_status | session_end... │ │
+│  │  Compression: compress | urls | dedupe | checkpoint         │ │
 │  └───────────────────────────┬────────────────────────────────┘ │
 │                              │ run(tool, args)                   │
 │  ┌───────────────────────────▼────────────────────────────────┐ │
@@ -743,6 +770,58 @@ Sort by lastUsed or useCount to find frequently used queries
 Use delete_query to remove old queries
 ```
 
+### Plan a Research Topic
+```
+Use plan_search with topic "History of Arden Street Oval 1920s"
+Returns: search strategy, historical name suggestions, source priorities, coverage matrix
+Optionally saves plan.md file for reference
+```
+
+### Start a Research Session
+```
+Use session_start with name "arden-street-research", topic "Arden Street Oval history"
+All subsequent searches are automatically logged to the session
+Use session_status to check progress and coverage gaps
+```
+
+### Compress Accumulated Results
+```
+Use compress with records from searches, level "standard" (~50 tokens/record)
+Levels: "minimal" (~20 tokens), "standard" (~50), "full" (~80)
+Reduces token usage by 70-85% for large result sets
+```
+
+### Remove Duplicate Results
+```
+Use dedupe with records from multiple searches
+Matches by URL first, then title similarity (Jaccard coefficient)
+Source priority: trove > prov > nma > museums-victoria > vhd > acmi > ghap > ala
+```
+
+### Save Research Progress (Checkpoint)
+```
+Use checkpoint with action "save", name "arden-street-day1"
+Stores compressed records and fingerprints for later resume
+Use checkpoint with action "load", name "arden-street-day1" to restore
+```
+
+### Resume After Context Reset
+```
+Use session_resume with name "arden-street-research"
+Restores session state, coverage tracking, and query history
+Continue research without losing previous progress
+```
+
+### Complete Research Workflow
+```
+1. plan_search(topic="...") → Review strategy
+2. session_start(name="...", topic="...") → Begin tracking
+3. search(query="...") → Auto-logged to session
+4. compress(records=..., level="standard") → Reduce tokens
+5. checkpoint(action="save", name="...") → Save progress
+6. session_end() → Complete with final report
+```
+
 ---
 
 ## Documentation Hierarchy
@@ -900,4 +979,4 @@ Workflow: `.github/workflows/publish.yml` (triggers on `v*` tags)
 
 ---
 
-**Token Count:** ~1100 tokens
+**Token Count:** ~1600 tokens

@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-30
+
+### Added
+- **Research Planning** - `plan_search` meta-tool for structured research strategy
+  - Analyses topics to extract themes and research questions
+  - Suggests historical name variations (suburbs, streets, venues)
+  - Prioritises relevant data sources
+  - Generates coverage matrix (sources vs content types)
+  - Creates plan.md file for reference
+- **Session Management** - 7 meta-tools for tracking research sessions
+  - `session_start` - Start a named research session
+  - `session_status` - Get current progress and coverage gaps
+  - `session_end` - End session with final report
+  - `session_resume` - Resume a paused or previous session
+  - `session_list` - List all sessions with optional filters
+  - `session_export` - Export session data (JSON, Markdown, CSV)
+  - `session_note` - Add notes to current session
+- **Context Compression** - 4 meta-tools for reducing token usage
+  - `compress` - Reduce records to essential fields (70-85% savings)
+  - `urls` - Extract only URLs from records
+  - `dedupe` - Remove duplicate records using URL and title matching
+  - `checkpoint` - Save/load/list/delete research checkpoints
+- **Automatic query logging** when session is active
+- **Result fingerprinting** for duplicate detection across searches
+- **Checkpoint persistence** for long research sessions
+
+### Changed
+- Meta-tool count: 10 → 22
+- Dynamic mode token cost: ~1,100 → ~1,600 tokens (still 86% reduction vs legacy)
+
+### Documentation
+- Updated CLAUDE.md with all new meta-tools and use cases
+- Updated README.md with new features and workflow examples
+- Added `docs/quickrefs/research-workflow.md` guide
+- Added `docs/dev-guides/manual-testing-checklist.md`
+- Added integration test suite in `tests/integration/`
+
 ## [0.7.0] - 2025-12-27
 
 ### Added
