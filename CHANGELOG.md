@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-30
+
+This is the first stable release of the Australian History MCP Server, providing programmatic access to 11 Australian data sources with 75 data tools and 22 meta-tools.
+
+### Added
+- **Research Planning** - `plan_search` meta-tool for structured research strategy
+  - Analyses topics to extract themes and research questions
+  - Suggests historical name variations (suburbs, streets, venues)
+  - Prioritises relevant data sources with capital city recognition
+  - Generates coverage matrix (sources vs content types)
+  - Creates plan.md file for reference
+- **Session Management** - 7 meta-tools for tracking research sessions
+  - `session_start` - Start a named research session
+  - `session_status` - Get current progress and coverage gaps
+  - `session_end` - End session with final report
+  - `session_resume` - Resume a paused or previous session (by ID or name)
+  - `session_list` - List all sessions with optional filters
+  - `session_export` - Export session data (JSON, Markdown, CSV)
+  - `session_note` - Add notes to current session
+- **Context Compression** - 4 meta-tools for reducing token usage
+  - `compress` - Reduce records to essential fields (70-85% savings)
+  - `urls` - Extract only URLs from records
+  - `dedupe` - Remove duplicate records using URL and title matching
+  - `checkpoint` - Save/load/list/delete research checkpoints
+- **Saved Queries** - 4 meta-tools for reusable searches
+  - `save_query` - Save a named query for later reuse
+  - `list_queries` - List saved queries with filtering (searches name, description, and parameters)
+  - `run_query` - Execute a saved query with optional overrides (supports all tools including meta-tools)
+  - `delete_query` - Remove a saved query by name
+- **Automatic query logging** when session is active
+- **Result fingerprinting** for duplicate detection across searches
+- **Checkpoint persistence** for long research sessions
+- **Invalid source warnings** in federated search when invalid source names are passed
+
+### Fixed
+- Melbourne now correctly resolves to VIC (capital city priority in GHAP lookup)
+- GA-HAP now prioritised for aerial photograph queries (+50 relevance boost)
+- Species and common terms (platypus, koala, photographs, etc.) no longer parsed as locations
+- ALA now prioritised for biodiversity/species queries
+- `plan_search` now generates fallback search steps when no high-relevance sources found
+- `session_resume` now finds sessions by name, not just UUID
+- Duplicate fingerprints prevented in session tracking
+- `run_query` now works with meta-tools (fixed circular dependency)
+- `list_queries` search now checks query parameters, not just name/description
+- `export` now respects `fields` parameter for JSON format
+- GHAP HTML error responses now handled gracefully with informative error messages
+
+### Changed
+- Meta-tool count: 10 → 22
+- Dynamic mode token cost: ~1,100 → ~1,600 tokens (still 86% reduction vs legacy)
+- Biodiversity theme added to intent classifier (platypus, koala, species, fauna, flora)
+- Photograph theme added to intent classifier (aerial, airphoto, photo, image)
+
+### Documentation
+- Updated CLAUDE.md with all new meta-tools and use cases
+- Updated README.md with new features and workflow examples
+- Added `docs/quickrefs/research-workflow.md` guide
+- Added `docs/dev-guides/manual-testing-checklist.md`
+- Added `docs/testing/v1.0.0-test-findings.md` with comprehensive test results
+- Added integration test suite in `tests/integration/`
+
 ## [0.7.0] - 2025-12-27
 
 ### Added
@@ -132,6 +193,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Shared base client with retry logic
 - Harvest runner for pagination
 
+[1.0.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/littlebearapps/australian-history-mcp/compare/v0.4.0...v0.5.0

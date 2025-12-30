@@ -75,6 +75,33 @@ export abstract class BaseClient {
         );
       }
 
+      // Check content-type before parsing JSON (handles APIs returning HTML error pages)
+      const contentType = response.headers.get('content-type') || '';
+      if (!contentType.includes('application/json') && !contentType.includes('application/geo+json')) {
+        const text = await response.text();
+        if (text.startsWith('<!DOCTYPE') || text.startsWith('<html') || text.startsWith('<HTML')) {
+          throw new APIRequestError(
+            'API returned HTML error page instead of JSON. ' +
+            'This sometimes occurs with certain query combinations. ' +
+            'Try using a more specific search term or removing filters.',
+            'HTML_RESPONSE',
+            200,
+            false
+          );
+        }
+        // Some APIs don't set content-type correctly but still return valid JSON
+        try {
+          return JSON.parse(text) as T;
+        } catch {
+          throw new APIRequestError(
+            `Unexpected content-type: ${contentType || 'none'}`,
+            'INVALID_CONTENT_TYPE',
+            200,
+            false
+          );
+        }
+      }
+
       return await response.json() as T;
     } catch (error) {
       if (error instanceof APIRequestError) {

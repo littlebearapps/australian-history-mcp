@@ -164,9 +164,18 @@ export const exportMetaTool: SourceTool = {
         case 'csv':
           content = toCsv(input.records, input.fields);
           break;
-        case 'json':
-          content = JSON.stringify(input.records, null, 2);
+        case 'json': {
+          // Filter fields if specified
+          const outputRecords = input.fields && input.fields.length > 0
+            ? input.records.map(record =>
+                Object.fromEntries(
+                  Object.entries(record).filter(([key]) => input.fields!.includes(key))
+                )
+              )
+            : input.records;
+          content = JSON.stringify(outputRecords, null, 2);
           break;
+        }
         case 'markdown':
           content = toMarkdown(input.records, input.fields);
           break;

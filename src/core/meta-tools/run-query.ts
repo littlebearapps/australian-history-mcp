@@ -9,6 +9,16 @@ import { errorResponse } from '../types.js';
 import { savedQueriesStore, SavedQueriesStore } from '../saved-queries/store.js';
 import { registry } from '../../registry.js';
 
+// BUG-008: Lazy load metaTools to avoid circular dependency
+let _metaTools: SourceTool[] | null = null;
+async function getMetaTools(): Promise<SourceTool[]> {
+  if (!_metaTools) {
+    const mod = await import('./index.js');
+    _metaTools = mod.metaTools;
+  }
+  return _metaTools;
+}
+
 export const runQueryMetaTool: SourceTool = {
   schema: {
     name: 'run_query',
@@ -56,19 +66,46 @@ export const runQueryMetaTool: SourceTool = {
     // Merge parameters with overrides
     const mergedParams = { ...query.parameters, ...overrides };
 
-    // Check if tool exists in registry
-    const toolSchema = registry.getToolSchema(query.tool);
-    if (!toolSchema) {
-      return errorResponse(
-        `Tool not found: "${query.tool}". The tool may have been removed or renamed.`
-      );
-    }
-
     try {
       // Mark the query as used
       savedQueriesStore.markUsed(name);
 
-      // Execute the tool
+      // BUG-008: Check meta-tools first, then registry
+      const metaTools = await getMetaTools();
+      const metaTool = metaTools.find((t) => t.schema.name === query.tool);
+      if (metaTool) {
+        // Execute meta-tool directly
+        const result = await metaTool.execute(mergedParams);
+
+        // Add query metadata to the result
+        const content = result.content[0];
+        if (content.type === 'text') {
+          try {
+            const parsed = JSON.parse(content.text);
+            parsed._savedQuery = {
+              name: query.name,
+              useCount: query.useCount + 1,
+              overridesApplied: Object.keys(overrides).length > 0,
+            };
+            return {
+              content: [{ type: 'text' as const, text: JSON.stringify(parsed, null, 2) }],
+            };
+          } catch {
+            return result;
+          }
+        }
+        return result;
+      }
+
+      // Check if tool exists in registry (data tools)
+      const toolSchema = registry.getToolSchema(query.tool);
+      if (!toolSchema) {
+        return errorResponse(
+          `Tool not found: "${query.tool}". The tool may have been removed or renamed.`
+        );
+      }
+
+      // Execute data tool via registry
       const result = await registry.executeTool(query.tool, mergedParams);
 
       // Add query metadata to the result

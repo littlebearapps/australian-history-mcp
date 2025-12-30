@@ -23,8 +23,18 @@ Instead of navigating 11 different archive websites, just ask your AI:
 - *"Find historical placenames within 50km of Ballarat"* (uses point+radius)
 - *"What films are related to Mad Max?"* (uses related records)
 - *"Save this search so I can run it again later"* (uses saved queries)
+- *"Plan a research strategy for the Melbourne Olympics 1956"* (uses research planning)
+- *"Start a session to track my research on early Melbourne"* (uses session management)
+- *"Compress these results to save context"* (uses context compression)
 
 Your AI handles the API calls, pagination, and formatting - you just ask questions in plain English.
+
+### New in v1.0.0: Research Workflow Tools
+
+- **Research Planning** - Analyse topics, generate search strategies, identify historical name variations
+- **Session Management** - Track queries, avoid duplicates, resume after context resets
+- **Context Compression** - Reduce accumulated results by 70-85% to stay within token limits
+- **Checkpoints** - Save/restore research progress for long investigations
 
 ## Quick Start
 
@@ -263,8 +273,9 @@ Add to `.vscode/mcp.json` or user MCP configuration:
 
 ## How It Works
 
-This server uses **dynamic tool loading** - instead of exposing all 75 data tools upfront, it presents just 10 meta-tools:
+This server uses **dynamic tool loading** - instead of exposing all 75 data tools upfront, it presents just 22 meta-tools organised by function:
 
+### Core Tools (10)
 | Meta-Tool | Purpose |
 |-----------|---------|
 | `tools` | Discover available data tools by keyword, source, or category |
@@ -278,7 +289,59 @@ This server uses **dynamic tool loading** - instead of exposing all 75 data tool
 | `run_query` | Execute a saved query with optional overrides |
 | `delete_query` | Remove a saved query by name |
 
-**Why?** This reduces token usage by 93%, making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
+### Research Planning Tools (1)
+| Meta-Tool | Purpose |
+|-----------|---------|
+| `plan_search` | Analyse topic, generate search strategy, create plan.md |
+
+### Session Management Tools (7)
+| Meta-Tool | Purpose |
+|-----------|---------|
+| `session_start` | Start a named research session |
+| `session_status` | Get current progress and coverage gaps |
+| `session_end` | End session with final report |
+| `session_resume` | Resume a paused or previous session |
+| `session_list` | List all sessions with optional filters |
+| `session_export` | Export session data (JSON, Markdown, CSV) |
+| `session_note` | Add notes to current session |
+
+### Context Compression Tools (4)
+| Meta-Tool | Purpose |
+|-----------|---------|
+| `compress` | Reduce records to essential fields (70-85% token savings) |
+| `urls` | Extract only URLs from records |
+| `dedupe` | Remove duplicate records using URL and title matching |
+| `checkpoint` | Save/load/list/delete research checkpoints |
+
+**Why?** This reduces token usage by 86% (~1,600 vs ~11,909 tokens), making your AI more efficient. Your AI discovers what tools are available, loads parameters only when needed, and executes searches on your behalf.
+
+### Token Efficiency for Long Research Sessions
+
+When researching a topic across multiple searches, results accumulate and consume context. The compression tools help manage this:
+
+| Compression Level | Tokens per Record | Use Case |
+|-------------------|-------------------|----------|
+| `minimal` | ~20 | Just IDs and URLs for bookmarking |
+| `standard` | ~50 | Title, year, source for review |
+| `full` | ~80 | All metadata except descriptions |
+
+**Example workflow:**
+```
+# Plan your research
+plan_search(topic="Melbourne Olympics 1956")
+
+# Start tracking session
+session_start(name="olympics-research", topic="...")
+
+# Searches are automatically logged
+search(query="Melbourne Olympics", sources=["trove", "prov"])
+
+# Compress results to save context (70-85% reduction)
+compress(records=results, level="standard")
+
+# End session with summary
+session_end()
+```
 
 > 💡 **For backwards compatibility:** Set `MCP_MODE=legacy` to expose all 75 tools directly.
 
@@ -717,7 +780,13 @@ Use `ala_search_species` for scientific or common names, or `museumsvic_search` 
 <details>
 <summary><strong>7. What's the difference between dynamic and legacy mode?</strong></summary>
 
-**Dynamic mode** (default) exposes 10 meta-tools (`tools`, `schema`, `run`, `search`, `open`, `export`, `save_query`, `list_queries`, `run_query`, `delete_query`) and reduces token usage by 93%. Your AI discovers and executes tools on demand.
+**Dynamic mode** (default) exposes 22 meta-tools organised into 4 categories:
+- **Core tools** (10): `tools`, `schema`, `run`, `search`, `open`, `export`, `save_query`, `list_queries`, `run_query`, `delete_query`
+- **Research planning** (1): `plan_search`
+- **Session management** (7): `session_start`, `session_status`, `session_end`, `session_resume`, `session_list`, `session_export`, `session_note`
+- **Context compression** (4): `compress`, `urls`, `dedupe`, `checkpoint`
+
+This reduces token usage by 86% (~1,600 vs ~11,909 tokens). Your AI discovers and executes tools on demand.
 
 **Legacy mode** exposes all 75 data tools directly. Use this if you need backwards compatibility or prefer direct tool access.
 

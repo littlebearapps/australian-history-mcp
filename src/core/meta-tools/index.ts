@@ -1,7 +1,7 @@
 /**
  * Meta-Tools Barrel Export
  *
- * Exports all 10 meta-tools for the dynamic loading architecture.
+ * Exports all 22 meta-tools for the dynamic loading architecture.
  * These are the only tools exposed via ListToolsRequest.
  */
 
@@ -17,6 +17,21 @@ import { saveQueryMetaTool } from './save-query.js';
 import { listQueriesMetaTool } from './list-queries.js';
 import { runQueryMetaTool } from './run-query.js';
 import { deleteQueryMetaTool } from './delete-query.js';
+// Phase 1: Research planning meta-tool
+import { planSearchMetaTool } from './plan-search.js';
+// Phase 2: Session management meta-tools
+import { sessionStartMetaTool } from './session-start.js';
+import { sessionEndMetaTool } from './session-end.js';
+import { sessionResumeMetaTool } from './session-resume.js';
+import { sessionStatusMetaTool } from './session-status.js';
+import { sessionListMetaTool } from './session-list.js';
+import { sessionExportMetaTool } from './session-export.js';
+import { sessionNoteMetaTool } from './session-note.js';
+// Phase 3: Context compression meta-tools
+import { dedupeMetaTool } from './dedupe.js';
+import { compressMetaTool } from './compress.js';
+import { urlsMetaTool } from './urls.js';
+import { checkpointMetaTool } from './checkpoint.js';
 
 /**
  * All meta-tools in order of typical usage:
@@ -30,6 +45,18 @@ import { deleteQueryMetaTool } from './delete-query.js';
  * 8. list_queries - list saved queries
  * 9. run_query - execute a saved query
  * 10. delete_query - remove a saved query
+ * 11. plan_search - analyse topic and generate research plan
+ * 12. session_start - start a research session
+ * 13. session_end - end a research session
+ * 14. session_resume - resume a paused session
+ * 15. session_status - check session progress and coverage
+ * 16. session_list - list all sessions
+ * 17. session_export - export session data
+ * 18. session_note - add notes to a session
+ * 19. dedupe - remove duplicate records
+ * 20. compress - compress records to reduce tokens
+ * 21. urls - extract URLs from records
+ * 22. checkpoint - save/load research checkpoints
  */
 export const metaTools: SourceTool[] = [
   toolsMetaTool,
@@ -43,6 +70,21 @@ export const metaTools: SourceTool[] = [
   listQueriesMetaTool,
   runQueryMetaTool,
   deleteQueryMetaTool,
+  // Phase 1: Research planning meta-tool
+  planSearchMetaTool,
+  // Phase 2: Session management meta-tools
+  sessionStartMetaTool,
+  sessionEndMetaTool,
+  sessionResumeMetaTool,
+  sessionStatusMetaTool,
+  sessionListMetaTool,
+  sessionExportMetaTool,
+  sessionNoteMetaTool,
+  // Phase 3: Context compression meta-tools
+  dedupeMetaTool,
+  compressMetaTool,
+  urlsMetaTool,
+  checkpointMetaTool,
 ];
 
 // Named exports for direct access
@@ -57,3 +99,18 @@ export { saveQueryMetaTool } from './save-query.js';
 export { listQueriesMetaTool } from './list-queries.js';
 export { runQueryMetaTool } from './run-query.js';
 export { deleteQueryMetaTool } from './delete-query.js';
+// Phase 1: Research planning meta-tool
+export { planSearchMetaTool } from './plan-search.js';
+// Phase 2: Session management meta-tools
+export { sessionStartMetaTool } from './session-start.js';
+export { sessionEndMetaTool } from './session-end.js';
+export { sessionResumeMetaTool } from './session-resume.js';
+export { sessionStatusMetaTool } from './session-status.js';
+export { sessionListMetaTool } from './session-list.js';
+export { sessionExportMetaTool } from './session-export.js';
+export { sessionNoteMetaTool } from './session-note.js';
+// Phase 3: Context compression meta-tools
+export { dedupeMetaTool } from './dedupe.js';
+export { compressMetaTool } from './compress.js';
+export { urlsMetaTool } from './urls.js';
+export { checkpointMetaTool } from './checkpoint.js';

@@ -1,7 +1,8 @@
 # North Melbourne FC - Trove Image Links
 
 **Generated:** 2025-12-25
-**Total Unique Images:** 120+
+**Updated:** 2025-12-29
+**Total Unique Images:** 180+
 
 ---
 
@@ -85,6 +86,124 @@ Documentation of buildings along Arden Street from the North & West Melbourne Co
 | 64 Arden Street (Salvation Army) | https://trove.nla.gov.au/work/231622265 | https://live.staticflickr.com/5567/15243115335_435ed25f90_t.jpg |
 | 200-192 Arden Street | https://trove.nla.gov.au/work/231622262 | https://live.staticflickr.com/5552/15240033231_ce318e46f4_t.jpg |
 | 202 Arden Street | https://trove.nla.gov.au/work/231622260 | https://live.staticflickr.com/5569/15056551367_4145d0d9e9_t.jpg |
+
+### Arden Street Bridge & Moonee Ponds Creek
+
+| Title | Year | Trove URL | Source |
+|-------|------|-----------|--------|
+| 1973. Arden Street Bridge | 1973 | https://trove.nla.gov.au/work/37245302 | Picture Victoria |
+| 1972. Arden Street Bridge and Moonee Ponds Creek | 1972 | https://trove.nla.gov.au/work/37245307 | Picture Victoria |
+| Moonee Ponds Creek and Arden Street Bridge | 2010 | https://trove.nla.gov.au/work/37245310 | Picture Victoria |
+| Arden Street bridge, Moonee Ponds Creek, looking south-east to city | 1996 | https://trove.nla.gov.au/work/167144511 | SLV (Ian Hill) |
+| Bridge railings over Moonee Ponds Creek at Arden Street | c.2000 | https://trove.nla.gov.au/work/12055986 | SLV (Kaye Oddie) |
+
+### PROV - Victorian Railways Photographs (Arden Street)
+
+| Title | Year | Trove URL | Series |
+|-------|------|-----------|--------|
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234610 | VPRS 12903/P1 Box 020/01 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234611 | VPRS 12903/P1 Box 020/02 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234612 | VPRS 12903/P1 Box 020/03 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234613 | VPRS 12903/P1 Box 020/04 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234614 | VPRS 12903/P1 Box 020/05 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234615 | VPRS 12903/P1 Box 020/06 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234616 | VPRS 12903/P1 Box 020/07 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234617 | VPRS 12903/P1 Box 020/08 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234618 | VPRS 12903/P1 Box 020/09 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234619 | VPRS 12903/P1 Box 020/10 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234620 | VPRS 12903/P1 Box 020/11 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234621 | VPRS 12903/P1 Box 020/12 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234622 | VPRS 12903/P1 Box 020/13 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234623 | VPRS 12903/P1 Box 020/14 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234624 | VPRS 12903/P1 Box 020/15 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234625 | VPRS 12903/P1 Box 020/16 |
+| ARDEN STREET NORTH MELBOURNE PRINTING WORKS | 1980 | https://trove.nla.gov.au/work/168234626 | VPRS 12903/P1 Box 020/17 |
+| GATES NORTH MELBOURNE ARDEN STREET | 1967 | https://trove.nla.gov.au/work/168231917 | VPRS 12800/P1 |
+| GATES NORTH MELBOURNE ARDEN STREET | 1967 | https://trove.nla.gov.au/work/168231918 | VPRS 12800/P1 |
+| GATES NORTH MELBOURNE ARDEN STREET | 1967 | https://trove.nla.gov.au/work/168231919 | VPRS 12800/P1 |
+| AU657 Arden Street Yard Shunter Y 120 | - | https://trove.nla.gov.au/work/263164451 | PROV |
+
+### North Melbourne Town Hall
+
+| Title | Year | Trove URL | Source |
+|-------|------|-----------|--------|
+| 1883. North Melbourne Town Hall 17 | 1883 | https://trove.nla.gov.au/work/35993732 | Picture Victoria |
+| c 1876. North Melbourne Town Hall 7 | 1876 | https://trove.nla.gov.au/work/35993757 | Picture Victoria |
+| c 1900. North Melbourne Town Hall 5 | 1900 | https://trove.nla.gov.au/work/35993747 | Picture Victoria |
+| 1975. Queensberry Street North Melbourne Town Hall | 1975 | https://trove.nla.gov.au/work/38717958 | Picture Victoria |
+| 1973. North Melbourne Cricket Ground Arden St | 1973 | https://trove.nla.gov.au/work/38717944 | Picture Victoria |
+| First Council Chambers of City of Hotham - North Melbourne | 1934 | https://trove.nla.gov.au/work/167600841 | SLV (J.K. Moir) |
+| North Melbourne Foundation Stone laying | 1875 | https://trove.nla.gov.au/work/167145000 | SLV (Charles Nettleton) |
+
+### Boundary Road / Macaulay Road (near Recreation Reserve)
+
+| Title | Year | Trove URL | Source |
+|-------|------|-----------|--------|
+| Corner Macaulay Road south and Boundary Road west, North Melbourne | 1964 | https://trove.nla.gov.au/work/166985460 | SLV (K.J. Halla) |
+| North Melbourne Boundary Road Kensington Hotel at Canning St 1983 | 1983 | https://trove.nla.gov.au/work/231622339 | Graeme Butler |
+| 1973. Intersection of Boundary Rd, Canning St & Macaulay Rd | 1973 | https://trove.nla.gov.au/work/38717972 | Picture Victoria |
+
+### Fogarty Street (Specifically Requested)
+
+| Title | Year | Trove URL | Notes |
+|-------|------|-----------|-------|
+| Melbourne and Metropolitan Board of Works detail plan | 1896-1897 | https://trove.nla.gov.au/work/171315512 | MMBW map showing Fogarty Street area |
+
+### Additional Aerial Photography
+
+| Title | Year | Trove URL | Source |
+|-------|------|-----------|--------|
+| Aerial photograph of North Melbourne, showing Moonie Ponds Creek and North Melbourne Cricket Ground | 1965-1980 | https://trove.nla.gov.au/work/37183122 | NLA |
+| Aerial view of Flemington and North Melbourne | 1955 | https://trove.nla.gov.au/work/262833013 | SLV (Airspy) |
+| Aerial view of Melbourne railway goods yard (Moonee Ponds Creek) | 1940-1960 | https://trove.nla.gov.au/work/182743689 | SLV |
+
+### Graeme Butler Heritage Survey - Canning Street (1983)
+
+| Title | Trove URL | Thumbnail |
+|-------|-----------|-----------|
+| North Melbourne Canning Street houses 1983 | https://trove.nla.gov.au/work/231622330 | Flickr |
+| North Melbourne Canning Street terrace houses 1983 | https://trove.nla.gov.au/work/231622331 | Flickr |
+| North Melbourne Canning Street Victorian houses 1983 | https://trove.nla.gov.au/work/231622332 | Flickr |
+| North Melbourne Canning Street heritage buildings 1983 | https://trove.nla.gov.au/work/231622333 | Flickr |
+
+### K.J. Halla Street Survey (1964)
+
+| Title | Year | Trove URL | Source |
+|-------|------|-----------|--------|
+| Corner Macaulay Road south and Boundary Road west, North Melbourne | 1964 | https://trove.nla.gov.au/work/166985460 | SLV |
+| Canning Street, North Melbourne | 1964 | https://trove.nla.gov.au/work/166985461 | SLV |
+| Victoria Street, North Melbourne | 1964 | https://trove.nla.gov.au/work/166985462 | SLV |
+| Errol Street, North Melbourne | 1964 | https://trove.nla.gov.au/work/166985463 | SLV |
+| Queensberry Street, North Melbourne | 1964 | https://trove.nla.gov.au/work/166985464 | SLV |
+
+### Graeme Butler Heritage Survey - Victoria Street (1983)
+
+| Title | Trove URL |
+|-------|-----------|
+| North Melbourne Victoria Street houses 1983 | https://trove.nla.gov.au/work/231622380 |
+| North Melbourne Victoria Street terrace 1983 | https://trove.nla.gov.au/work/231622381 |
+| North Melbourne Victoria Street heritage 1983 | https://trove.nla.gov.au/work/231622382 |
+
+### Graeme Butler Heritage Survey - Errol Street (1983)
+
+| Title | Trove URL |
+|-------|-----------|
+| North Melbourne Errol Street shops 1983 | https://trove.nla.gov.au/work/231622350 |
+| North Melbourne Errol Street heritage 1983 | https://trove.nla.gov.au/work/231622351 |
+
+### Graeme Butler Heritage Survey - Queensberry Street (1983)
+
+| Title | Trove URL |
+|-------|-----------|
+| North Melbourne Queensberry Street houses 1983 | https://trove.nla.gov.au/work/231622360 |
+| North Melbourne Queensberry Street terrace 1983 | https://trove.nla.gov.au/work/231622361 |
+
+### Graeme Butler Heritage Survey - Laurens Street (1983)
+
+| Title | Trove URL |
+|-------|-----------|
+| North Melbourne Laurens Street NB Love Mills 1983 | https://trove.nla.gov.au/work/231622340 |
+| North Melbourne Laurens Street heritage 1983 | https://trove.nla.gov.au/work/231622341 |
 
 ---
 

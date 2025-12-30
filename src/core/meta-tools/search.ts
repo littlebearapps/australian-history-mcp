@@ -3,11 +3,20 @@
  *
  * Executes federated search across multiple Australian history sources in parallel.
  * Reduces typical multi-source research from 6-10 tool calls to 1-2.
+ *
+ * Phase 2: Auto-logging integration
+ * - Logs queries to active session if one exists
+ * - Generates fingerprints for deduplication tracking
+ * - Updates source coverage
  */
 
+import { randomUUID } from 'crypto';
 import type { SourceTool } from '../base-source.js';
 import { successResponse, errorResponse } from '../types.js';
 import { registry } from '../../registry.js';
+import { sessionStore } from '../sessions/store.js';
+import { generateFingerprint, checkDuplicates } from '../sessions/fingerprint.js';
+import type { SessionQuery } from '../sessions/types.js';
 import {
   selectSources,
   mapArgsToSource,
@@ -71,6 +80,10 @@ interface SearchResponse {
   };
   _routing?: RoutingExplanation;
   _suggestions?: NameSuggestion[];
+  _session?: {
+    uniqueResults: number;
+    duplicatesRemoved: number;
+  };
 }
 
 interface RoutingExplanation {
@@ -194,6 +207,21 @@ export const searchMetaTool: SourceTool = {
       }
     }
 
+    // ENH-001: Validate explicit sources and warn about invalid ones
+    const validSourceNames = getValidSources();
+    const invalidSources: string[] = [];
+    if (input.sources && input.sources.length > 0) {
+      const validatedSources: string[] = [];
+      for (const s of input.sources) {
+        if (validSourceNames.includes(s)) {
+          validatedSources.push(s);
+        } else {
+          invalidSources.push(s);
+        }
+      }
+      input.sources = validatedSources;
+    }
+
     // Smart source selection using intent classification
     let intentResult: IntentResult | undefined;
     let excludedSources: Record<string, string> = {};
@@ -280,9 +308,99 @@ export const searchMetaTool: SourceTool = {
       });
     }
 
+    // ENH-001: Add invalid source warnings
+    if (invalidSources.length > 0) {
+      errors.push({
+        source: 'validation',
+        error: `Invalid sources ignored: ${invalidSources.join(', ')}. Valid sources: ${validSourceNames.join(', ')}`,
+      });
+    }
+
     // Calculate totals
     const totalResults = successResults.reduce((sum, r) => sum + r.count, 0);
     const endTime = Date.now();
+
+    // =========================================================================
+    // Phase 2: Auto-logging to active session
+    // =========================================================================
+    let sessionStats: { uniqueCount: number; duplicatesRemoved: number } | undefined;
+    const activeSession = sessionStore.getActive();
+
+    if (activeSession) {
+      const queryId = randomUUID();
+      let uniqueCount = 0;
+      let duplicatesRemoved = 0;
+
+      // Get existing fingerprints for duplicate checking
+      const existingFingerprints = activeSession.fingerprints;
+
+      // Process each source's results
+      for (const sourceResult of successResults) {
+        const source = sourceResult.source;
+
+        // Build batch for deduplication check
+        const batch = sourceResult.records.map((record) => ({
+          result: record as Record<string, unknown>,
+          source,
+        }));
+
+        // Check for duplicates
+        const duplicateResults = checkDuplicates(batch, existingFingerprints);
+
+        // Add new fingerprints for unique results
+        for (let i = 0; i < batch.length; i++) {
+          const dupCheck = duplicateResults.get(i);
+          if (dupCheck?.isDuplicate) {
+            duplicatesRemoved++;
+          } else {
+            const fp = generateFingerprint(batch[i].result, source, queryId);
+            sessionStore.addFingerprint(activeSession.id, fp);
+            // Add to existing fingerprints for subsequent checks within this query
+            existingFingerprints.push(fp);
+            uniqueCount++;
+          }
+        }
+
+        // Update source coverage
+        const hasResults = sourceResult.count > 0;
+        sessionStore.updateCoverage(
+          activeSession.id,
+          source,
+          hasResults ? 'searched' : 'searched'
+        );
+      }
+
+      // Update coverage for sources that had errors
+      for (const err of errors) {
+        sessionStore.updateCoverage(activeSession.id, err.source, 'failed');
+      }
+
+      // Log the query
+      const sessionQuery: SessionQuery = {
+        id: queryId,
+        timestamp: new Date().toISOString(),
+        tool: 'search',
+        sources: filteredRoutes.map((r) => r.source),
+        query: input.query,
+        filters: {
+          type: input.type,
+          dateFrom: input.dateFrom,
+          dateTo: input.dateTo,
+          state: input.state,
+          limit: input.limit,
+          lat: input.lat,
+          lon: input.lon,
+          radiusKm: input.radiusKm,
+        },
+        resultCount: totalResults,
+        uniqueCount,
+        duplicatesRemoved,
+        durationMs: endTime - startTime,
+      };
+      sessionStore.logQuery(activeSession.id, sessionQuery);
+
+      sessionStats = { uniqueCount, duplicatesRemoved };
+    }
 
     const response: SearchResponse = {
       query: input.query,
@@ -295,6 +413,12 @@ export const searchMetaTool: SourceTool = {
         total_ms: endTime - startTime,
         sources: timings,
       },
+      ...(sessionStats && {
+        _session: {
+          uniqueResults: sessionStats.uniqueCount,
+          duplicatesRemoved: sessionStats.duplicatesRemoved,
+        },
+      }),
     };
 
     // Add routing explanation if explain mode enabled
