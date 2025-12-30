@@ -8,9 +8,11 @@
 
 import { getBuilder, hasBuilder } from './query/index.js';
 import type { ParsedQuery } from './query/types.js';
+import type { IntentAnalysis, EntityType } from './search/intent.js';
+import { getExtendedCoverage } from './search/temporal.js';
 
 // ============================================================================
-// Types
+// Types - Original (backward compatibility)
 // ============================================================================
 
 export interface SourceRoute {
@@ -37,6 +39,55 @@ export interface CommonSearchArgs {
   lon?: number;
   radiusKm?: number;
   [key: string]: unknown;
+}
+
+// ============================================================================
+// Types - Enhanced (Phase 1 Research Planning)
+// ============================================================================
+
+/** Relevance level for source prioritisation */
+export type RelevanceLevel = 'high' | 'medium' | 'low';
+
+/** Individual prioritised source with reasoning */
+export interface PrioritisedSource {
+  /** Source identifier */
+  source: string;
+  /** Tool name for search */
+  tool: string;
+  /** Relevance level based on intent analysis */
+  relevance: RelevanceLevel;
+  /** Human-readable reason for this relevance */
+  reason: string;
+  /** Additional tools available for this source */
+  suggestedTools: string[];
+  /** Suggested filters based on intent */
+  suggestedFilters: Record<string, unknown>;
+  /** Relevance score (0-100) */
+  score: number;
+}
+
+/** Excluded source with reason */
+export interface ExcludedSource {
+  /** Source identifier */
+  source: string;
+  /** Reason for exclusion */
+  reason: string;
+}
+
+/** Complete source prioritisation result */
+export interface SourcePrioritisation {
+  /** Sources ordered by relevance */
+  prioritised: PrioritisedSource[];
+  /** Sources excluded from search */
+  excluded: ExcludedSource[];
+  /** Recommended execution order (source names) */
+  searchOrder: string[];
+}
+
+/** Source relevance score with reasoning */
+interface RelevanceScore {
+  score: number;
+  reason: string;
 }
 
 // ============================================================================
@@ -359,4 +410,297 @@ export function getValidSources(): string[] {
  */
 export function isValidSource(source: string): boolean {
   return SOURCE_ROUTES.some((r) => r.source === source);
+}
+
+// ============================================================================
+// Enhanced Routing (Phase 1 Research Planning)
+// ============================================================================
+
+/**
+ * Maps research themes to relevant sources.
+ * Used for intelligent source selection based on intent analysis.
+ */
+const THEME_SOURCE_MAP: Record<string, string[]> = {
+  sports: ['trove', 'prov', 'museumsvic', 'nma'],
+  architecture: ['vhd', 'trove', 'prov', 'ga-hap'],
+  politics: ['trove', 'prov', 'nma'],
+  military: ['trove', 'nma', 'prov'],
+  indigenous: ['nma', 'trove', 'museumsvic'],
+  nature: ['ala', 'museumsvic', 'trove'],
+  transport: ['prov', 'trove', 'vhd', 'ga-hap'],
+  immigration: ['prov', 'trove', 'nma'],
+  gold: ['prov', 'trove', 'museumsvic', 'vhd'],
+  film: ['acmi', 'trove', 'nma'],
+  television: ['acmi', 'trove'],
+  geography: ['ghap', 'ga-hap', 'trove'],
+  heritage: ['vhd', 'trove', 'prov'],
+  local: ['prov', 'trove', 'vhd', 'ghap'],
+};
+
+/**
+ * Maps entity types to relevant sources.
+ */
+const ENTITY_SOURCE_MAP: Record<EntityType, string[]> = {
+  person: ['trove', 'prov', 'nma', 'acmi'],
+  place: ['ghap', 'vhd', 'ga-hap', 'trove', 'prov'],
+  event: ['trove', 'prov', 'nma'],
+  object: ['museumsvic', 'nma', 'prov'],
+  organisation: ['trove', 'prov', 'nma'],
+};
+
+/**
+ * Additional tools available for each source.
+ */
+const SOURCE_TOOLS: Record<string, string[]> = {
+  prov: ['prov_search', 'prov_get_images', 'prov_harvest', 'prov_get_agency', 'prov_get_series'],
+  trove: ['trove_search', 'trove_harvest', 'trove_newspaper_article', 'trove_get_work'],
+  museumsvic: ['museumsvic_search', 'museumsvic_get_item', 'museumsvic_get_species', 'museumsvic_harvest'],
+  ala: ['ala_search_occurrences', 'ala_search_species', 'ala_get_species', 'ala_harvest'],
+  nma: ['nma_search_objects', 'nma_get_object', 'nma_search_places', 'nma_harvest'],
+  vhd: ['vhd_search_places', 'vhd_get_place', 'vhd_search_shipwrecks', 'vhd_harvest'],
+  acmi: ['acmi_search_works', 'acmi_get_work', 'acmi_harvest'],
+  ghap: ['ghap_search', 'ghap_get_place', 'ghap_list_layers', 'ghap_harvest'],
+  'ga-hap': ['ga_hap_search', 'ga_hap_get_photo', 'ga_hap_harvest'],
+};
+
+/**
+ * Score a source's relevance to an intent analysis.
+ *
+ * @param source - Source identifier
+ * @param intent - Intent analysis from query
+ * @returns Score (0-100) and reason
+ */
+export function scoreSourceRelevance(source: string, intent: IntentAnalysis): RelevanceScore {
+  let score = 0;
+  const reasons: string[] = [];
+
+  // Theme matching (up to 40 points)
+  for (const theme of intent.themes) {
+    const themeSources = THEME_SOURCE_MAP[theme];
+    if (themeSources?.includes(source)) {
+      const themeIndex = themeSources.indexOf(source);
+      const themeScore = Math.max(0, 10 - themeIndex * 2);
+      score += themeScore;
+      reasons.push(`${theme} theme match`);
+    }
+  }
+  score = Math.min(score, 40);
+
+  // Entity type matching (up to 30 points)
+  for (const entityType of intent.entityTypes) {
+    const entitySources = ENTITY_SOURCE_MAP[entityType];
+    if (entitySources?.includes(source)) {
+      const entityIndex = entitySources.indexOf(source);
+      const entityScore = Math.max(0, 10 - entityIndex * 2);
+      score += entityScore;
+      reasons.push(`${entityType} entity support`);
+    }
+  }
+  score = Math.min(score, 70);
+
+  // Location matching (up to 15 points)
+  if (intent.locations.length > 0) {
+    // Victoria-specific sources get bonus for VIC locations
+    const hasVic = intent.locations.some((l) => l.state === 'VIC' || l.state === 'Victoria');
+    if (hasVic && ['prov', 'vhd', 'museumsvic'].includes(source)) {
+      score += 15;
+      reasons.push('Victorian location match');
+    } else if (intent.locations.length > 0 && ['ghap', 'trove'].includes(source)) {
+      score += 10;
+      reasons.push('Place-aware source');
+    }
+  }
+
+  // Date range matching (up to 15 points)
+  if (intent.dateRange) {
+    const coverage = getExtendedCoverage(source);
+    if (coverage) {
+      const from = parseInt(intent.dateRange.from ?? '1788', 10);
+      const to = parseInt(intent.dateRange.to ?? '2024', 10);
+      if (coverage.fromYear <= from && coverage.toYear >= to) {
+        score += 15;
+        reasons.push('Full date coverage');
+      } else if (coverage.fromYear <= to && coverage.toYear >= from) {
+        score += 8;
+        reasons.push('Partial date coverage');
+      }
+    }
+  }
+
+  const reason = reasons.length > 0 ? reasons.join(', ') : 'General relevance';
+  return { score: Math.min(score, 100), reason };
+}
+
+/**
+ * Suggest filters for a source based on intent analysis.
+ *
+ * @param source - Source identifier
+ * @param intent - Intent analysis from query
+ * @returns Suggested filter parameters
+ */
+export function suggestFilters(source: string, intent: IntentAnalysis): Record<string, unknown> {
+  const filters: Record<string, unknown> = {};
+
+  // Apply date range if detected
+  if (intent.dateRange) {
+    if (source === 'trove' || source === 'prov') {
+      if (intent.dateRange.from) filters.dateFrom = intent.dateRange.from;
+      if (intent.dateRange.to) filters.dateTo = intent.dateRange.to;
+    } else if (source === 'ga-hap') {
+      if (intent.dateRange.from) filters.yearFrom = parseInt(intent.dateRange.from, 10);
+      if (intent.dateRange.to) filters.yearTo = parseInt(intent.dateRange.to, 10);
+    } else if (source === 'ala') {
+      if (intent.dateRange.from) filters.startYear = parseInt(intent.dateRange.from, 10);
+      if (intent.dateRange.to) filters.endYear = parseInt(intent.dateRange.to, 10);
+    }
+  }
+
+  // Apply state filter from locations
+  const states = intent.locations
+    .filter((l) => l.state)
+    .map((l) => l.state);
+  if (states.length > 0) {
+    const state = states[0]; // Use first state
+    if (['trove', 'ghap', 'ga-hap'].includes(source)) {
+      filters.state = state;
+    }
+  }
+
+  // Source-specific suggestions
+  switch (source) {
+    case 'trove':
+      // Suggest newspaper category for historical research
+      if (intent.themes.includes('politics') || intent.themes.includes('sports')) {
+        filters.category = 'newspaper';
+      }
+      break;
+    case 'prov':
+      filters.digitisedOnly = true;
+      break;
+    case 'museumsvic':
+      filters.hasImages = true;
+      break;
+    case 'ga-hap':
+      filters.scannedOnly = true;
+      break;
+  }
+
+  return filters;
+}
+
+/**
+ * Determine optimal search order based on prioritised sources.
+ *
+ * @param prioritised - Prioritised sources with scores
+ * @returns Ordered list of source names
+ */
+export function determineSearchOrder(prioritised: PrioritisedSource[]): string[] {
+  // Already sorted by score, but apply additional heuristics
+
+  // Group by relevance level
+  const high = prioritised.filter((p) => p.relevance === 'high');
+  const medium = prioritised.filter((p) => p.relevance === 'medium');
+  const low = prioritised.filter((p) => p.relevance === 'low');
+
+  // Within each group, prefer sources with broad content first
+  const broadSources = ['trove', 'prov', 'nma'];
+  const sortByBreadth = (a: PrioritisedSource, b: PrioritisedSource) => {
+    const aIdx = broadSources.indexOf(a.source);
+    const bIdx = broadSources.indexOf(b.source);
+    if (aIdx >= 0 && bIdx >= 0) return aIdx - bIdx;
+    if (aIdx >= 0) return -1;
+    if (bIdx >= 0) return 1;
+    return 0;
+  };
+
+  high.sort(sortByBreadth);
+  medium.sort(sortByBreadth);
+  low.sort(sortByBreadth);
+
+  return [...high, ...medium, ...low].map((p) => p.source);
+}
+
+/**
+ * Route sources based on intent analysis with relevance scoring.
+ *
+ * @param intent - Intent analysis from query
+ * @param contentTypes - Optional content type filter
+ * @returns Complete source prioritisation with reasoning
+ */
+export function routeSources(
+  intent: IntentAnalysis,
+  contentTypes?: ContentType[]
+): SourcePrioritisation {
+  const prioritised: PrioritisedSource[] = [];
+  const excluded: ExcludedSource[] = [];
+
+  // Score all sources
+  for (const route of SOURCE_ROUTES) {
+    // Check content type filter
+    if (contentTypes && contentTypes.length > 0) {
+      const hasMatchingType = route.types.some((t) => contentTypes.includes(t));
+      if (!hasMatchingType) {
+        excluded.push({
+          source: route.source,
+          reason: `Content types ${route.types.join(', ')} don't match requested ${contentTypes.join(', ')}`,
+        });
+        continue;
+      }
+    }
+
+    // Check date coverage
+    if (intent.dateRange) {
+      const coverage = getExtendedCoverage(route.source);
+      if (coverage) {
+        const from = parseInt(intent.dateRange.from ?? '1788', 10);
+        const to = parseInt(intent.dateRange.to ?? '2024', 10);
+        if (coverage.toYear < from || coverage.fromYear > to) {
+          excluded.push({
+            source: route.source,
+            reason: `Coverage ${coverage.fromYear}-${coverage.toYear} doesn't overlap ${from}-${to}`,
+          });
+          continue;
+        }
+      }
+    }
+
+    // Score relevance
+    const { score, reason } = scoreSourceRelevance(route.source, intent);
+
+    // Determine relevance level
+    let relevance: RelevanceLevel;
+    if (score >= 50) {
+      relevance = 'high';
+    } else if (score >= 25) {
+      relevance = 'medium';
+    } else {
+      relevance = 'low';
+    }
+
+    // Get suggested filters and tools
+    const suggestedFilters = suggestFilters(route.source, intent);
+    const suggestedTools = SOURCE_TOOLS[route.source] ?? [route.tool];
+
+    prioritised.push({
+      source: route.source,
+      tool: route.tool,
+      relevance,
+      reason,
+      suggestedTools,
+      suggestedFilters,
+      score,
+    });
+  }
+
+  // Sort by score descending
+  prioritised.sort((a, b) => b.score - a.score);
+
+  // Determine search order
+  const searchOrder = determineSearchOrder(prioritised);
+
+  return {
+    prioritised,
+    excluded,
+    searchOrder,
+  };
 }

@@ -1,7 +1,7 @@
 /**
  * Meta-Tools Barrel Export
  *
- * Exports all 10 meta-tools for the dynamic loading architecture.
+ * Exports all 11 meta-tools for the dynamic loading architecture.
  * These are the only tools exposed via ListToolsRequest.
  */
 
@@ -17,6 +17,8 @@ import { saveQueryMetaTool } from './save-query.js';
 import { listQueriesMetaTool } from './list-queries.js';
 import { runQueryMetaTool } from './run-query.js';
 import { deleteQueryMetaTool } from './delete-query.js';
+// Phase 1: Research planning meta-tool
+import { planSearchMetaTool } from './plan-search.js';
 
 /**
  * All meta-tools in order of typical usage:
@@ -30,6 +32,7 @@ import { deleteQueryMetaTool } from './delete-query.js';
  * 8. list_queries - list saved queries
  * 9. run_query - execute a saved query
  * 10. delete_query - remove a saved query
+ * 11. plan_search - analyse topic and generate research plan
  */
 export const metaTools: SourceTool[] = [
   toolsMetaTool,
@@ -43,6 +46,8 @@ export const metaTools: SourceTool[] = [
   listQueriesMetaTool,
   runQueryMetaTool,
   deleteQueryMetaTool,
+  // Phase 1: Research planning meta-tool
+  planSearchMetaTool,
 ];
 
 // Named exports for direct access
@@ -57,3 +62,5 @@ export { saveQueryMetaTool } from './save-query.js';
 export { listQueriesMetaTool } from './list-queries.js';
 export { runQueryMetaTool } from './run-query.js';
 export { deleteQueryMetaTool } from './delete-query.js';
+// Phase 1: Research planning meta-tool
+export { planSearchMetaTool } from './plan-search.js';
