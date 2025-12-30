@@ -17,7 +17,6 @@ import type {
   ResultFingerprint,
   SourceCoverage,
   ListSessionOptions,
-  SessionStatus,
 } from './types.js';
 import {
   createInitialCoverage,
@@ -26,7 +25,7 @@ import {
   isValidSessionName,
 } from './types.js';
 
-const STORE_VERSION = 1;
+const _STORE_VERSION = 1; // Reserved for future store migrations
 const DATA_DIR = join(homedir(), '.local', 'share', 'australian-history-mcp');
 const SESSIONS_PATH = join(DATA_DIR, 'sessions.json');
 

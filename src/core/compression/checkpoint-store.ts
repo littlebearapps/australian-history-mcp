@@ -18,7 +18,7 @@ import type {
 } from './types.js';
 import { createEmptyCheckpointStoreFile, isValidCheckpointName } from './types.js';
 
-const STORE_VERSION = 1;
+const _STORE_VERSION = 1; // Reserved for future store migrations
 const DATA_DIR = join(homedir(), '.local', 'share', 'australian-history-mcp');
 const CHECKPOINTS_PATH = join(DATA_DIR, 'checkpoints.json');
 

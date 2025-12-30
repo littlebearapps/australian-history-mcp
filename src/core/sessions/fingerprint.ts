@@ -14,9 +14,9 @@
 import { createHash } from 'crypto';
 import type { ResultFingerprint, DuplicateCheckResult } from './types.js';
 
-// Similarity thresholds for title matching
-const SAME_SOURCE_THRESHOLD = 0.85;
-const CROSS_SOURCE_THRESHOLD = 0.9;
+// Similarity thresholds for title matching (reserved for future fuzzy matching)
+const _SAME_SOURCE_THRESHOLD = 0.85;
+const _CROSS_SOURCE_THRESHOLD = 0.9;
 
 /**
  * Normalise a URL for comparison
@@ -324,10 +324,9 @@ export function isDuplicate(
     for (const fp of existingFingerprints) {
       if (!fp.titleHash) continue;
 
-      // Use appropriate threshold based on source
-      const threshold =
-        fp.source === source ? SAME_SOURCE_THRESHOLD : CROSS_SOURCE_THRESHOLD;
-
+      // Note: Threshold would be calculated as:
+      // fp.source === source ? SAME_SOURCE_THRESHOLD : CROSS_SOURCE_THRESHOLD
+      //
       // We need to retrieve the original title to compare
       // Since we only store the hash, we compare hashes for exact match
       // For fuzzy matching, we'd need to store titles which is expensive
@@ -366,7 +365,7 @@ export function checkDuplicates(
 
   // Check each result
   for (let i = 0; i < results.length; i++) {
-    const { result, source } = results[i];
+    const { result, source: _source } = results[i];
 
     const url = extractUrl(result);
     const title = extractTitle(result);

@@ -9,7 +9,7 @@ import { dirname } from 'path';
 import type { SourceTool } from '../base-source.js';
 import { successResponse, errorResponse } from '../types.js';
 import { sessionStore } from '../sessions/store.js';
-import type { Session, SessionQuery, SourceCoverage } from '../sessions/types.js';
+import type { Session } from '../sessions/types.js';
 
 /**
  * Generate Markdown export
