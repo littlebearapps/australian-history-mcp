@@ -1,7 +1,7 @@
 /**
  * Meta-Tools Barrel Export
  *
- * Exports all 18 meta-tools for the dynamic loading architecture.
+ * Exports all 22 meta-tools for the dynamic loading architecture.
  * These are the only tools exposed via ListToolsRequest.
  */
 
@@ -27,6 +27,11 @@ import { sessionStatusMetaTool } from './session-status.js';
 import { sessionListMetaTool } from './session-list.js';
 import { sessionExportMetaTool } from './session-export.js';
 import { sessionNoteMetaTool } from './session-note.js';
+// Phase 3: Context compression meta-tools
+import { dedupeMetaTool } from './dedupe.js';
+import { compressMetaTool } from './compress.js';
+import { urlsMetaTool } from './urls.js';
+import { checkpointMetaTool } from './checkpoint.js';
 
 /**
  * All meta-tools in order of typical usage:
@@ -48,6 +53,10 @@ import { sessionNoteMetaTool } from './session-note.js';
  * 16. session_list - list all sessions
  * 17. session_export - export session data
  * 18. session_note - add notes to a session
+ * 19. dedupe - remove duplicate records
+ * 20. compress - compress records to reduce tokens
+ * 21. urls - extract URLs from records
+ * 22. checkpoint - save/load research checkpoints
  */
 export const metaTools: SourceTool[] = [
   toolsMetaTool,
@@ -71,6 +80,11 @@ export const metaTools: SourceTool[] = [
   sessionListMetaTool,
   sessionExportMetaTool,
   sessionNoteMetaTool,
+  // Phase 3: Context compression meta-tools
+  dedupeMetaTool,
+  compressMetaTool,
+  urlsMetaTool,
+  checkpointMetaTool,
 ];
 
 // Named exports for direct access
@@ -95,3 +109,8 @@ export { sessionStatusMetaTool } from './session-status.js';
 export { sessionListMetaTool } from './session-list.js';
 export { sessionExportMetaTool } from './session-export.js';
 export { sessionNoteMetaTool } from './session-note.js';
+// Phase 3: Context compression meta-tools
+export { dedupeMetaTool } from './dedupe.js';
+export { compressMetaTool } from './compress.js';
+export { urlsMetaTool } from './urls.js';
+export { checkpointMetaTool } from './checkpoint.js';
