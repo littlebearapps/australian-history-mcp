@@ -114,6 +114,50 @@ const STATE_ABBREVIATIONS: Record<string, string> = {
 };
 
 // ============================================================================
+// Capital Cities (for location disambiguation)
+// ============================================================================
+
+/**
+ * Capital cities with their state - used to prioritize major cities
+ * over minor placenames with the same name.
+ */
+const CAPITAL_CITIES = new Map<string, string>([
+  ['melbourne', 'VIC'],
+  ['sydney', 'NSW'],
+  ['brisbane', 'QLD'],
+  ['perth', 'WA'],
+  ['adelaide', 'SA'],
+  ['hobart', 'TAS'],
+  ['darwin', 'NT'],
+  ['canberra', 'ACT'],
+]);
+
+// ============================================================================
+// Location Stoplist (to prevent false positives)
+// ============================================================================
+
+/**
+ * Words that should NOT be matched as locations via GHAP.
+ * These are common English words that happen to match minor placenames.
+ */
+const LOCATION_STOPLIST = new Set([
+  // Species names (match to minor placenames like "Platypus, QLD")
+  'platypus', 'koala', 'kangaroo', 'wombat', 'echidna', 'possum', 'emu',
+  'wallaby', 'dingo', 'bilby', 'quokka', 'numbat', 'bandicoot',
+  // Content types
+  'photographs', 'photograph', 'documents', 'records', 'archives',
+  'letters', 'maps', 'articles', 'newspapers', 'images', 'pictures',
+  // Research terms
+  'heritage', 'historical', 'colonial', 'aboriginal', 'indigenous',
+  'historic', 'ancient', 'old', 'early', 'modern',
+  // Photography terms
+  'aerial', 'panorama', 'portrait', 'landscape', 'studio', 'snapshot',
+  // Common adjectives/nouns that match placenames
+  'royal', 'diamond', 'golden', 'victory', 'union', 'hope', 'sunrise',
+  'sunset', 'paradise', 'pleasant', 'happy', 'lucky',
+]);
+
+// ============================================================================
 // Intent Keywords
 // ============================================================================
 
@@ -335,6 +379,19 @@ const THEME_KEYWORDS: Record<string, string[]> = {
     'river', 'creek', 'park', 'garden', 'tree', 'flood', 'drought',
     'climate', 'weather', 'wildlife', 'conservation',
   ],
+  // BUG-004: Add biodiversity theme for ALA prioritization
+  biodiversity: [
+    'species', 'fauna', 'flora', 'wildlife', 'biodiversity', 'animal',
+    'plant', 'specimen', 'sightings', 'observations', 'occurrence',
+    'platypus', 'koala', 'kangaroo', 'wombat', 'echidna', 'possum',
+    'bird', 'mammal', 'reptile', 'insect', 'fish', 'marsupial',
+  ],
+  // BUG-002: Add photography theme for GA-HAP prioritization
+  photography: [
+    'photograph', 'photo', 'image', 'picture', 'aerial', 'airphoto',
+    'snapshot', 'portrait', 'studio', 'daguerreotype', 'lantern slide',
+    'overhead', 'survey', 'flight',
+  ],
 };
 
 /** Date extraction patterns with extractors */
@@ -446,6 +503,10 @@ export function extractPotentialLocations(query: string): string[] {
     const words = candidate.toLowerCase().split(/\s+/);
     // Skip if all words are common non-place words
     if (!words.every((w) => skipWords.has(w)) && candidate.length > 2) {
+      // BUG-003: Filter single-word stoplist terms (multi-word like "Platypus Creek" allowed)
+      if (words.length === 1 && LOCATION_STOPLIST.has(words[0])) {
+        continue;
+      }
       locations.push(candidate);
     }
   }
@@ -475,18 +536,48 @@ export async function validateLocationsViaGHAP(
 
   for (const name of potentialLocations) {
     try {
-      // Query GHAP with fuzzy name matching
+      // BUG-001: Check if this is a capital city first
+      const nameLower = name.toLowerCase();
+      const capitalState = CAPITAL_CITIES.get(nameLower);
+
+      if (capitalState) {
+        // Capital city - use known state directly (no GHAP needed)
+        validated.push({
+          name: name,
+          state: capitalState,
+          validated: true,
+        });
+        continue;
+      }
+
+      // Query GHAP with fuzzy name matching (increased limit for disambiguation)
       const result = await ghapClient.search({
         fuzzyname: name,
-        limit: 1,
+        limit: 10,
       });
 
       if (result.places.length > 0) {
-        const place = result.places[0];
+        // BUG-001: Prioritize results - prefer capital cities, then by name match
+        let bestPlace = result.places[0];
+
+        for (const place of result.places) {
+          const placeLower = place.name.toLowerCase();
+          // Check if any result is a capital city
+          const placeCapitalState = CAPITAL_CITIES.get(placeLower);
+          if (placeCapitalState && place.state === placeCapitalState) {
+            bestPlace = place;
+            break;
+          }
+          // Prefer exact name match over fuzzy match
+          if (placeLower === nameLower && bestPlace.name.toLowerCase() !== nameLower) {
+            bestPlace = place;
+          }
+        }
+
         validated.push({
-          name: place.name,
-          state: place.state,
-          ghapId: place.id,
+          name: bestPlace.name,
+          state: bestPlace.state,
+          ghapId: bestPlace.id,
           validated: true,
         });
       } else {

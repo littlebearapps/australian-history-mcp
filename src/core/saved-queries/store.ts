@@ -187,11 +187,13 @@ export class SavedQueriesStore {
 
     if (options.search) {
       const searchLower = options.search.toLowerCase();
-      queries = queries.filter(
-        (q) =>
-          q.name.toLowerCase().includes(searchLower) ||
-          q.description?.toLowerCase().includes(searchLower)
-      );
+      queries = queries.filter((q) => {
+        // BUG-009: Search name, description, AND parameters
+        const nameMatch = q.name.toLowerCase().includes(searchLower);
+        const descMatch = q.description?.toLowerCase().includes(searchLower);
+        const paramsMatch = JSON.stringify(q.parameters).toLowerCase().includes(searchLower);
+        return nameMatch || descMatch || paramsMatch;
+      });
     }
 
     // Apply sorting

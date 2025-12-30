@@ -207,6 +207,21 @@ export const searchMetaTool: SourceTool = {
       }
     }
 
+    // ENH-001: Validate explicit sources and warn about invalid ones
+    const validSourceNames = getValidSources();
+    const invalidSources: string[] = [];
+    if (input.sources && input.sources.length > 0) {
+      const validatedSources: string[] = [];
+      for (const s of input.sources) {
+        if (validSourceNames.includes(s)) {
+          validatedSources.push(s);
+        } else {
+          invalidSources.push(s);
+        }
+      }
+      input.sources = validatedSources;
+    }
+
     // Smart source selection using intent classification
     let intentResult: IntentResult | undefined;
     let excludedSources: Record<string, string> = {};
@@ -290,6 +305,14 @@ export const searchMetaTool: SourceTool = {
       errors.push({
         source: 'trove',
         error: 'Skipped: TROVE_API_KEY not configured',
+      });
+    }
+
+    // ENH-001: Add invalid source warnings
+    if (invalidSources.length > 0) {
+      errors.push({
+        source: 'validation',
+        error: `Invalid sources ignored: ${invalidSources.join(', ')}. Valid sources: ${validSourceNames.join(', ')}`,
       });
     }
 

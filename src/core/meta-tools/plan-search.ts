@@ -132,6 +132,27 @@ function generateSearchPlan(
     }
   }
 
+  // BUG-005: Fallback - ensure at least 2 search steps are generated
+  if (steps.length === 0 && stepNum <= maxSearches) {
+    // Use general-purpose sources (Trove, PROV) as fallback
+    const fallbackSources = ['trove', 'prov', 'nma'];
+    for (const sourceName of fallbackSources) {
+      if (stepNum > maxSearches) break;
+      const sourceInfo = sourcePriority.prioritised.find((p) => p.source === sourceName);
+      if (sourceInfo) {
+        steps.push({
+          step: stepNum++,
+          phase: 'discovery',
+          action: sourceInfo.tool,
+          query: topic,
+          source: sourceName,
+          filters: sourceInfo.suggestedFilters,
+          rationale: `Fallback search: ${sourceName} covers broad historical content`,
+        });
+      }
+    }
+  }
+
   return steps;
 }
 

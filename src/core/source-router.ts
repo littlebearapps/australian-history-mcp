@@ -435,6 +435,10 @@ const THEME_SOURCE_MAP: Record<string, string[]> = {
   geography: ['ghap', 'ga-hap', 'trove'],
   heritage: ['vhd', 'trove', 'prov'],
   local: ['prov', 'trove', 'vhd', 'ghap'],
+  // BUG-004: Add biodiversity theme for ALA prioritization
+  biodiversity: ['ala', 'museumsvic', 'nma', 'trove'],
+  // BUG-002: Add photography theme for GA-HAP prioritization
+  photography: ['ga-hap', 'prov', 'trove', 'nma', 'museumsvic'],
 };
 
 /**
@@ -474,6 +478,14 @@ export function scoreSourceRelevance(source: string, intent: IntentAnalysis): Re
   let score = 0;
   const reasons: string[] = [];
 
+  // BUG-002: Special aerial keyword detection for GA-HAP priority
+  const queryLower = intent.query.toLowerCase();
+  const hasAerialKeyword = /\b(aerial|airphoto|overhead|flight survey)\b/i.test(queryLower);
+  if (hasAerialKeyword && source === 'ga-hap') {
+    score += 50; // Major boost for aerial photo queries
+    reasons.push('aerial photo specialization');
+  }
+
   // Theme matching (up to 40 points)
   for (const theme of intent.themes) {
     const themeSources = THEME_SOURCE_MAP[theme];
@@ -484,7 +496,7 @@ export function scoreSourceRelevance(source: string, intent: IntentAnalysis): Re
       reasons.push(`${theme} theme match`);
     }
   }
-  score = Math.min(score, 40);
+  score = Math.min(score, hasAerialKeyword && source === 'ga-hap' ? 100 : 40);
 
   // Entity type matching (up to 30 points)
   for (const entityType of intent.entityTypes) {

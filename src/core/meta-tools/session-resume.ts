@@ -33,7 +33,17 @@ export const sessionResumeMetaTool: SourceTool = {
     }
 
     try {
-      const session = sessionStore.resume(id);
+      // BUG-006: Try as UUID first, then as session name
+      let session = sessionStore.get(id);
+      if (!session) {
+        session = sessionStore.getByName(id);
+      }
+      if (!session) {
+        return errorResponse(`Session not found: "${id}". Use session_list to see available sessions.`);
+      }
+
+      // Now resume the found session by its actual ID
+      session = sessionStore.resume(session.id);
 
       const coverageSummary = sessionStore.getCoverageSummary(session.id);
 

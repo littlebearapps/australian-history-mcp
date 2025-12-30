@@ -430,6 +430,11 @@ export class SessionStore {
       throw new Error(`Session '${sessionId}' not found.`);
     }
 
+    // BUG-007: Check for duplicate fingerprints before adding
+    if (session.fingerprints.some((fp) => fp.id === fingerprint.id)) {
+      return; // Skip duplicate fingerprint
+    }
+
     session.fingerprints.push(fingerprint);
     session.updated = new Date().toISOString();
     this.save();
