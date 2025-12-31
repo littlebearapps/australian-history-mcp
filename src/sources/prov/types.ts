@@ -155,3 +155,97 @@ export interface PROVAgency {
   status?: string;
   seriesCount?: number;
 }
+
+// ============================================================================
+// Internal API Response Types (for client.ts type safety)
+// ============================================================================
+
+/**
+ * Raw document from PROV Solr API response
+ */
+export interface PROVSolrDoc {
+  _id?: string;
+  id?: string;
+  title?: string;
+  name?: string;
+  description?: string;
+  presentation_text?: string;
+  'description.aggregate'?: string;
+  series_id?: string | number;
+  'is_part_of_series.title'?: string | string[];
+  'agencies.ids'?: string | string[];
+  'agencies.titles'?: string | string[];
+  record_form?: string | string[];
+  start_dt?: string;
+  end_dt?: string;
+  'iiif-manifest'?: string;
+  citation?: string;
+  VA?: string | number;
+  history?: string;
+  scope_content?: string;
+  status?: string;
+  series_count?: number;
+  'identifier.PROV_ACM.id'?: string;
+  resp_agency_id?: string | string[];
+  resp_agency_title?: string | string[];
+  rights_status?: string | string[];
+  item_count?: number;
+  function_content?: string | string[];
+}
+
+/**
+ * PROV Solr API search response structure
+ */
+export interface PROVSolrResponse {
+  response?: {
+    numFound?: number;
+    start?: number;
+    docs?: PROVSolrDoc[];
+  };
+  facet_counts?: {
+    facet_fields?: Record<string, unknown[]>;
+  };
+}
+
+/**
+ * IIIF v2/v3 manifest structure (simplified)
+ */
+export interface IIIFManifest {
+  label?: string | string[] | Record<string, string[]> | Array<{ '@value': string }>;
+  description?: string | string[] | Record<string, string[]> | Array<{ '@value': string }>;
+  summary?: string | string[] | Record<string, string[]>;
+  sequences?: IIIFSequence[];
+  items?: IIIFCanvas[];
+}
+
+export interface IIIFSequence {
+  canvases?: IIIFCanvas[];
+}
+
+export interface IIIFCanvas {
+  label?: string;
+  images?: IIIFImage[];
+  items?: IIIFAnnotationPage[];
+}
+
+export interface IIIFImage {
+  resource?: {
+    '@id'?: string;
+    service?: IIIFService | IIIFService[];
+  };
+}
+
+export interface IIIFAnnotationPage {
+  items?: IIIFAnnotation[];
+}
+
+export interface IIIFAnnotation {
+  body?: {
+    service?: IIIFService | IIIFService[];
+  };
+}
+
+export interface IIIFService {
+  '@id'?: string;
+  id?: string;
+}

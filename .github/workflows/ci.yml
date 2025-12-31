@@ -50,7 +50,6 @@ jobs:
 
       - name: Test
         run: npm test
-        continue-on-error: true  # No tests yet
 
   security:
     name: Security Audit

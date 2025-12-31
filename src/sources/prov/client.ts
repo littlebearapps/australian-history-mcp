@@ -19,6 +19,11 @@ import type {
   PROVImagesResult,
   PROVFacetField,
   PROVFacet,
+  PROVSolrDoc,
+  PROVSolrResponse,
+  IIIFManifest,
+  IIIFCanvas,
+  IIIFService,
 } from './types.js';
 import { PROV_FACET_DISPLAY_NAMES, PROV_SORT_MAPPINGS } from './types.js';
 
@@ -102,7 +107,7 @@ export class PROVClient extends BaseClient {
     }
 
     const url = `${this.baseUrl}/query?${urlParams.toString()}`;
-    const data = await this.fetchJSON<any>(url);
+    const data = await this.fetchJSON<PROVSolrResponse>(url);
     return this.parseSearchResponse(data, start, rows, params.includeFacets);
   }
 
@@ -118,7 +123,7 @@ export class PROVClient extends BaseClient {
       rows: 1,
     });
 
-    const data = await this.fetchJSON<{ response?: { docs?: any[] } }>(url);
+    const data = await this.fetchJSON<PROVSolrResponse>(url);
     const docs = data.response?.docs ?? [];
 
     if (docs.length === 0) {
@@ -140,7 +145,7 @@ export class PROVClient extends BaseClient {
       rows: 1,
     });
 
-    const data = await this.fetchJSON<{ response?: { docs?: any[] } }>(url);
+    const data = await this.fetchJSON<PROVSolrResponse>(url);
     const docs = data.response?.docs ?? [];
 
     if (docs.length === 0) {
@@ -158,11 +163,11 @@ export class PROVClient extends BaseClient {
     pageRange?: string;
   }): Promise<PROVImagesResult> {
     // PROV IIIF manifests reject Accept: application/json header (HTTP 406)
-    const manifest = await this.fetchJSON<any>(manifestUrl, { skipAcceptHeader: true });
+    const manifest = await this.fetchJSON<IIIFManifest>(manifestUrl, { skipAcceptHeader: true });
 
     const title = this.extractManifestTitle(manifest);
     const description = this.extractManifestDescription(manifest);
-    const canvases = manifest.sequences?.[0]?.canvases ?? manifest.items ?? [];
+    const canvases: IIIFCanvas[] = manifest.sequences?.[0]?.canvases ?? manifest.items ?? [];
 
     const pageFilter = this.parsePageFilter(options?.pages, options?.pageRange);
 
@@ -213,7 +218,7 @@ export class PROVClient extends BaseClient {
   }
 
   private parseSearchResponse(
-    data: any,
+    data: PROVSolrResponse,
     start: number,
     rows: number,
     includeFacets?: boolean
@@ -225,7 +230,7 @@ export class PROVClient extends BaseClient {
       totalResults: response.numFound ?? 0,
       start,
       rows,
-      records: docs.map((doc: any) => this.parseRecordDoc(doc)),
+      records: docs.map((doc) => this.parseRecordDoc(doc)),
     };
 
     // Parse Solr facets if requested
@@ -270,58 +275,58 @@ export class PROVClient extends BaseClient {
     return facets;
   }
 
-  private parseRecordDoc(doc: any): PROVRecord {
-    const getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
+  private parseRecordDoc(doc: PROVSolrDoc): PROVRecord {
+    const getFirst = <T>(val: T | T[] | undefined): T | undefined =>
+      Array.isArray(val) ? val[0] : val;
 
     return {
       id: doc._id ?? doc.id ?? '',
       title: doc.title ?? doc.name ?? 'Untitled',
       description: doc.presentation_text ?? doc['description.aggregate'] ?? undefined,
       series: doc.series_id ? `VPRS ${doc.series_id}` : undefined,
-      seriesTitle: getFirst(doc['is_part_of_series.title']) ?? undefined,
-      agency: getFirst(doc['agencies.ids']) ?? undefined,
-      agencyTitle: getFirst(doc['agencies.titles']) ?? undefined,
-      recordForm: getFirst(doc.record_form) ?? undefined,
-      startDate: doc.start_dt ?? undefined,
-      endDate: doc.end_dt ?? undefined,
-      iiifManifest: doc['iiif-manifest'] ?? undefined,
+      seriesTitle: getFirst(doc['is_part_of_series.title']),
+      agency: getFirst(doc['agencies.ids']),
+      agencyTitle: getFirst(doc['agencies.titles']),
+      recordForm: getFirst(doc.record_form),
+      startDate: doc.start_dt,
+      endDate: doc.end_dt,
+      iiifManifest: doc['iiif-manifest'],
       digitised: !!doc['iiif-manifest'],
       url: this.buildRecordUrl(doc),
     };
   }
 
-  private parseSeriesDoc(doc: any): PROVSeries {
-    const getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
+  private parseSeriesDoc(doc: PROVSolrDoc): PROVSeries {
+    const getFirst = <T>(val: T | T[] | undefined): T | undefined =>
+      Array.isArray(val) ? val[0] : val;
 
     // Extract description from function_content or other fields
-    const description = getFirst(doc.function_content) ?? doc.description ?? doc.scope_content ?? undefined;
+    const description = getFirst(doc.function_content) ?? doc.description ?? doc.scope_content;
 
     return {
       id: doc['identifier.PROV_ACM.id'] ?? `VPRS ${doc.series_id ?? doc.id}`,
       title: doc.title ?? doc.name ?? 'Untitled',
-      description: description,
+      description,
       agency: getFirst(doc.resp_agency_id) ? `VA ${getFirst(doc.resp_agency_id)}` : undefined,
-      agencyTitle: getFirst(doc.resp_agency_title) ?? undefined,
+      agencyTitle: getFirst(doc.resp_agency_title),
       dateRange: this.formatDateRange(doc.start_dt, doc.end_dt),
-      accessStatus: getFirst(doc.rights_status) ?? undefined,
-      itemCount: doc.item_count ?? undefined,
+      accessStatus: getFirst(doc.rights_status),
+      itemCount: doc.item_count,
     };
   }
 
-  private parseAgencyDoc(doc: any): PROVAgency {
-    const _getFirst = (val: any) => Array.isArray(val) ? val[0] : val;
-
+  private parseAgencyDoc(doc: PROVSolrDoc): PROVAgency {
     return {
       id: doc['identifier.PROV_ACM.id'] ?? doc.citation ?? `VA ${doc.VA}`,
       title: doc.title ?? doc.name ?? 'Untitled',
-      description: doc.description ?? doc.history ?? doc.scope_content ?? undefined,
+      description: doc.description ?? doc.history ?? doc.scope_content,
       dateRange: this.formatDateRange(doc.start_dt, doc.end_dt),
-      status: doc.status ?? undefined,
-      seriesCount: doc.series_count ?? undefined,
+      status: doc.status,
+      seriesCount: doc.series_count,
     };
   }
 
-  private buildRecordUrl(doc: any): string {
+  private buildRecordUrl(doc: PROVSolrDoc): string {
     const id = doc._id ?? doc.id;
     if (doc.series_id) {
       return `https://prov.vic.gov.au/archive/VPRS${doc.series_id}`;
@@ -339,22 +344,36 @@ export class PROVClient extends BaseClient {
     return `- ${end}`;
   }
 
-  private extractManifestTitle(manifest: any): string {
+  private extractManifestTitle(manifest: IIIFManifest): string {
     const label = manifest.label;
     if (typeof label === 'string') return label;
-    if (Array.isArray(label)) return label[0]?.['@value'] ?? label[0] ?? 'Untitled';
-    if (typeof label === 'object') {
+    if (Array.isArray(label)) {
+      const first = label[0];
+      if (typeof first === 'string') return first;
+      if (typeof first === 'object' && first !== null && '@value' in first) {
+        return (first as { '@value': string })['@value'];
+      }
+      return 'Untitled';
+    }
+    if (typeof label === 'object' && label !== null) {
       const values = Object.values(label)[0] as string[] | undefined;
       return values?.[0] ?? 'Untitled';
     }
     return 'Untitled';
   }
 
-  private extractManifestDescription(manifest: any): string | undefined {
+  private extractManifestDescription(manifest: IIIFManifest): string | undefined {
     const desc = manifest.description ?? manifest.summary;
     if (typeof desc === 'string') return desc;
-    if (Array.isArray(desc)) return desc[0]?.['@value'] ?? desc[0];
-    if (typeof desc === 'object') {
+    if (Array.isArray(desc)) {
+      const first = desc[0];
+      if (typeof first === 'string') return first;
+      if (typeof first === 'object' && first !== null && '@value' in first) {
+        return (first as { '@value': string })['@value'];
+      }
+      return undefined;
+    }
+    if (typeof desc === 'object' && desc !== null) {
       const values = Object.values(desc)[0] as string[] | undefined;
       return values?.[0];
     }
@@ -387,7 +406,7 @@ export class PROVClient extends BaseClient {
     return filter.size > 0 ? filter : null;
   }
 
-  private extractImageUrls(canvas: any): { thumbnail: string; medium: string; full: string } | null {
+  private extractImageUrls(canvas: IIIFCanvas): { thumbnail: string; medium: string; full: string } | null {
     let serviceUrl: string | undefined;
 
     // Try IIIF v2 structure
@@ -395,7 +414,9 @@ export class PROVClient extends BaseClient {
     if (images.length > 0) {
       const resource = images[0].resource;
       if (resource?.service) {
-        const service = Array.isArray(resource.service) ? resource.service[0] : resource.service;
+        const service: IIIFService | undefined = Array.isArray(resource.service)
+          ? resource.service[0]
+          : resource.service;
         serviceUrl = service?.['@id'] ?? service?.id;
       }
       if (!serviceUrl && resource?.['@id']) {
@@ -412,7 +433,9 @@ export class PROVClient extends BaseClient {
       const annotation = annotationPage?.items?.[0];
       const body = annotation?.body;
       if (body?.service) {
-        const service = Array.isArray(body.service) ? body.service[0] : body.service;
+        const service: IIIFService | undefined = Array.isArray(body.service)
+          ? body.service[0]
+          : body.service;
         serviceUrl = service?.['@id'] ?? service?.id;
       }
     }
